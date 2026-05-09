@@ -43,6 +43,17 @@ echo "==> Deploy: Standards are reference-only, nothing to deploy."
 echo "  Use 'mise run new <template> <target>' to create a project."
 '''
 
+[tasks."generate:dockerfile"]
+description = "Run pi in batch mode with the generate-dockerfile prompt"
+run = '''
+set -euo pipefail
+echo "==> Running pi to regenerate Dockerfile..."
+pi --batch --prompt "$(cat prompts/generate-dockerfile.md)"
+echo ""
+echo "==> Running static validation on the result..."
+./tests/validate-dockerfile.sh
+'''
+
 [tasks."templates:list"]
 description = "List available project templates"
 run = '''
