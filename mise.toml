@@ -27,13 +27,13 @@ echo "==> All templates present."
 '''
 
 [tasks.test]
-description = "Run tests (template validation)"
+description = "Run static Dockerfile validation + integration tests"
 run = '''
-echo "==> Running tests..."
-echo "  PASS: mise.toml present"
-echo "  PASS: AGENTS.md present"
-echo "  PASS: skills-lock.json present"
-echo "==> All tests passed."
+echo "==> Static validation..."
+./tests/validate-dockerfile.sh
+echo ""
+echo "==> Integration tests (docker build + smoke)..."
+./tests/test-dockerfile.sh "$@"
 '''
 
 [tasks.deploy]
