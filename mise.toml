@@ -48,7 +48,7 @@ description = "Run pi in batch mode with the generate-dockerfile prompt"
 run = '''
 set -euo pipefail
 echo "==> Running pi to regenerate Dockerfile..."
-pi --batch --prompt "$(cat prompts/generate-dockerfile.md)"
+pi -p "$(cat prompts/generate-dockerfile.md)"
 echo ""
 echo "==> Running static validation on the result..."
 ./tests/validate-dockerfile.sh
