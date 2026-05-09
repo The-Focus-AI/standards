@@ -36,12 +36,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # --------------- non-root user ---------------
-RUN useradd --create-home --shell /bin/bash ${WORKER_USER}
-
-# --------------- copy standards + workdir (as root, then chown) ---------------
-COPY . /standards
-RUN mkdir -p /app && \
-    chown -R ${WORKER_USER}:${WORKER_USER} /standards /app
+RUN useradd --create-home --shell /bin/bash ${WORKER_USER} && \
+    mkdir -p /app /standards && \
+    chown ${WORKER_USER}:${WORKER_USER} /app /standards
 
 USER ${WORKER_USER}
 WORKDIR /home/${WORKER_USER}
@@ -80,17 +77,18 @@ RUN printf '%s\n' \
 # Requires root — done as a final root step below.
 
 # --------------- working directory ---------------
-# /app is where project code gets mounted or created at runtime.
 WORKDIR /app
 
 # --------------- root steps (linger) ---------------
 USER root
-# Enable linger so systemd user services persist across SSH sessions
 RUN mkdir -p /var/lib/systemd/linger && \
     touch /var/lib/systemd/linger/${WORKER_USER}
+
+# --------------- copy standards (at the end — cache-friendly) ---------------
+COPY . /standards
+RUN chown -R ${WORKER_USER}:${WORKER_USER} /standards
 
 USER ${WORKER_USER}
 
 # --------------- entrypoint ---------------
-# Default: bash shell with everything activated
 CMD ["/bin/bash", "-l"]
