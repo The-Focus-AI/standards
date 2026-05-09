@@ -40,6 +40,9 @@ RUN useradd --create-home --shell /bin/bash ${WORKER_USER}
 USER ${WORKER_USER}
 WORKDIR /home/${WORKER_USER}
 
+# All RUN commands below need bash (mise activate output uses bash syntax)
+SHELL ["/bin/bash", "-c"]
+
 # --------------- mise ---------------
 RUN curl https://mise.run | sh
 
