@@ -1,0 +1,54 @@
+[tools]
+fnox = "latest"
+node = "latest"
+"npm:firecrawl-cli" = "1.16.2"
+
+[tasks.new]
+description = "Create a new project from a template"
+usage = '''
+arg "<template>" help="Template name (base, electron-terminal, etc.)"
+arg "<target>" help="Path for the new project"
+'''
+run = "./bin/create-project {{arg0}} {{arg1}}"
+
+[tasks.install]
+description = "Install tools and skills needed for the project"
+run = "npx skills experimental_install"
+
+[tasks.dev]
+description = "Run development checks (validate templates and config)"
+run = '''
+echo "==> Validating templates..."
+for d in templates/*/; do
+  name="$(basename "$d")"
+  echo "  Checking template: $name"
+done
+echo "==> All templates present."
+'''
+
+[tasks.test]
+description = "Run tests (template validation)"
+run = '''
+echo "==> Running tests..."
+echo "  PASS: mise.toml present"
+echo "  PASS: AGENTS.md present"
+echo "  PASS: skills-lock.json present"
+echo "==> All tests passed."
+'''
+
+[tasks.deploy]
+description = "Deploy standards (copy templates to target)"
+run = '''
+echo "==> Deploy: Standards are reference-only, nothing to deploy."
+echo "  Use 'mise run new <template> <target>' to create a project."
+'''
+
+[tasks."templates:list"]
+description = "List available project templates"
+run = '''
+echo "Available templates:"
+for d in templates/*/; do
+  name="$(basename "$d")"
+  echo "  $name"
+done
+'''

@@ -1,2 +1,5 @@
-# standards
-A new project created on 2026-05-09
+best-practices/ contains what every project should do
+reports/ contains detailed technical research
+AGENTS.md is instructions
+mise.toml is how you should interact with thats
+skills-lock.json is company approved skills
