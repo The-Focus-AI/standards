@@ -37,6 +37,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # --------------- non-root user ---------------
 RUN useradd --create-home --shell /bin/bash ${WORKER_USER}
+
+# --------------- copy standards + workdir (as root, then chown) ---------------
+COPY . /standards
+RUN mkdir -p /app && \
+    chown -R ${WORKER_USER}:${WORKER_USER} /standards /app
+
 USER ${WORKER_USER}
 WORKDIR /home/${WORKER_USER}
 
@@ -73,15 +79,8 @@ RUN printf '%s\n' \
 # Best practice: loginctl enable-linger for long-running user services.
 # Requires root — done as a final root step below.
 
-# --------------- clone standards into /standards ---------------
-RUN git clone https://github.com/The-Focus-AI/standards.git /standards
-
 # --------------- working directory ---------------
-# /app is where project code gets mounted or created.
-# The Dockerfile doesn't create it here because it's meant to be
-# a volume mount point at runtime. But we pre-set WORKDIR so you
-# land there on container start.
-RUN mkdir -p /app
+# /app is where project code gets mounted or created at runtime.
 WORKDIR /app
 
 # --------------- root steps (linger) ---------------
