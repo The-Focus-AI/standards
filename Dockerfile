@@ -12,7 +12,7 @@
 # Run (app mode — mounts a project at /app):
 #   docker run -it -v $(pwd):/app focus-ai-standards
 
-FROM ubuntu:24.04
+FROM debian:stable-slim
 
 ARG DEBIAN_FRONTEND=noninteractive
 ARG WORKER_USER=worker_user
