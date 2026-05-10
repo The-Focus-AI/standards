@@ -1,4 +1,14 @@
 {
-  "npmCommand": ["mise", "exec", "node", "--", "npm"],
-  "sessionDir": ".pi/sessions"
+  "npmCommand": [
+    "mise",
+    "exec",
+    "node",
+    "--",
+    "npm"
+  ],
+  "sessionDir": ".pi/sessions",
+  "packages": [
+    "git:github.com/offline-ant/pi-tmux",
+    "npm:pi-powerline-footer"
+  ]
 }

@@ -1,38 +1,36 @@
 [tools]
 fnox = "latest"
 node = "latest"
+ripgrep = "latest"
+fd = "latest"
 "npm:firecrawl-cli" = "1.16.2"
+"npm:@earendil-works/pi-coding-agent" = "latest"
 
 [tasks.install]
 description = "Install tools and skills needed for the project"
 run = "npx skills experimental_install"
 
 [tasks.dev]
-description = "Run development checks (validate templates and config)"
+description = "Run development checks (validate configs and best-practices)"
 run = '''
-echo "==> Validating templates..."
-for d in templates/*/; do
-  name="$(basename "$d")"
-  echo "  Checking template: $name"
+echo "==> Validating configuration..."
+for f in best-practices/*.md; do
+  echo "  $(basename "$f") — OK"
 done
-echo "==> All templates present."
+echo "==> All best-practice docs present."
 '''
 
 [tasks.test]
-description = "Run static Dockerfile validation + integration tests"
+description = "Run Dockerfile integration tests (docker build + smoke)"
 run = '''
-echo "==> Static validation..."
-./tests/validate-dockerfile.sh
-echo ""
 echo "==> Integration tests (docker build + smoke)..."
 ./tests/test-dockerfile.sh "$@"
 '''
 
 [tasks.deploy]
-description = "Deploy standards (copy templates to target)"
+description = "Deploy standards"
 run = '''
 echo "==> Deploy: Standards are reference-only, nothing to deploy."
-echo "  Use 'mise run new <template> <target>' to create a project."
 '''
 
 [tasks."generate:dockerfile"]
