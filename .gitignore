@@ -1,6 +1,16 @@
 node_modules/
+out/
+dist/
+dist-installer/
 .agents
 .firecrawl/
+.fnox/
+*.env
+*.env.local
 .pi/sessions/
 .pi/npm/
 .pi/git/
+.pi/skills/
+.agents/skills/
+.DS_Store
+*.log

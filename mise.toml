@@ -6,6 +6,42 @@ fd = "latest"
 "npm:firecrawl-cli" = "1.16.2"
 "npm:@earendil-works/pi-coding-agent" = "latest"
 
+[env]
+_.file = ".fnox/env"
+
+[tasks.setup]
+description = "First-time onboarding: pulls SA token from 1Password into .fnox/env"
+run = '''
+set -euo pipefail
+mkdir -p .fnox && chmod 700 .fnox
+if [ -f .fnox/env ]; then
+  echo "✓ .fnox/env already exists — skipping"
+  exit 0
+fi
+TOKEN="$(op read 'op://thefocus/standards service account token/credential')"
+printf 'OP_SERVICE_ACCOUNT_TOKEN=%s\n' "$TOKEN" > .fnox/env
+chmod 600 .fnox/env
+echo "✓ .fnox/env written. Open a new shell tab."
+'''
+
+[tasks."secrets:check"]
+description = "Verify every declared secret resolves cleanly"
+run = "fnox check"
+
+[tasks."secrets:list"]
+description = "List all declared secrets and where they resolve from"
+run = "fnox list"
+
+[tasks."secrets:rotate-token"]
+description = "Re-pull SA token from 1Password (overwrites .fnox/env)"
+run = '''
+set -euo pipefail
+TOKEN="$(op read 'op://thefocus/standards service account token/credential')"
+printf 'OP_SERVICE_ACCOUNT_TOKEN=%s\n' "$TOKEN" > .fnox/env
+chmod 600 .fnox/env
+echo "✓ .fnox/env refreshed."
+'''
+
 [tasks.install]
 description = "Install tools and skills needed for the project"
 run = "npx skills experimental_install"
