@@ -86,8 +86,8 @@ echo ""
 echo "==> Identity and filesystem"
 echo ""
 
-check     "whoami is worker_user" \
-          bash -c 'user=$(docker exec "$1" whoami 2>/dev/null); [ "$user" = "worker_user" ]' -- "$CONTAINER"
+check     "whoami is agent" \
+          bash -c 'user=$(docker exec "$1" whoami 2>/dev/null); [ "$user" = "agent" ]' -- "$CONTAINER"
 
 check     "/standards exists" \
           bash -c 'docker exec "$1" test -d /standards' -- "$CONTAINER"
@@ -98,6 +98,9 @@ check     "/standards/AGENTS.md readable" \
 check     "/app exists and is writable" \
           bash -c 'docker exec "$1" test -d /app && docker exec "$1" test -w /app' -- "$CONTAINER"
 
+check     "/app is empty (no pre-population)" \
+          bash -c 'docker exec "$1" bash -c "ls -A /app 2>/dev/null | wc -l | xargs test 0 -eq"' -- "$CONTAINER"
+
 echo ""
 
 # ============================================================
@@ -106,24 +109,35 @@ echo ""
 echo "==> Tool availability"
 echo ""
 
-for tool in mise fnox node git tmux gh zsh curl bash; do
+# Tools baked into the image (mise + system packages)
+for tool in mise git tmux gh curl bash; do
   check     "$tool is on PATH" \
             bash -c 'docker exec "$1" bash -l -c "command -v '"$tool"'" 2>/dev/null | grep -q .' -- "$CONTAINER"
 done
 
+# Tools NOT baked — require `mise install` at runtime
+check_not "node NOT on PATH (needs mise install)" \
+          bash -c 'docker exec "$1" bash -l -c "command -v node" 2>/dev/null | grep -q .' -- "$CONTAINER"
+
+check_not "fnox NOT on PATH (needs mise install)" \
+          bash -c 'docker exec "$1" bash -l -c "command -v fnox" 2>/dev/null | grep -q .' -- "$CONTAINER"
+
+check_not "pi NOT on PATH (needs mise install)" \
+          bash -c 'docker exec "$1" bash -l -c "command -v pi" 2>/dev/null | grep -q .' -- "$CONTAINER"
+
+check_not "zsh NOT installed (bash only)" \
+          bash -c 'docker exec "$1" bash -l -c "command -v zsh" 2>/dev/null | grep -q .' -- "$CONTAINER"
+
 echo ""
 
 # ============================================================
-# Step 5: Mise tool versions
+# Step 5: Mise trust
 # ============================================================
-echo "==> Mise tools"
+echo "==> Mise trust"
 echo ""
 
-check     "mise lists node" \
-          bash -c 'docker exec "$1" bash -l -c "mise ls node 2>/dev/null | grep -q node"' -- "$CONTAINER"
-
-check     "mise lists fnox" \
-          bash -c 'docker exec "$1" bash -l -c "mise ls fnox 2>/dev/null | grep -q fnox"' -- "$CONTAINER"
+check     "/standards is trusted by mise" \
+          bash -c 'docker exec "$1" bash -l -c "cd /standards && mise trust 2>&1" | grep -q "trusted"' -- "$CONTAINER"
 
 echo ""
 
@@ -134,24 +148,30 @@ echo "==> Shell activation"
 echo ""
 
 check     ".bashrc has mise activate" \
-          bash -c 'docker exec "$1" grep -q "mise activate bash" /home/worker_user/.bashrc' -- "$CONTAINER"
+          bash -c 'docker exec "$1" grep -q "mise activate bash" /home/agent/.bashrc' -- "$CONTAINER"
 
-check     ".bashrc has fnox activate" \
-          bash -c 'docker exec "$1" grep -q "fnox activate bash" /home/worker_user/.bashrc' -- "$CONTAINER"
+check     ".bash_profile has mise activate" \
+          bash -c 'docker exec "$1" grep -q "mise activate bash" /home/agent/.bash_profile' -- "$CONTAINER"
 
 echo ""
 
 # ============================================================
-# Step 7: Pi agent
+# Step 7: Dotfiles
 # ============================================================
-echo "==> Pi agent"
+echo "==> Dotfiles"
 echo ""
 
-check     "pi is on PATH" \
-          bash -c 'docker exec "$1" bash -l -c "command -v pi" 2>/dev/null | grep -q .' -- "$CONTAINER"
+check     "~/.tmux.conf exists" \
+          bash -c 'docker exec "$1" test -f /home/agent/.tmux.conf' -- "$CONTAINER"
 
-check     "pi --version prints" \
-          bash -c 'docker exec "$1" bash -l -c "pi --version 2>&1" | grep -q .' -- "$CONTAINER"
+check     "tmux conf has mouse mode" \
+          bash -c 'docker exec "$1" grep -q "set -g mouse on" /home/agent/.tmux.conf' -- "$CONTAINER"
+
+check     "git user.name is TheFocus.AI" \
+          bash -c 'docker exec "$1" git config --global user.name 2>/dev/null | grep -q "TheFocus.AI"' -- "$CONTAINER"
+
+check     "git user.email is agent@thefocus.ai" \
+          bash -c 'docker exec "$1" git config --global user.email 2>/dev/null | grep -q "agent@thefocus.ai"' -- "$CONTAINER"
 
 echo ""
 
@@ -185,8 +205,8 @@ check_not "No npm install -g in Dockerfile" \
 check_not "No pip install in Dockerfile" \
           bash -c 'docker exec "$1" grep -q "pip install" /standards/Dockerfile' -- "$CONTAINER"
 
-check     ".gitignore covers .agents" \
-          bash -c 'docker exec "$1" grep -q "\.agents" /app/.gitignore' -- "$CONTAINER"
+check_not "/app has no .gitignore (intentionally bare)" \
+          bash -c 'docker exec "$1" test -f /app/.gitignore' -- "$CONTAINER"
 
 echo ""
 

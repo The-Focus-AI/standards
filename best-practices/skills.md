@@ -8,6 +8,7 @@ The following should be installed on all projects
 - The-Focus-AI/nano-banana-cli - nano-banana-videogen
 - The-Focus-AI/focus-agents
 - firecrawl/cli
+- vercel-labs/skills@find-skills 
 
 # Running a browser
 

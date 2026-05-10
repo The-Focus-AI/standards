@@ -7,3 +7,5 @@ And then these are installed using pi install -l
 
 - git:github.com/offline-ant/pi-tmux
 - npm:pi-powerline-footer
+- npm:pi-web-access
+- npm:pi-lens

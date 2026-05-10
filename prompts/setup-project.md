@@ -33,8 +33,8 @@ runnable with `mise dev` after setup.
   - `sessionDir`: `".pi/sessions"`
 
 ### 4. Install pi extensions (always use -l for project-local)
-- `pi install -l git:github.com/offline-ant/pi-tmux`
-- `pi install -l npm:pi-powerline-footer`
+
+These are defined in @best-practices/pi-extensions.md
 
 ### 5. Write mise.toml tasks
 - Add `[tasks]` section with these required tasks:
@@ -62,12 +62,10 @@ runnable with `mise dev` after setup.
 - Never write actual secret values — only the mappings to 1Password items
 
 ### 9. Install skills (each command separately — npx skills add only processes one source at a time)
-- `npx skills add -y The-Focus-AI/nano-banana-cli`
-- `npx skills add -y The-Focus-AI/focus-agents`
-- `npx skills add -y firecrawl/cli`
-- `npx skills add -y The-Focus-AI/chrome-driver`
-- `npx skills add -y zeke/swiss-design-skill`
-- `npx skills add -y The-Focus-AI/focus-ai-brand`
+
+Skills are defined in best-practices/skills.md
+
+Information on how to use it in reports/
 
 ### 10. Write AGENTS.md
 - Copy and adapt from the standards `AGENTS.md`
