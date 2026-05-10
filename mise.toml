@@ -3,14 +3,6 @@ fnox = "latest"
 node = "latest"
 "npm:firecrawl-cli" = "1.16.2"
 
-[tasks.new]
-description = "Create a new project from a template"
-usage = '''
-arg "<template>" help="Template name (base, electron-terminal, etc.)"
-arg "<target>" help="Path for the new project"
-'''
-run = "./bin/create-project {{arg0}} {{arg1}}"
-
 [tasks.install]
 description = "Install tools and skills needed for the project"
 run = "npx skills experimental_install"
@@ -47,19 +39,39 @@ echo "  Use 'mise run new <template> <target>' to create a project."
 description = "Run pi in batch mode with the generate-dockerfile prompt"
 run = '''
 set -euo pipefail
-echo "==> Running pi to regenerate Dockerfile..."
-pi -p "$(cat prompts/generate-dockerfile.md)"
-echo ""
-echo "==> Running static validation on the result..."
-./tests/validate-dockerfile.sh
-'''
 
-[tasks."templates:list"]
-description = "List available project templates"
-run = '''
-echo "Available templates:"
-for d in templates/*/; do
-  name="$(basename "$d")"
-  echo "  $name"
-done
+echo "==> Generating Dockerfile (streaming progress)..."
+echo ""
+
+pi --mode json -p "$(cat prompts/generate-dockerfile.md)" 2>/dev/null | jq -R -r '
+  fromjson? |
+  if .type == "tool_execution_start" then
+    if .toolName == "read" then
+      "\n📖 read: \(.args.path // "?")"
+    elif .toolName == "bash" then
+      "\n🔧 run: \(.args.command // "?" | split("\n")[0])"
+    elif .toolName == "write" then
+      "\n✏️  write: \(.args.path // "?")"
+    elif .toolName == "edit" then
+      "\n✏️  edit: \(.args.path // "?")"
+    else
+      "\n⚙️  \(.toolName)"
+    end
+  elif .type == "tool_execution_end" then
+    if .isError then "  ❌ FAILED" else "  ✓" end
+  elif .type == "message_update" then
+    if .assistantMessageEvent.type == "thinking_delta" then
+      "💭 \(.assistantMessageEvent.delta)"
+    elif .assistantMessageEvent.type == "text_delta" then
+      .assistantMessageEvent.delta
+    else empty end
+  elif .type == "agent_end" then
+    "\n==> Done."
+  else
+    empty
+  end
+'
+
+echo ""
+echo "Run 'mise test' to validate, or 'docker build -t standards .' to build."
 '''

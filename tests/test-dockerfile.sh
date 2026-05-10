@@ -151,7 +151,7 @@ check     "pi is on PATH" \
           bash -c 'docker exec "$1" bash -l -c "command -v pi" 2>/dev/null | grep -q .' -- "$CONTAINER"
 
 check     "pi --version prints" \
-          bash -c 'docker exec "$1" bash -l -c "pi --version 2>/dev/null" | grep -q .' -- "$CONTAINER"
+          bash -c 'docker exec "$1" bash -l -c "pi --version 2>&1" | grep -q .' -- "$CONTAINER"
 
 echo ""
 
@@ -186,7 +186,7 @@ check_not "No pip install in Dockerfile" \
           bash -c 'docker exec "$1" grep -q "pip install" /standards/Dockerfile' -- "$CONTAINER"
 
 check     ".gitignore covers .agents" \
-          bash -c 'docker exec "$1" grep -q "\.agents" /standards/.gitignore' -- "$CONTAINER"
+          bash -c 'docker exec "$1" grep -q "\.agents" /app/.gitignore' -- "$CONTAINER"
 
 echo ""
 

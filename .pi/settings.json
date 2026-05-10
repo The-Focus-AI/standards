@@ -1,0 +1,4 @@
+{
+  "npmCommand": ["mise", "exec", "node", "--", "npm"],
+  "sessionDir": ".pi/sessions"
+}
