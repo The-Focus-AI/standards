@@ -23,22 +23,26 @@ The Dockerfile is the only artifact — write the file, do not explain.
 
 Install these packages (and only these) via `apt-get`:
 `curl`, `ca-certificates`, `git`, `tmux`, `unzip`, `build-essential`.
-Also install **GitHub CLI** (`gh`) — it requires its own apt repo (see the
-existing package registration pattern).
+
+Do **not** install **GitHub CLI** (`gh`) via `apt-get` or an apt repository.
 
 Do NOT install zsh. Bash is the only shell.
 
 ### mise
 
-- `mise` is the **only** tooling dependency baked into the image. Everything
-  else (Node, pi, fnox, firecrawl-cli, etc.) flows from `mise install` inside
-  `/standards` at runtime.
+- `mise` is the primary tooling dependency baked into the image. **GitHub CLI**
+  (`gh`) is the only exception and must be installed through project-scoped
+  `mise use gh@latest`. Everything else (Node, pi, fnox, firecrawl-cli, etc.)
+  flows from `mise install` inside `/standards` at runtime.
 - Install mise via `curl https://mise.run | sh` as the `agent` user. This lands
   the binary at `/home/agent/.local/bin/mise`. Add `/home/agent/.local/bin` to
   `PATH` via ENV.
 - **Do NOT run `mise install` at build time.** The user runs it manually.
 - **Do run `mise trust /standards` at build time** so the user doesn't hit a
   trust prompt at runtime.
+- Install **GitHub CLI** (`gh`) via project-scoped mise after copying
+  `/standards`: `cd /standards && mise use gh@latest`. This may update the
+  repo's mise config in the image; do not use apt for `gh`.
 - **NEVER use `mise -g` (global).** All mise operations are project-scoped.
 
 ### Shell activation
@@ -90,11 +94,13 @@ The generated Dockerfile must include comments at the top documenting:
 2. **Run (interactive shell with LLM keys):**
    `docker run -it --rm -v ~/.pi:/home/agent/.pi focus-ai-standards-agent`
 3. **First steps inside the container:**
+
    ```bash
    cd /standards
    mise install
    pi -p prompts/setup-project.md   # follow the prompt to scaffold /app
    ```
+
 4. Explanation that `~/.pi` is mounted to give pi access to the host's LLM
    API keys, and that sessions are ephemeral (lost when the container exits).
 

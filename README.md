@@ -27,27 +27,28 @@ Sessions are ephemeral — lost when the container exits. Mount a volume to
 
 ## What's Inside
 
-| Path | Purpose |
-|------|---------|
-| `AGENTS.md` | Mandatory tools, constraints, task structure for pi agents |
-| `mise.toml` | Tool declarations (mise is the only dependency — everything else flows from here) |
-| `Dockerfile` | Minimal container: `debian:stable-slim`, mise, bash, tmux, git, gh. `/app` is left empty for your project. |
-| `skills-lock.json` | Company-approved skills (locked hashes for reproducibility) |
-| `best-practices/` | Deployment, security, skills, pi extensions, project organization |
-| `prompts/` | Pi prompts — `setup-project.md` scaffolds new projects, `generate-dockerfile.md` regenerates this Dockerfile |
-| `reports/` | Technical research (fnox secrets reference, npx skills CLI guide, electron shell) |
-| `tests/` | Dockerfile integration tests — `mise test` validates the image |
-| `architecture/` | Design documents — PRDs and decision records |
-| `.pi/settings.json` | Project-local pi config (npmCommand routes through mise, sessionDir keeps sessions local) |
-| `.agents/skills/` | Installed skill files (managed by `npx skills install`) |
+| Path                | Purpose                                                                                                      |
+| ------------------- | ------------------------------------------------------------------------------------------------------------ |
+| `AGENTS.md`         | Mandatory tools, constraints, task structure for pi agents                                                   |
+| `mise.toml`         | Tool declarations (mise is the only dependency — everything else flows from here)                            |
+| `Dockerfile`        | Minimal container: `debian:stable-slim`, mise, bash, tmux, git, gh. `/app` is left empty for your project.   |
+| `skills-lock.json`  | Company-approved skills (locked hashes for reproducibility)                                                  |
+| `best-practices/`   | Deployment, security, skills, pi extensions, project organization                                            |
+| `prompts/`          | Pi prompts — `setup-project.md` scaffolds new projects, `generate-dockerfile.md` regenerates this Dockerfile |
+| `reports/`          | Technical research (fnox secrets reference, npx skills CLI guide, electron shell)                            |
+| `tests/`            | Dockerfile integration tests — `mise test` validates the image                                               |
+| `architecture/`     | Design documents — PRDs and decision records                                                                 |
+| `.pi/settings.json` | Project-local pi config (npmCommand routes through mise, sessionDir keeps sessions local)                    |
+| `.agents/skills/`   | Installed skill files (managed by `npx skills install`)                                                      |
 
 ## Tasks
 
 ```bash
 mise install           # Install all tools (one-time, or after mise.toml changes)
-mise run generate:dockerfile   # Regenerate the Dockerfile via pi
+mise lint              # Run linters (markdownlint, mise doctor, fnox check)
 mise test              # Build and validate the Docker image
-mise dev               # Validate best-practice docs
+mise dev               # Run lint + test
+mise run generate:dockerfile   # Regenerate the Dockerfile via pi
 ```
 
 ## Design Philosophy

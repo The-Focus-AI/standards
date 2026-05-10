@@ -5,6 +5,8 @@ ripgrep = "latest"
 fd = "latest"
 "npm:firecrawl-cli" = "1.16.2"
 "npm:@earendil-works/pi-coding-agent" = "latest"
+"npm:markdownlint-cli2" = "latest"
+gh = "latest"
 
 [env]
 _.file = ".fnox/env"
@@ -47,13 +49,40 @@ description = "Install tools and skills needed for the project"
 run = "npx skills experimental_install"
 
 [tasks.dev]
-description = "Run development checks (validate configs and best-practices)"
+description = "Run lint + test in development mode"
 run = '''
-echo "==> Validating configuration..."
-for f in best-practices/*.md; do
-  echo "  $(basename "$f") — OK"
-done
-echo "==> All best-practice docs present."
+set -euo pipefail
+mise run lint
+mise run test
+'''
+
+[tasks.lint]
+description = "Run all linters (markdownlint, mise doctor, fnox check)"
+run = '''
+set -euo pipefail
+echo "==> Linting markdown..."
+npx markdownlint-cli2 "**/*.md" "#node_modules" "#.pi" "#.agents" || {
+  echo "  ✗ Markdown lint failed"
+  exit 1
+}
+echo "  ✓ Markdown OK"
+echo ""
+echo "==> Validating mise config..."
+mise doctor
+echo "  ✓ mise config OK"
+echo ""
+echo "==> Checking fnox secrets..."
+fnox check
+echo "  ✓ fnox secrets OK"
+'''
+
+[tasks."lint:fix"]
+description = "Auto-fix markdown lint violations"
+run = '''
+set -euo pipefail
+echo "==> Auto-fixing markdown..."
+npx markdownlint-cli2 --fix "**/*.md" "#node_modules" "#.pi" "#.agents"
+echo "  ✓ Fixes applied"
 '''
 
 [tasks.test]

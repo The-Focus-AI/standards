@@ -1,6 +1,6 @@
-Install pi agents locally
+# Pi extensions
 
-Make sure that pi is installed using 
+Make sure that pi is installed using
 mise use npm:@earendil-works/pi-coding-agent
 
 And then these are installed using pi install -l

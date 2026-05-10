@@ -8,7 +8,7 @@ The following should be installed on all projects
 - The-Focus-AI/nano-banana-cli - nano-banana-videogen
 - The-Focus-AI/focus-agents
 - firecrawl/cli
-- vercel-labs/skills@find-skills 
+- vercel-labs/skills@find-skills
 
 # Running a browser
 
@@ -16,5 +16,5 @@ The following should be installed on all projects
 
 # Design
 
-- zeke/swiss-design-skill  -- general design 
+- zeke/swiss-design-skill  -- general design
 - The-Focus-AI/focus-ai-brand -- focus specifically
