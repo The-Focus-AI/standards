@@ -49,6 +49,7 @@ mise lint              # Run linters (markdownlint, mise doctor, fnox check)
 mise test              # Build and validate the Docker image
 mise dev               # Run lint + test
 mise run generate:dockerfile   # Regenerate the Dockerfile via pi
+./scripts/setup-default-project.sh ../my-project   # Copy default project files, run mise install, install locked skills
 ```
 
 ## Design Philosophy

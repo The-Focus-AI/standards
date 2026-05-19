@@ -1,0 +1,91 @@
+[tools]
+node = "22"
+"npm:pnpm" = "latest"
+fnox = "latest"
+gh = "latest"
+ripgrep = "latest"
+fd = "latest"
+"npm:@earendil-works/pi-coding-agent" = "latest"
+"npm:markdownlint-cli2" = "latest"
+
+[env]
+_.file = ".fnox/env"
+
+[tasks.setup]
+description = "First-time local setup"
+run = '''
+set -euo pipefail
+mkdir -p .fnox
+chmod 700 .fnox
+if [ ! -f .fnox/env ]; then
+  touch .fnox/env
+  chmod 600 .fnox/env
+  echo "Created .fnox/env. Add OP_SERVICE_ACCOUNT_TOKEN or other local bootstrap values if needed."
+else
+  echo ".fnox/env already exists"
+fi
+'''
+
+[tasks.install]
+description = "Install project dependencies, pi packages, and locked agent skills"
+run = '''
+set -euo pipefail
+if [ -f package.json ]; then
+  pnpm install --frozen-lockfile || pnpm install
+fi
+npx skills experimental_install
+'''
+
+[tasks.dev]
+description = "Run development checks"
+run = '''
+set -euo pipefail
+mise run lint
+mise run test
+'''
+
+[tasks.lint]
+description = "Run linters"
+run = '''
+set -euo pipefail
+if [ -f package.json ] && pnpm run | grep -q "^[[:space:]]*lint"; then
+  pnpm run lint
+elif command -v markdownlint-cli2 >/dev/null 2>&1; then
+  markdownlint-cli2 "**/*.md" "#node_modules" "#.pi" "#.agents" || true
+else
+  echo "No linter configured yet"
+fi
+if [ -f fnox.toml ]; then
+  fnox check
+fi
+'''
+
+[tasks.test]
+description = "Run tests/typechecks"
+run = '''
+set -euo pipefail
+if [ -f package.json ] && pnpm run | grep -q "^[[:space:]]*test"; then
+  pnpm run test
+else
+  echo "No test command configured yet"
+fi
+'''
+
+[tasks.deploy]
+description = "Build or deploy the project"
+run = '''
+set -euo pipefail
+if [ -f package.json ] && pnpm run | grep -q "^[[:space:]]*build"; then
+  pnpm run build
+else
+  echo "No deploy/build command configured yet"
+fi
+'''
+
+[tasks."secrets:check"]
+description = "Verify declared secrets resolve"
+run = "fnox check"
+
+[tasks."secrets:list"]
+description = "List declared secrets"
+run = "fnox list"
