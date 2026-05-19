@@ -11,6 +11,7 @@
     "git:github.com/offline-ant/pi-tmux",
     "npm:pi-powerline-footer",
     "npm:pi-web-access",
-    "npm:pi-lens"
+    "npm:pi-lens",
+    "git:github.com/The-Focus-AI/pi-local-models"
   ]
 }

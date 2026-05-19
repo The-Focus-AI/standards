@@ -1,0 +1,49 @@
+models:
+  gemma-4-31B-it-Q4_K_M:
+    path: /Users/wschenk/.cache/huggingface/hub/models--ggml-org--gemma-4-31B-it-GGUF/snapshots/fb5801c702a472691c6eba168f28af79a076fbe9/gemma-4-31B-it-Q4_K_M.gguf
+    proxy_chat: /v1/chat/completions
+    cmd: llama-server --model
+      /Users/wschenk/.cache/huggingface/hub/models--ggml-org--gemma-4-31B-it-GGUF/snapshots/fb5801c702a472691c6eba168f28af79a076fbe9/gemma-4-31B-it-Q4_K_M.gguf
+      --host 127.0.0.1 --port ${PORT} --ctx-size 8192 --n-gpu-layers 0
+  GLM-4.7-Flash-Q4_K_M:
+    path: /Users/wschenk/.cache/huggingface/hub/models--unsloth--GLM-4.7-Flash-GGUF/snapshots/0d32489ecb9db6d2a4fc93bd27ef01519f95474d/GLM-4.7-Flash-Q4_K_M.gguf
+    proxy_chat: /v1/chat/completions
+    cmd: llama-server --model
+      /Users/wschenk/.cache/huggingface/hub/models--unsloth--GLM-4.7-Flash-GGUF/snapshots/0d32489ecb9db6d2a4fc93bd27ef01519f95474d/GLM-4.7-Flash-Q4_K_M.gguf
+      --host 127.0.0.1 --port ${PORT} --ctx-size 8192 --n-gpu-layers 0
+  Qwen3.6-27B-Q4_K_M:
+    path: /Users/wschenk/.cache/huggingface/hub/models--unsloth--Qwen3.6-27B-GGUF/snapshots/82d411acf4a06cfb8d9b073a5211bf410bfc29bf/Qwen3.6-27B-Q4_K_M.gguf
+    proxy_chat: /v1/chat/completions
+    cmd: llama-server --model
+      /Users/wschenk/.cache/huggingface/hub/models--unsloth--Qwen3.6-27B-GGUF/snapshots/82d411acf4a06cfb8d9b073a5211bf410bfc29bf/Qwen3.6-27B-Q4_K_M.gguf
+      --host 127.0.0.1 --port ${PORT} --ctx-size 8192 --n-gpu-layers 0
+  gemma-4-26B-A4B-it-Q4_K_M:
+    path: /Users/wschenk/.cache/huggingface/hub/models--ggml-org--gemma-4-26B-A4B-it-GGUF/snapshots/ae4d537a6345467d1c86bb5cc0d4505ff3ebe0f3/gemma-4-26B-A4B-it-Q4_K_M.gguf
+    proxy_chat: /v1/chat/completions
+    cmd: llama-server --model
+      /Users/wschenk/.cache/huggingface/hub/models--ggml-org--gemma-4-26B-A4B-it-GGUF/snapshots/ae4d537a6345467d1c86bb5cc0d4505ff3ebe0f3/gemma-4-26B-A4B-it-Q4_K_M.gguf
+      --host 127.0.0.1 --port ${PORT} --ctx-size 8192 --n-gpu-layers 0
+  gpt-oss-20b-mxfp4:
+    path: /Users/wschenk/.cache/huggingface/hub/models--ggml-org--gpt-oss-20b-GGUF/snapshots/e1dc459feff949ff451ce107337a2026daa80df8/gpt-oss-20b-mxfp4.gguf
+    proxy_chat: /v1/chat/completions
+    cmd: llama-server --model
+      /Users/wschenk/.cache/huggingface/hub/models--ggml-org--gpt-oss-20b-GGUF/snapshots/e1dc459feff949ff451ce107337a2026daa80df8/gpt-oss-20b-mxfp4.gguf
+      --host 127.0.0.1 --port ${PORT} --ctx-size 8192 --n-gpu-layers 0
+  gemma-4-E4B-it-Q4_K_M:
+    path: /Users/wschenk/.cache/huggingface/hub/models--ggml-org--gemma-4-E4B-it-GGUF/snapshots/2714b5519c6c3516b1000e7c5e1eba998dfe1fe8/gemma-4-E4B-it-Q4_K_M.gguf
+    proxy_chat: /v1/chat/completions
+    cmd: llama-server --model
+      /Users/wschenk/.cache/huggingface/hub/models--ggml-org--gemma-4-E4B-it-GGUF/snapshots/2714b5519c6c3516b1000e7c5e1eba998dfe1fe8/gemma-4-E4B-it-Q4_K_M.gguf
+      --host 127.0.0.1 --port ${PORT} --ctx-size 8192 --n-gpu-layers 0
+  gemma-4-E2B-it-Q4_K_M:
+    path: /Users/wschenk/.cache/huggingface/hub/models--unsloth--gemma-4-E2B-it-GGUF/snapshots/f064409f340b34190993560b2168133e5dbae558/gemma-4-E2B-it-Q4_K_M.gguf
+    proxy_chat: /v1/chat/completions
+    cmd: llama-server --model
+      /Users/wschenk/.cache/huggingface/hub/models--unsloth--gemma-4-E2B-it-GGUF/snapshots/f064409f340b34190993560b2168133e5dbae558/gemma-4-E2B-it-Q4_K_M.gguf
+      --host 127.0.0.1 --port ${PORT} --ctx-size 8192 --n-gpu-layers 0
+  NVIDIA-Nemotron-3-Nano-4B-Q4_K_M:
+    path: /Users/wschenk/.cache/huggingface/hub/models--unsloth--NVIDIA-Nemotron-3-Nano-4B-GGUF/snapshots/8e81be55c5aa3d63bb82b6ceec62d50805d9e1bb/NVIDIA-Nemotron-3-Nano-4B-Q4_K_M.gguf
+    proxy_chat: /v1/chat/completions
+    cmd: llama-server --model
+      /Users/wschenk/.cache/huggingface/hub/models--unsloth--NVIDIA-Nemotron-3-Nano-4B-GGUF/snapshots/8e81be55c5aa3d63bb82b6ceec62d50805d9e1bb/NVIDIA-Nemotron-3-Nano-4B-Q4_K_M.gguf
+      --host 127.0.0.1 --port ${PORT} --ctx-size 8192 --n-gpu-layers 0
