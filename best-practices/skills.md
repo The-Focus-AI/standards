@@ -16,5 +16,13 @@ The following should be installed on all projects
 
 # Design
 
-- zeke/swiss-design-skill  -- general design
+- zeke/swiss-design-skill -- general design
 - The-Focus-AI/focus-ai-brand -- focus specifically
+
+# Product / planning / architecture workflow
+
+- mattpocock/skills - grill-me
+- mattpocock/skills - grill-with-docs
+- mattpocock/skills - to-issues
+- mattpocock/skills - to-prd
+- mattpocock/skills - prototype
