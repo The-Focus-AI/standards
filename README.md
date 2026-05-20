@@ -1,6 +1,6 @@
-# Focus.AI Standards
+# TheFocus.AI Standards
 
-Reference implementation of Focus.AI development standards — tooling,
+Reference implementation of TheFocus.AI development standards — tooling,
 best-practices, prompts, and a containerized environment for scaffolding new
 projects.
 
@@ -49,7 +49,8 @@ mise lint              # Run linters (markdownlint, mise doctor, fnox check)
 mise test              # Build and validate the Docker image
 mise dev               # Run lint + test
 mise run generate:dockerfile   # Regenerate the Dockerfile via pi
-./scripts/setup-default-project.sh ../my-project   # Copy default project files, run mise install, install locked skills
+./scripts/setup-default-project.sh ../my-project   # New/empty project bootstrap
+pi @prompts/standardize-project.md "Target project: ../qbsync"   # Audit another project and propose a standards migration
 ```
 
 ## Design Philosophy

@@ -1,6 +1,6 @@
-# Focus.AI standards agent guide
+# TheFocus.AI standards agent guide
 
-You act as the overall software architect for the organization. This repository is the canonical source for how Focus.AI projects should be structured, bootstrapped, secured, deployed, and extended with agent skills.
+You act as the overall software architect for the organization. This repository is the canonical source for how TheFocus.AI projects should be structured, bootstrapped, secured, deployed, and extended with agent skills.
 
 When a project may be changed, inspect these standards first, compare the target project against them, then either make the needed changes or provide an itemized implementation plan.
 
@@ -17,9 +17,10 @@ Start with these files, depending on the work being requested:
 - `skills-lock.json` — locked, reproducible list of installed/approved skills and hashes.
 - `mise.toml` — this standards repo's tool/task declaration; use as a reference for project bootstrapping.
 - `.pi/settings.json` — project-local pi configuration example.
-- `scripts/setup-default-project.sh` — quick bootstrap script that copies default `mise.toml`, `.pi/settings.json`, `skills-lock.json`, `AGENTS.md`, and issue-workflow docs into a project, then runs `mise trust`, `mise install`, setup, and locked skill installation.
-- `templates/default-project/` — source templates used by the bootstrap script.
-- `prompts/setup-project.md` — prompt for applying these standards to a new or existing project.
+- `scripts/setup-default-project.sh` — quick bootstrap script for new/empty projects; copies default `mise.toml`, `.pi/settings.json`, `skills-lock.json`, `AGENTS.md`, and issue-workflow docs, then runs `mise trust`, `mise install`, setup, and locked skill installation.
+- `templates/default-project/` — source templates used by the bootstrap script and by prompts as examples for missing files.
+- `prompts/setup-project.md` — prompt for applying these standards to a new project.
+- `prompts/standardize-project.md` — inspect-first prompt for auditing an existing project against these markdown standards, proposing a diff, and migrating to mise/fnox/1Password safely.
 - `prompts/generate-dockerfile.md` — prompt for regenerating the standards container Dockerfile.
 - `architecture/` — design notes and decisions for this standards repo itself.
 - `reports/` — longer research/reference material, including fnox secrets and `npx skills` CLI behavior.

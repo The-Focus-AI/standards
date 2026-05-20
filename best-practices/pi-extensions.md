@@ -9,3 +9,4 @@ And then these are installed using pi install -l
 - npm:pi-powerline-footer
 - npm:pi-web-access
 - npm:pi-lens
+- npm:pi-xai

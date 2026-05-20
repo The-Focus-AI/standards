@@ -5,7 +5,7 @@ usage() {
 	cat <<'EOF'
 Usage: scripts/setup-default-project.sh [TARGET_DIR] [--force] [--no-install]
 
-Sets up Focus.AI default project files in TARGET_DIR.
+Sets up TheFocus.AI default project files in TARGET_DIR.
 If TARGET_DIR is omitted, the current directory is used.
 
 Creates/updates:
@@ -79,7 +79,7 @@ run_if_available() {
 	fi
 }
 
-echo "==> Setting up Focus.AI default project files in $TARGET_DIR"
+echo "==> Setting up TheFocus.AI default project files in $TARGET_DIR"
 
 copy_file "$TEMPLATE_DIR/mise.toml" "$TARGET_DIR/mise.toml"
 copy_file "$TEMPLATE_DIR/.pi/settings.json" "$TARGET_DIR/.pi/settings.json"

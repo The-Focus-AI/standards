@@ -1,6 +1,6 @@
 # Project agent guide
 
-This project follows the Focus.AI standards. Agents should optimize for durable, maintainable changes; keep tooling reproducible; and write down decisions that future agents need.
+This project follows TheFocus.AI standards. Agents should optimize for durable, maintainable changes; keep tooling reproducible; and write down decisions that future agents need.
 
 ## First files to read
 
@@ -15,7 +15,7 @@ When starting work, inspect these files in order:
 7. `fnox.toml` — secret declarations only; never secret values.
 8. `skills-lock.json` — locked agent skills for reproducible setup.
 
-If this repository also links to the Focus.AI standards repository, read its `AGENTS.md` and relevant `best-practices/*` files before making broad tooling, security, deployment, or workflow changes.
+If this repository also links to TheFocus.AI standards repository, read its `AGENTS.md` and relevant `best-practices/*` files before making broad tooling, security, deployment, or workflow changes.
 
 ## Required operating rules
 

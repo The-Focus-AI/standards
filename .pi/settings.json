@@ -12,6 +12,7 @@
     "npm:pi-powerline-footer",
     "npm:pi-web-access",
     "npm:pi-lens",
+    "npm:pi-xai",
     "git:github.com/The-Focus-AI/pi-local-models"
   ]
 }
