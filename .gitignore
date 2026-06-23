@@ -3,6 +3,7 @@ out/
 dist/
 dist-installer/
 .agents
+.antigravitycli/
 .firecrawl/
 .fnox/
 *.env
@@ -14,3 +15,7 @@ dist-installer/
 .agents/skills/
 .DS_Store
 *.log
+
+# Root-level preview artifacts (canonical copies live in dist/)
+/index.html
+/magazine_cover.png

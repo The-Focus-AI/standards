@@ -27,4 +27,4 @@
 - unless otherwise specifed, use typescript and pnpm as a package manager
 - avoid having a build step for typescript if possible, have commands that run it exactly.
 - use neon/postgres as database
-- use clerk as an authentication layer
+- use clerk as an authentication layer — see @clerk.md (one app per client, production instances, custom domains)
