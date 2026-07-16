@@ -1,3 +1,11 @@
+# Deployment
+
+For **Vercel + GitHub** apps (previews, Neon, Blob, Clerk env matrix, fnox
+`vercel:sync`), see @vercel-deployment.md. For **GCP Cloud Run / App Engine**,
+see @gcp-deployment.md. For the **GCE Gaia agent runtime** (Umwelten/habitats
+fleet, self-hosted runner), see @gce-gaia-runtime.md. This file covers mise/fnox
+shell setup, remote servers, and pi.
+
 # mise and fnox setup
 
 Install mise:

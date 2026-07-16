@@ -21,6 +21,10 @@ The standards repository is the current working directory. Read these files befo
 - `best-practices/skills.md` — required agent skills; install with `skills add`
 - `best-practices/security.md` — fnox and 1Password policy
 - `best-practices/deployment.md` — mise/fnox/pi setup
+- `best-practices/vercel-deployment.md` — Vercel Git previews, fnox sync, Neon/Blob/Clerk
+- `best-practices/gcp-deployment.md` — Cloud Run / App Engine, gcloud configs via mise
+- `best-practices/gce-gaia-runtime.md` — GCE Gaia/habitats runtime (if applicable)
+- `best-practices/clerk.md` — Clerk prod vs dev instances
 - `best-practices/pi-extensions.md` — required pi extensions
 - `best-practices/organization.md` — organization guidance
 - `reports/fnox-secrets.md` — detailed fnox + 1Password migration reference

@@ -12,6 +12,10 @@ Start with these files, depending on the work being requested:
 - `best-practices/skills.md` — standard agent skills that should be installed on all projects. Always use `skills add ...` (mise-pinned) to install skills.
 - `best-practices/security.md` — security and secrets policy. Projects should use a dedicated 1Password vault, fnox, and mise activation for environment variables.
 - `best-practices/deployment.md` — mise/fnox setup, remote server setup, pi project-local configuration, and deployment-related conventions.
+- `best-practices/vercel-deployment.md` — Vercel + GitHub previews, fnox→Vercel env sync, Neon, Blob, and Clerk prod vs preview.
+- `best-practices/gcp-deployment.md` — gcloud named configs, Cloud Run / App Engine deploy via mise (Fountain Creek, qbsync).
+- `best-practices/gce-gaia-runtime.md` — GCE Gaia/habitats runtime: Docker host, self-hosted runner, three deploy loops (Umwelten).
+- `best-practices/clerk.md` — Clerk per-client apps, production vs development instances, OAuth and DNS.
 - `best-practices/pi-extensions.md` — pi installation and required pi extensions.
 - `best-practices/organization.md` — organization-level structure guidance. Review when setting up or auditing repo layout.
 - `skills-lock.json` — locked, reproducible list of installed/approved skills and hashes.
@@ -35,7 +39,7 @@ When auditing or changing another repository, look in this order:
 3. Check required tasks exist and work conceptually: `mise install`, `mise dev`, `mise lint`, `mise test`, and `mise deploy` when applicable.
 4. Check skills: compare installed skills and `skills-lock.json` against `best-practices/skills.md`; install missing skills with `skills add`.
 5. Check security: fnox configuration, 1Password vault assumptions, secret loading, and no committed secrets.
-6. Check deployment: Dockerfile, deployment scripts, remote setup docs, and runtime environment assumptions.
+6. Check deployment: for Vercel apps read `best-practices/vercel-deployment.md`; for Cloud Run/App Engine read `best-practices/gcp-deployment.md`; for Gaia/habitats GCE runtime read `best-practices/gce-gaia-runtime.md`; otherwise Dockerfile, remote setup docs, and runtime environment assumptions.
 7. Check project organization: README, docs, prompts, architecture docs, test layout, and whether conventions are documented for future agents.
 8. Report gaps as an itemized list, then implement safe changes when the request asks for execution.
 
