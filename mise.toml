@@ -1,11 +1,12 @@
 [tools]
 fnox = "latest"
-node = "latest"
+node = "24.18.0"
 ripgrep = "latest"
 fd = "latest"
 "npm:firecrawl-cli" = "1.16.2"
 "npm:@earendil-works/pi-coding-agent" = "latest"
 "npm:markdownlint-cli2" = "latest"
+"npm:skills" = "1.5.13"
 gh = "latest"
 
 [env]
@@ -46,7 +47,7 @@ echo "✓ .fnox/env refreshed."
 
 [tasks.install]
 description = "Install tools and skills needed for the project"
-run = "npx skills experimental_install"
+run = "skills experimental_install"
 
 [tasks.dev]
 description = "Run lint + test in development mode"
