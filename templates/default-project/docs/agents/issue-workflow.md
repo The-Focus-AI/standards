@@ -1,6 +1,7 @@
 # Agent issue workflow
 
-This project uses agent-assisted planning through PRDs and issues.
+This project uses agent-assisted planning through specs, tickets, and
+wayfinder maps.
 
 ## Tracker
 
@@ -12,33 +13,73 @@ Agents should detect the actual tracker at runtime:
 2. Otherwise, use local markdown files in `docs/issues/`.
 3. If the user names a different tracker, document it here before creating tickets.
 
+Default label vocabulary:
+
+- `ready-for-agent` — fully specified, AFK-ready work
+- `needs-info` — waiting on more information
+- `needs-triage` — maintainer needs to evaluate
+- `wontfix` — will not be actioned
+
 ## Skills to use
 
 - `grill-me` — challenge and clarify a plan or design.
 - `grill-with-docs` — challenge a plan against project docs and update docs as decisions settle.
-- `to-prd` — convert conversation context into a PRD.
-- `to-issues` — split a PRD or plan into vertical implementation issues.
+- `wayfinder` — map large or foggy work into linked research, grilling, prototype, and task tickets.
+- `research` — investigate primary sources and save a cited Markdown note.
+- `to-spec` — convert conversation context into a spec.
+- `to-tickets` — split a spec, plan, or conversation into vertical tickets with blocking edges.
 - `prototype` — build throwaway validation before committing to a direction.
+- `implement` — implement one ticket, using TDD where appropriate.
+- `code-review` — review implementation against standards, spec, and refactoring smells.
+- `tdd` — reference for red/green testing at agreed seams.
 
 ## Recommended flow
 
 1. Clarify with `grill-me` or `grill-with-docs`.
-2. Write a PRD with `to-prd` for anything non-trivial.
-3. Create or link the PRD in the tracker.
-4. Break the PRD into issues with `to-issues`.
-5. Ensure every issue has:
+2. If the work is too large or foggy for one session, use `wayfinder` to create a map.
+3. Write a spec with `to-spec` for anything non-trivial.
+4. Create or link the spec in the tracker.
+5. Break the spec into tickets with `to-tickets`.
+6. Ensure every ticket has:
    - Goal / user outcome
    - Background links
    - Acceptance criteria
    - Test or verification plan
+   - Blocking edges (`Blocked by`)
    - Out-of-scope notes
-6. Keep issue status and docs updated as decisions change.
+7. Work the frontier: any open, unassigned ticket whose blockers are complete.
+8. Implement one ticket at a time with `implement`, then run `code-review` before marking it done.
+9. Keep ticket status and docs updated as decisions change.
+
+## Wayfinding operations
+
+Use `wayfinder` for planning work that is bigger than one agent session or whose
+route is not clear yet.
+
+On GitHub Issues:
+
+- Create one map issue labelled `wayfinder:map`.
+- Put the destination, notes, decisions so far, not-yet-specified fog, and out-of-scope items in the map body.
+- Create child issues for individual map tickets.
+- Label child issues by type: `wayfinder:research`, `wayfinder:prototype`, `wayfinder:grilling`, or `wayfinder:task`.
+- Use native sub-issues and native blocking relationships where GitHub supports them.
+- If native blocking is unavailable, include `## Parent` and `## Blocked by` sections in each child issue.
+- Claim work by assigning the ticket to the person or agent session driving it.
+- The frontier is the set of open, unassigned child issues whose blockers are closed.
+
+Local markdown fallback:
+
+- Put maps under `docs/wayfinder/<slug>/map.md`.
+- Put child tickets under `docs/wayfinder/<slug>/tickets/NN-short-title.md`.
+- Represent blocking edges with a `Blocked by:` line containing ticket filenames or titles.
+- Keep the map as an index: link to ticket files rather than duplicating ticket answers.
 
 ## Local markdown fallback
 
 If GitHub Issues are unavailable, create:
 
+- `docs/specs/YYYY-MM-DD-short-title.md`
 - `docs/issues/0001-short-title.md`
-- `docs/prd/YYYY-MM-DD-short-title.md`
+- `docs/wayfinder/<slug>/map.md` when using `wayfinder`
 
-Use stable links between PRDs and issue files.
+Use stable links between specs, ticket files, and wayfinder maps.

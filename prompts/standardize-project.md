@@ -37,7 +37,7 @@ Inspect:
 3. Secrets: `.env`, `.env.*`, `fnox.toml`, `.fnox/`, CI secret references, README setup instructions.
 4. pi setup: `.pi/settings.json`, pi packages, local session/cache ignores.
 5. Skills: `skills-lock.json`, `.agents/skills/`, `.pi/skills/`.
-6. Project workflow: README, docs, GitHub remote, issue tracker usage, PRD/issue docs.
+6. Project workflow: README, docs, GitHub remote, issue tracker usage, spec/ticket docs, and wayfinder maps.
 7. Git hygiene: `.gitignore`, committed generated files, committed secret risk.
 
 ## Required output before changes
@@ -113,11 +113,16 @@ Planning workflow skills should be available and referenced in project instructi
 
 - `grill-me`
 - `grill-with-docs`
-- `to-prd`
-- `to-issues`
+- `wayfinder`
+- `research`
+- `to-spec`
+- `to-tickets`
 - `prototype`
+- `implement`
+- `code-review`
+- `tdd`
 
-Use GitHub Issues via `gh` when the repo has a GitHub remote and auth is available. Otherwise document the fallback in `docs/agents/issue-workflow.md`.
+Remove deprecated `to-prd` and `to-issues` installs and lock entries when migrating existing projects. Use GitHub Issues via `gh` when the repo has a GitHub remote and auth is available. Otherwise document the fallback in `docs/agents/issue-workflow.md`. The workflow doc should describe specs, blocked tickets, and Wayfinder operations.
 
 ### pi
 
@@ -130,7 +135,7 @@ Update or create target-project `AGENTS.md` additively. It should tell future ag
 - where to read project context
 - that tooling goes through mise
 - that secrets go through fnox + 1Password
-- how to use the planning workflow (`grill-me` → `to-prd` → `to-issues`)
+- how to use the planning workflow (`grill-me` / `grill-with-docs` → `to-spec` → `to-tickets` → `implement` → `code-review`, with `wayfinder` for large or foggy work)
 - how issues are tracked (GitHub Issues or documented fallback)
 - what commands prove the project is healthy
 

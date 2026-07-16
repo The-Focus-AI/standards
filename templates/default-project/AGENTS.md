@@ -8,7 +8,7 @@ When starting work, inspect these files in order:
 
 1. `AGENTS.md` — this project-specific guide.
 2. `README.md` — product and developer overview, if present.
-3. `docs/agents/issue-workflow.md` — how planning work maps to GitHub Issues, PRDs, and implementation tickets.
+3. `docs/agents/issue-workflow.md` — how planning work maps to GitHub Issues, specs, tickets, and wayfinder maps.
 4. `docs/adr/` — architecture decisions, if present.
 5. `CONTEXT.md` — domain language and project context, if present.
 6. `mise.toml` — tools, environment loading, and required tasks.
@@ -34,25 +34,32 @@ This project uses the Matt Pocock planning skills installed in `skills-lock.json
 
 - `grill-me` — use when a user wants to be challenged on a plan or design before implementation.
 - `grill-with-docs` — use when a plan should be stress-tested against `CONTEXT.md`, ADRs, or other domain docs, and those docs should be updated as decisions crystallize.
-- `to-prd` — use when current conversation context should become a Product Requirements Document.
-- `to-issues` — use when a PRD, plan, or spec should be broken into independently grabbable implementation issues.
+- `wayfinder` — use when the work is too large or foggy for one agent session; it creates a shared map of research, grilling, prototype, and task tickets.
+- `research` — use for background primary-source investigation that should produce a cited Markdown note.
+- `to-spec` — use when current conversation context should become a durable specification.
+- `to-tickets` — use when a spec, plan, or conversation should be broken into independently grabbable, blocked vertical-slice tickets.
 - `prototype` — use when the team wants a throwaway prototype to validate a UI, state machine, data model, or design direction before committing.
+- `implement` — use to implement one approved ticket, with tests at agreed seams.
+- `code-review` — use after implementation to review against repo standards, the originating spec/ticket, and refactoring smells.
+- `tdd` — use as reference material for red/green testing at agreed seams.
 
 Default planning flow:
 
-1. Use `grill-me` or `grill-with-docs` to clarify goals, constraints, terminology, risks, and non-goals.
-2. Use `to-prd` to produce a PRD when the work is product-facing, multi-step, or ambiguous.
-3. Publish or reference the PRD through the configured issue tracker in `docs/agents/issue-workflow.md`.
-4. Use `to-issues` to split the PRD into vertical tracer-bullet issues that can be picked up independently.
-5. Use `prototype` before implementation when the design has high UX, architecture, or state-model uncertainty.
-6. Keep GitHub Issues, PRDs, ADRs, and `CONTEXT.md` in sync with the final decisions.
+1. Use `wayfinder` first when the work is too large, cross-cutting, or foggy for one agent session.
+2. Use `grill-me` or `grill-with-docs` to clarify goals, constraints, terminology, risks, and non-goals.
+3. Use `to-spec` to produce a spec when the work is multi-step or ambiguous.
+4. Publish or reference the spec through the configured issue tracker in `docs/agents/issue-workflow.md`.
+5. Use `to-tickets` to split the spec into vertical tracer-bullet tickets with explicit blocking edges.
+6. Use `prototype` before implementation when the design has high UX, architecture, or state-model uncertainty.
+7. Use `implement` for one ticket at a time, then `code-review` before declaring the ticket complete.
+8. Keep GitHub Issues, specs, tickets, ADRs, and `CONTEXT.md` in sync with the final decisions.
 
 ## GitHub Issues / tracker expectations
 
 - Prefer GitHub Issues when this repo has a GitHub remote and `gh` is authenticated.
 - If GitHub Issues are unavailable, use local markdown under `docs/issues/` and document that choice in `docs/agents/issue-workflow.md`.
 - Issues should be small enough for an agent to complete independently.
-- Each implementation issue should include context, acceptance criteria, test expectations, and links to the PRD or parent issue.
+- Each implementation ticket should include context, acceptance criteria, test expectations, blocking edges, and links to the spec or parent issue.
 - Before creating issues, check existing open issues to avoid duplicates.
 
 ## Quality bar
