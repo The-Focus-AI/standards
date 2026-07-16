@@ -28,67 +28,107 @@ Notes:
 - Removing a skill with `skills rm` deletes files but leaves the `skills-lock.json`
   entry, so the next `experimental_install` reinstalls it. To truly remove a skill,
   edit `skills-lock.json` by hand (or delete it and re-add the ones you want).
+- Lock entry names must be kebab-case (matching the skill folder). Do not keep
+  title-case duplicates alongside kebab-case names.
 
 ## Standard skill set
 
 The following are installed on all projects and are recorded in `skills-lock.json`.
-Source repos are GitHub (`sourceType: github`).
+Source repos are GitHub (`sourceType: github`). Install only this set — do not
+`skills add mattpocock/skills -y` blindly; that repo also contains course/writing
+skills that are not part of TheFocus.AI standards.
 
 ### Always installed
 
-| Installed skill name | Source repo | Skill folder |
+| Skill | Source repo | Skill folder |
 | --- | --- | --- |
-| Nano Banana Image Generation | The-Focus-AI/nano-banana-cli | `nano-banana-imagegen` |
-| Nano Banana Video Generation | The-Focus-AI/nano-banana-cli | `nano-banana-videogen` |
-| Research Methodology | The-Focus-AI/focus-agents | (root) |
-| firecrawl + 8 `firecrawl-*` skills | firecrawl/cli | `skills/firecrawl-*` |
-| find-skills | vercel-labs/skills | `skills/find-skills` |
+| `nano-banana-imagegen` | The-Focus-AI/nano-banana-cli | `skills/nano-banana-imagegen` |
+| `nano-banana-videogen` | The-Focus-AI/nano-banana-cli | `skills/nano-banana-videogen` |
+| `research-methodology` | The-Focus-AI/focus-agents | `skills/research-methodology` |
+| `firecrawl` + 8 `firecrawl-*` | firecrawl/cli | `skills/firecrawl-*` |
+| `find-skills` | vercel-labs/skills | `skills/find-skills` |
 
 ### Running a browser
 
-| Installed skill name | Source repo | Skill folder |
+| Skill | Source repo | Skill folder |
 | --- | --- | --- |
-| browser-automation | The-Focus-AI/chrome-driver | `skills/browser-automation` |
+| `browser-automation` | The-Focus-AI/chrome-driver | `skills/browser-automation` |
 
 ### Design
 
-| Installed skill name | Source repo | Skill folder |
+| Skill | Source repo | Skill folder |
 | --- | --- | --- |
-| swiss-design | zeke/swiss-design-skill | `swiss-design` |
-| focus-ai-brand | The-Focus-AI/focus-ai-brand | `skills/focus-ai-brand` |
+| `swiss-design` | zeke/swiss-design-skill | `swiss-design` |
+| `focus-ai-brand` | The-Focus-AI/focus-ai-brand | `skills/focus-ai-brand` |
 
 ### Product / planning / architecture workflow
 
-All from `mattpocock/skills`. The standard flow is: grill the idea, produce a
-spec, break it into tickets, implement a ticket, then run code review. Use
-`wayfinder` before the spec when the work is too large or foggy for one agent
-session. Projects using this workflow must document tracker behavior, label
-vocabulary, local fallbacks, and Wayfinder operations in
-`docs/agents/issue-workflow.md`.
+All from `mattpocock/skills`. Canonical set matches the full engineering/productivity
+bundle used in production projects (for example walking-thoughts): 22 skills.
 
-| Installed skill name | Skill folder | Role |
+Default flow: grill the idea, produce a spec, break it into tickets, implement a
+ticket, then run code review. Use `wayfinder` before the spec when the work is
+too large or foggy for one agent session. Use `ask-matt` when unsure which skill
+fits. Run `setup-matt-pocock-skills` once per repo before first use of the
+tracker-backed skills.
+
+Projects using this workflow must document tracker behavior, label vocabulary,
+local fallbacks, and Wayfinder operations in `docs/agents/issue-workflow.md`.
+
+#### Setup and routing
+
+| Skill | Skill folder | Role |
 | --- | --- | --- |
-| grill-me | `skills/productivity/grill-me` | Interactive questioning for an idea, plan, or decision |
-| grill-with-docs | `skills/engineering/grill-with-docs` | Grilling informed by repo docs and existing code |
-| wayfinder | `skills/engineering/wayfinder` | Multi-session planning map for large or foggy work |
-| research | `skills/engineering/research` | Background primary-source research into a Markdown note |
-| to-spec | `skills/engineering/to-spec` | Convert a conversation or plan into a specification |
-| to-tickets | `skills/engineering/to-tickets` | Break a spec/plan into blocked vertical-slice tickets |
-| prototype | `skills/engineering/prototype` | Throwaway logic/UI prototype to answer a design question |
-| implement | `skills/engineering/implement` | Implement one ticket, using TDD where appropriate |
-| code-review | `skills/engineering/code-review` | Review against standards, spec, and refactoring smells |
-| tdd | `skills/engineering/tdd` | Reference material for red/green testing at agreed seams |
+| `setup-matt-pocock-skills` | `skills/engineering/setup-matt-pocock-skills` | One-time repo setup: tracker, triage labels, domain docs |
+| `ask-matt` | `skills/engineering/ask-matt` | Router — which skill/flow fits the situation |
+| `writing-great-skills` | `skills/productivity/writing-great-skills` | Reference for authoring predictable skills |
 
-`mattpocock/skills` v1.1 renamed `to-prd` to `to-spec` and merged `to-plan` /
-`to-issues` into `to-tickets`. Do not install the deprecated `to-prd` or
+#### Planning and tickets
+
+| Skill | Skill folder | Role |
+| --- | --- | --- |
+| `grill-me` | `skills/productivity/grill-me` | Relentless interview to sharpen a plan or design |
+| `grilling` | `skills/productivity/grilling` | Stress-test a plan/decision/idea (grill trigger phrases) |
+| `grill-with-docs` | `skills/engineering/grill-with-docs` | Grill while creating ADRs and glossary docs |
+| `wayfinder` | `skills/engineering/wayfinder` | Multi-session planning map for large or foggy work |
+| `research` | `skills/engineering/research` | Primary-source research into a Markdown note |
+| `to-spec` | `skills/engineering/to-spec` | Conversation → specification on the tracker |
+| `to-tickets` | `skills/engineering/to-tickets` | Spec/plan → blocked vertical-slice tickets |
+| `triage` | `skills/engineering/triage` | Move issues/PRs through triage roles to agent-ready briefs |
+| `prototype` | `skills/engineering/prototype` | Throwaway logic/UI prototype for a design question |
+| `handoff` | `skills/productivity/handoff` | Compact the conversation for another agent |
+
+#### Implementation and quality
+
+| Skill | Skill folder | Role |
+| --- | --- | --- |
+| `implement` | `skills/engineering/implement` | Implement work from a spec or tickets |
+| `tdd` | `skills/engineering/tdd` | Red/green testing at agreed seams |
+| `code-review` | `skills/engineering/code-review` | Standards + spec review since a fixed point |
+| `diagnosing-bugs` | `skills/engineering/diagnosing-bugs` | Diagnosis loop for hard bugs / regressions |
+| `resolving-merge-conflicts` | `skills/engineering/resolving-merge-conflicts` | Resolve in-progress merge/rebase conflicts |
+
+#### Domain and architecture
+
+| Skill | Skill folder | Role |
+| --- | --- | --- |
+| `domain-modeling` | `skills/engineering/domain-modeling` | Ubiquitous language, CONTEXT.md, ADRs |
+| `codebase-design` | `skills/engineering/codebase-design` | Deep-module vocabulary and seam design |
+| `improve-codebase-architecture` | `skills/engineering/improve-codebase-architecture` | Scan for deepening opportunities, grill one |
+| `teach` | `skills/productivity/teach` | Teach a skill or concept in-workspace |
+
+`mattpocock/skills` renamed `to-prd` → `to-spec` and merged `to-plan` /
+`to-issues` → `to-tickets`. Do not install the deprecated `to-prd` or
 `to-issues` skills in new projects.
 
 ## Adding a new skill
 
+Prefer adding a specific skill folder, not the entire upstream repo:
+
 ```bash
-skills add <owner>/<repo>            # interactive; picks agents + skills
-skills add <owner>/<repo> -y        # non-interactive; all skills to detected agents
-skills add <owner>/<repo> --skill <folder> -a pi -a claude-code
+skills add <owner>/<repo> --skill <folder> -y
+skills add mattpocock/skills --skill triage -y
+skills add firecrawl/cli -y   # OK: firecrawl/cli is entirely in the standard set
 ```
 
 Then commit the updated `skills-lock.json`. Run `mise install` (or
@@ -98,6 +138,6 @@ Then commit the updated `skills-lock.json`. Run `mise install` (or
 
 ```bash
 skills update -y        # update all project skills, rewrite hashes
-skills update find-skills firecrawl -y   # update a subset
+skills update find-skills firecrawl wayfinder -y   # update a subset
 git diff skills-lock.json   # review before committing
 ```

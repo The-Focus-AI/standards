@@ -35,11 +35,11 @@ Sessions are ephemeral — lost when the container exits. Mount a volume to
 | `skills-lock.json`  | Company-approved skills (locked hashes for reproducibility)                                                  |
 | `best-practices/`   | Deployment, security, skills, pi extensions, project organization                                            |
 | `prompts/`          | Pi prompts — `setup-project.md` scaffolds new projects, `generate-dockerfile.md` regenerates this Dockerfile |
-| `reports/`          | Technical research (fnox secrets reference, npx skills CLI guide, electron shell)                            |
+| `reports/`          | Technical research (fnox secrets reference, skills CLI guide, electron shell)                               |
 | `tests/`            | Dockerfile integration tests — `mise test` validates the image                                               |
 | `architecture/`     | Design documents — PRDs and decision records                                                                 |
 | `.pi/settings.json` | Project-local pi config (npmCommand routes through mise, sessionDir keeps sessions local)                    |
-| `.agents/skills/`   | Installed skill files (managed by `npx skills install`)                                                      |
+| `.agents/skills/`   | Installed skill files (managed by `skills experimental_install`)                                             |
 
 ## Tasks
 

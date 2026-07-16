@@ -69,11 +69,14 @@ These are defined in @best-practices/pi-extensions.md
 - Declare API keys the project will need (ANTHROPIC_API_KEY, OPENAI_API_KEY, etc.)
 - Never write actual secret values — only the mappings to 1Password items
 
-### 9. Install skills (each command separately — npx skills add only processes one source at a time)
+### 9. Install skills
 
-Skills are defined in best-practices/skills.md
-
-Information on how to use it in reports/
+Skills are defined in `best-practices/skills.md` and locked in
+`skills-lock.json` / `templates/default-project/skills-lock.json`. Prefer
+copying the template lockfile, then `mise install` (runs
+`skills experimental_install`). To add one skill later: `skills add
+<owner>/<repo> --skill <folder> -y` — do not `skills add mattpocock/skills -y`
+(pulls course/writing extras). See `reports/` for CLI details.
 
 ### 10. Write AGENTS.md
 
@@ -83,9 +86,9 @@ Information on how to use it in reports/
 
 ### 11. Write .gitignore
 
-- `node_modules/`, `out/`, `dist/`, `dist-installer/`, `.fnox/`,
-  `*.env`, `*.env.local`, `.pi/sessions/`, `.pi/npm/`, `.pi/git/`,
-  `.pi/skills/`, `.agents/skills/`, `.DS_Store`, `*.log`
+- `node_modules/`, `out/`, `dist/`, `dist-installer/`, `.agents`,
+  `agent/skills/`, `.fnox/`, `*.env`, `*.env.local`, `.pi/sessions/`,
+  `.pi/npm/`, `.pi/git/`, `.pi/skills/`, `.DS_Store`, `*.log`
 
 ### 12. Write project configs
 

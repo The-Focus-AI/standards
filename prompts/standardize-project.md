@@ -18,7 +18,7 @@ The standards repository is the current working directory. Read these files befo
 
 - `AGENTS.md` — how agents should navigate and apply standards
 - `best-practices/AGENTS.md` — baseline project setup rules
-- `best-practices/skills.md` — required agent skills; install with `npx skills add`
+- `best-practices/skills.md` — required agent skills; install with `skills add`
 - `best-practices/security.md` — fnox and 1Password policy
 - `best-practices/deployment.md` — mise/fnox/pi setup
 - `best-practices/pi-extensions.md` — required pi extensions
@@ -48,7 +48,7 @@ Produce a plan with these sections:
 2. **Compliance gaps** — map each gap to the standards file that requires it.
 3. **Proposed diff** — list exact target-project files to create or edit, with summary of intended changes.
 4. **Secrets migration plan** — list discovered secret keys only, never values. Explain which 1Password vault and service account should be used.
-5. **Commands to run from the target project** — include `mise use ...`, `mise trust`, `mise install`, `npx skills add ...`, `fnox check`, etc.
+5. **Commands to run from the target project** — include `mise use ...`, `mise trust`, `mise install`, `skills add ...`, `fnox check`, etc.
 6. **Questions / approvals needed** — especially before moving secrets or changing deployment behavior.
 
 Do not apply changes until the user approves the plan, unless the user explicitly asked to execute immediately.
@@ -107,22 +107,20 @@ Never print, commit, or copy secret values into the conversation beyond key name
 
 ### Skills
 
-Read `best-practices/skills.md`. Install missing skills using `npx skills add`; do not manually copy skill directories.
+Read `best-practices/skills.md`. Install missing skills using `skills add` (mise-pinned); do not manually copy skill directories. Prefer `--skill <folder>` over `skills add mattpocock/skills -y` so course/writing extras are not pulled in.
 
-Planning workflow skills should be available and referenced in project instructions:
+The canonical lock in this standards repo (and `templates/default-project/skills-lock.json`) is the source of truth: Focus always-installed skills (nano-banana, firecrawl, find-skills, research-methodology, browser-automation, design) plus the 22 Matt Pocock skills listed in `best-practices/skills.md`.
 
-- `grill-me`
-- `grill-with-docs`
-- `wayfinder`
-- `research`
-- `to-spec`
-- `to-tickets`
-- `prototype`
-- `implement`
-- `code-review`
-- `tdd`
+Planning workflow skills that must be available and referenced in project instructions include at least:
 
-Remove deprecated `to-prd` and `to-issues` installs and lock entries when migrating existing projects. Use GitHub Issues via `gh` when the repo has a GitHub remote and auth is available. Otherwise document the fallback in `docs/agents/issue-workflow.md`. The workflow doc should describe specs, blocked tickets, and Wayfinder operations.
+- `setup-matt-pocock-skills`, `ask-matt`
+- `grill-me`, `grilling`, `grill-with-docs`
+- `wayfinder`, `research`, `to-spec`, `to-tickets`, `triage`
+- `prototype`, `implement`, `code-review`, `tdd`
+- `domain-modeling`, `codebase-design`, `improve-codebase-architecture`
+- `diagnosing-bugs`, `resolving-merge-conflicts`, `handoff`, `teach`, `writing-great-skills`
+
+Remove deprecated `to-prd` and `to-issues` installs and lock entries when migrating existing projects. Drop title-case lock keys in favor of kebab-case names. Use GitHub Issues via `gh` when the repo has a GitHub remote and auth is available. Otherwise document the fallback in `docs/agents/issue-workflow.md`. The workflow doc should describe specs, blocked tickets, triage labels, and Wayfinder operations.
 
 ### pi
 
@@ -135,7 +133,7 @@ Update or create target-project `AGENTS.md` additively. It should tell future ag
 - where to read project context
 - that tooling goes through mise
 - that secrets go through fnox + 1Password
-- how to use the planning workflow (`grill-me` / `grill-with-docs` → `to-spec` → `to-tickets` → `implement` → `code-review`, with `wayfinder` for large or foggy work)
+- how to use the planning workflow (`ask-matt` / `grill-*` → `to-spec` → `to-tickets` → `implement` → `code-review`, with `wayfinder` for large or foggy work and `triage` for inbound issues)
 - how issues are tracked (GitHub Issues or documented fallback)
 - what commands prove the project is healthy
 

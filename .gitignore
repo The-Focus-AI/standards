@@ -3,6 +3,7 @@ out/
 dist/
 dist-installer/
 .agents
+agent/skills/
 .antigravitycli/
 .firecrawl/
 .fnox/
@@ -12,7 +13,6 @@ dist-installer/
 .pi/npm/
 .pi/git/
 .pi/skills/
-.agents/skills/
 .DS_Store
 *.log
 

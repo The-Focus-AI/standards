@@ -22,24 +22,30 @@ Default label vocabulary:
 
 ## Skills to use
 
-- `grill-me` — challenge and clarify a plan or design.
+Run `setup-matt-pocock-skills` once if this doc and tracker layout are not yet configured.
+Use `ask-matt` when unsure which skill fits.
+
+- `grill-me` / `grilling` — challenge and clarify a plan or design.
 - `grill-with-docs` — challenge a plan against project docs and update docs as decisions settle.
 - `wayfinder` — map large or foggy work into linked research, grilling, prototype, and task tickets.
 - `research` — investigate primary sources and save a cited Markdown note.
 - `to-spec` — convert conversation context into a spec.
 - `to-tickets` — split a spec, plan, or conversation into vertical tickets with blocking edges.
+- `triage` — move inbound issues/PRs through triage roles to agent-ready briefs.
 - `prototype` — build throwaway validation before committing to a direction.
 - `implement` — implement one ticket, using TDD where appropriate.
 - `code-review` — review implementation against standards, spec, and refactoring smells.
 - `tdd` — reference for red/green testing at agreed seams.
+- `domain-modeling` — maintain ubiquitous language, `CONTEXT.md`, and ADRs.
+- `handoff` — compact the conversation for another agent session.
 
 ## Recommended flow
 
-1. Clarify with `grill-me` or `grill-with-docs`.
+1. Clarify with `grill-me`, `grilling`, or `grill-with-docs`.
 2. If the work is too large or foggy for one session, use `wayfinder` to create a map.
 3. Write a spec with `to-spec` for anything non-trivial.
 4. Create or link the spec in the tracker.
-5. Break the spec into tickets with `to-tickets`.
+5. Break the spec into tickets with `to-tickets`; use `triage` for inbound work.
 6. Ensure every ticket has:
    - Goal / user outcome
    - Background links

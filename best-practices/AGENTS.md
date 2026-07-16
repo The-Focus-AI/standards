@@ -16,11 +16,11 @@
   - mise test
   - mise deploy
 - use fnox for security
-- mise install should call out to pnpm install, or npx skills install and everything needed to start the project
+- mise install should call out to pnpm install, or `skills experimental_install` and everything needed to start the project
 
 # Skills
 
-- use npx skills add to add a skill
+- use `skills add` (mise-pinned `npm:skills`) to add a skill; see `best-practices/skills.md`
 
 # Technologies
 
