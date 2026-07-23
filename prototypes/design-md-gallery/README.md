@@ -18,6 +18,12 @@ history rather than from other tech companies:
 | `naturalist` | Victorian field notebook: sepia, specimen labels, moss green |
 | `hardware` | Industrial hardware panel: aluminum, engraved labels, safety orange |
 
+Four variants embed their real display faces as woff2 data URIs (Special
+Elite for the dossier, Le Murmure for futurismo, Zodiak + true italic for
+the naturalist, Departure Mono for hardware labels); the rest state their
+fallback in the meta strip per the anti-silent-fallback rule in
+`reports/2026-07-23-creative-typography.md`.
+
 Each variant shows the same content — hero, type scale, color roles,
 components with states, and a voice rulebook (numbered Orwell-style rules in
 character, a before/after rewrite, banned words) — plus its would-be

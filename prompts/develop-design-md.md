@@ -135,6 +135,13 @@ Rules for the variants:
   AI-default face as display, and give every variant a named signature
   move. The note's "checkable anti-boring rules" belong in the final
   DESIGN.md's typography section.
+- **Specimens show the real face or say they don't.** Embed the actual
+  display face as a subsetted woff2 data URI (Fontshare, Velvetyne, and
+  Google faces run 15–55 KB per cut — the note has sources and license
+  terms). Where embedding isn't worth it, print the fallback in the
+  specimen's own chrome ("rendered in Trebuchet; spec face is Gill Sans").
+  A silent fallback is a wrong answer the user can't see they're
+  approving.
 - **Never propose the AI-default looks** unless the user explicitly asks for
   one: warm cream ground + serif display + terracotta/clay accent (the
   ubiquitous "Claude look"), near-black with a lone acid-green pop, or a
