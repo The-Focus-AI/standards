@@ -45,10 +45,33 @@ job; only decisions belong to the user.
    DESIGN.md?
 3. Competitor/aspiration references if the user has named any.
 
+Then sort every Phase 1 decision branch into one of two bins — this
+determines how it gets asked:
+
+- **Evidenced** — the repo already embodies the decision (a palette shipped
+  in `globals.css`, a prior design verdict in an ADR). Present these as
+  one-line confirmations with the evidence attached ("the palette in
+  `globals.css` is warm-grey + orange — keep it?"). These resolve in four
+  words.
+- **Open** — nothing in the repo has a point of view (typically typography
+  and positioning nuance). Never ask these as abstract adjective questions;
+  route them to Phase 2 where the user reacts to rendered artifacts. Taste
+  questions need something to look at.
+
 ## Phase 1 — Grill the brand (grill-me)
 
+**Unattended-session rule.** The interview is the point of this phase —
+never silently substitute repo evidence for it. If the user may not be
+present, ask the first grill question and stop. If the task explicitly
+requires delivering autonomously, label every choice a veto-able
+recommendation and lead the final report with the decision log (what was
+assumed and why), not the deliverable. Evidence tells you what exists; only
+the user can tell you what it should feel like.
+
 Run the `grill-me` skill. Interview one question at a time, always with your
-recommended answer, until shared understanding is reached. Walk these
+recommended answer, until shared understanding is reached. Plain-prose
+questions and screenshot reactions beat structured option dialogs; accept
+short answers ("keep it", "V1 but denser") as confirmations. Walk these
 branches in order — later branches depend on earlier answers:
 
 1. **Positioning** — What is this product, for whom, and what should someone
@@ -60,29 +83,52 @@ branches in order — later branches depend on earlier answers:
    utilitarian? Rounded or sharp? Flat or elevated?
 4. **Color feelings** — Not hex values yet: warm vs cool, muted vs vivid,
    one accent or several, any colors that are off-limits (cliché, competitor,
-   accessibility).
-5. **Typography vibes** — Serif/sans/mono roles, geometric vs humanist,
-   how loud headlines should be.
-6. **Voice rulebook** — Beyond traits: which writing creed governs the copy
+   accessibility). (Typography is deliberately *not* asked here — it is an
+   open-bin taste decision that resolves in Phase 2 against rendered
+   compositions, not adjectives.)
+5. **Voice rulebook** — Beyond traits: which writing creed governs the copy
    (Orwell's six rules, Strunk & White's "omit needless words", or the
    user's own)? Which words are banned outright (e.g. leverage, seamless,
    supercharge, excited to announce)? How do errors speak — apologetic,
    factual, or instructive? Are contractions, jokes, and exclamation marks
    allowed, and where?
-7. **Non-negotiables** — Accessibility floor (WCAG AA minimum), existing
+6. **Non-negotiables** — Accessibility floor (WCAG AA minimum), existing
    logo/colors that must be honored, print/PDF needs, dark-mode requirement.
+   Ask density per surface explicitly — mobile and desktop may want
+   opposite answers (kneeboard-dense phone, spacious desktop is a real
+   pattern).
 
-Do not proceed until the user confirms the summary of these decisions.
+Confirm branch-by-branch as you go; a final all-at-once summary gate is
+optional and usually redundant. Do not start Phase 2 with any branch
+unresolved unless it is explicitly parked as "decide against artifacts."
 
 ## Phase 2 — Prototype contrasting directions (prototype)
 
 Run the `prototype` skill, UI branch. This is throwaway code that answers one
 question: **"Which visual direction is right?"**
 
+Pick the venue by what the round is testing:
+
+- **Visual-language rounds** (which direction, which type treatment):
+  build a self-contained static HTML specimen and publish it where the user
+  can click through on any device (an artifact, a static host). No dev
+  server, instant republish, fastest possible react-and-revise loop.
+- **Integration rounds** (does the chosen direction survive contact with
+  real chrome and real data): an in-repo route behind the project's dev
+  server, judged against actual app conventions.
+
+Rules for the variants:
+
 - Build a single-route specimen page with 3–4 **contrasting** design
   directions, switchable via URL parameter (`?variant=a|b|c|d`). Contrasting
   means genuinely different interpretations of the Phase 1 answers, not one
   design with different accent colors.
+- **Typography is decided here, as a composition question.** Type variants
+  must differ in layout signature, grid, spacing rhythm, and detailing —
+  four font families swapped onto an identical layout is the same design
+  four times, and the user will (rightly) reject the whole round. A
+  typeface only reads as a direction when the composition around it
+  changes too.
 - **Never propose the AI-default looks** unless the user explicitly asks for
   one: warm cream ground + serif display + terracotta/clay accent (the
   ubiquitous "Claude look"), near-black with a lone acid-green pop, or a
@@ -141,11 +187,31 @@ Write `DESIGN.md` at the project root from the winning prototype:
 
 ## Phase 4 — Validate
 
-- Check every `{token}` reference resolves and no token is orphaned.
-- Check text/background pairs meet WCAG AA contrast.
+- Check every `{token}` reference resolves and no token is orphaned; check
+  text/background pairs meet WCAG AA contrast. Write these checks as small
+  scripts and keep them as **standing artifacts** next to the DESIGN.md —
+  they re-run on every future edit, not just at birth.
 - The real test: open a fresh agent session, give it only `DESIGN.md`, and
-  ask it to build a small page that the prototype never showed. If the result
-  would pass the user's squint test next to the winning variant, ship it.
-  If not, the file is missing a rule — add it and retest.
+  ask it to build a small page that the prototype never showed. The test
+  **must include a data-absent trap** — an empty state, a missing feed, a
+  zero-count list. Happy-path renders hide exactly the gaps that matter;
+  what the fresh agent invents when the data is gone tells you which rules
+  the file is missing. If the result would pass the user's squint test next
+  to the winning variant, ship it; if not, add the missing rule and retest.
 - Commit `DESIGN.md`; delete or archive the prototype branch. Main keeps
   only the validated decision.
+
+## Outputs — more than the file
+
+Prototyping a design surfaces product decisions, not just visual ones: a
+specimen cell will invent a capability the product doesn't have yet (a
+cached forecast, an offline pack, a share flow). Don't let those evaporate.
+End the process with three deliverables:
+
+1. `DESIGN.md` — validated, committed.
+2. A **decision log** — each branch's verdict and who made it (user answer
+   vs evidenced-from-repo vs autonomous recommendation), so the next agent
+   knows what is settled versus assumed.
+3. A **tickets-discovered list** — every product capability the prototypes
+   implied but the codebase lacks, ready for `to-tickets` or the issue
+   tracker.
