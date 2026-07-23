@@ -28,7 +28,7 @@ Start with these files, depending on the work being requested:
 - `prompts/generate-dockerfile.md` — prompt for regenerating the standards container Dockerfile.
 - `prompts/develop-design-md.md` — prompt for developing a project's brand/`DESIGN.md` via the `grill-me` and `prototype` skills.
 - `architecture/` — design notes and decisions for this standards repo itself.
-- `reports/` — longer research/reference material, including fnox secrets and the skills CLI.
+- `reports/` — longer research/reference material, including fnox secrets, the skills CLI, and creative typography for DESIGN.md work.
 - `tests/` — validation scripts for this standards repo.
 
 ## How to inspect a project

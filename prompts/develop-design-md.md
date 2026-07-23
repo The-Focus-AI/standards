@@ -129,6 +129,12 @@ Rules for the variants:
   four times, and the user will (rightly) reject the whole round. A
   typeface only reads as a direction when the composition around it
   changes too.
+- Draw faces and moves from `reports/2026-07-23-creative-typography.md`:
+  anchor each variant in a different personality group (editorial drama,
+  characterful grotesk, weird display, mono-led), never a system-stack or
+  AI-default face as display, and give every variant a named signature
+  move. The note's "checkable anti-boring rules" belong in the final
+  DESIGN.md's typography section.
 - **Never propose the AI-default looks** unless the user explicitly asks for
   one: warm cream ground + serif display + terracotta/clay accent (the
   ubiquitous "Claude look"), near-black with a lone acid-green pop, or a
