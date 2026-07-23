@@ -135,6 +135,43 @@ Brussels), plus one-offs. Foundry surveys: [Creative Boom](https://www.creativeb
 6. Every face named must ship with its license noted (OFL, ITF FFL, etc.)
    and a self-hosting plan.
 
+## Mocking a face without the file (approximation recipes)
+
+Specimens and quick mockups don't need font binaries — and font files never
+get committed to the standards repo. What an agent needs is a description
+sharp enough to fake the *silhouette* from system stacks and CSS, plus a
+label admitting the approximation. Recipes for the faces above:
+
+| Face | What it actually looks like | Mock recipe (system stacks + CSS) |
+| --- | --- | --- |
+| Le Murmure | Ultra-condensed grotesque, tall x-height, deep ink traps at every junction; library-meets-nightclub | `"Arial Narrow", Haettenschweiler` 700, uppercase, `letter-spacing: 0.02em`, `line-height: 0.95`, skew −6° for the manifesto cut |
+| Zodiak | High-contrast display serif: hairline horizontals, blade-like wedge serifs, glossy fashion energy | Georgia/`"Didot"` 700 at display sizes, `letter-spacing: -0.01em`, tight leading; italic for the drama cut |
+| Boska | Serif with claws — spiky terminals, more aggressive than Zodiak | Same base as Zodiak but add `font-stretch: condensed` where honored and tighter tracking |
+| Clash Display | Angular techy grotesk: flat-sided rounds, abrupt terminals, built for large sizes | `"Helvetica Neue"` 700, `letter-spacing: -0.03em`, sizes ≥ 40px only |
+| Cabinet Grotesk | Neo-grotesque with quirky display cuts, generous x-height | System sans 800, `letter-spacing: -0.02em`, slightly loose leading |
+| Apfel Grotezk | Round, Germanic, a little naive; circles barely modulated | `Verdana`/`"Trebuchet MS"` 700 with `letter-spacing: 0.01em` — the extra width reads as the roundness |
+| Pilowlava | Inflated blob display — letters look pumped full of air | `"Arial Rounded MT Bold", "Verdana"` 900, `letter-spacing: 0.04em`; use sparingly, one word at most |
+| Special Elite / Redaction | Typewriter with ribbon bleed / photocopy decay; institutional, worn | `"Courier New"` 700, uppercase for display; add `text-shadow: 0 0 0.5px currentColor` for ink spread |
+| Departure Mono | Pixel-grid terminal mono, charming at small sizes | `ui-monospace` at 11–12px, `letter-spacing: 0.08em`, lowercase labels |
+| Monaspace (Argon/Krypton) | Humanist/mechanical mono superfamily, texture-healed | `ui-monospace` with normal tracking; vary weight, not family |
+| Instrument Serif | Sharp small display serif, almost engraved | Georgia 400 at large sizes with `letter-spacing: 0.01em` — the lightness is the point |
+
+Two rules when mocking:
+
+1. **Label it.** The specimen's own chrome says "rendered in fallback;
+   spec face is Le Murmure." A silent approximation is a wrong answer the
+   user can't see they're approving.
+2. **Mock the composition, not just the family.** The recipes above only
+   read as their faces when the size, case, tracking, and leading come with
+   them — Arial Narrow at 16px lowercase is not a Le Murmure mock, it's
+   Arial Narrow.
+
+When a round graduates to high fidelity (final direction bake-off, client
+presentation), *then* pull the real woff2 from the foundry and embed it as
+a data URI in the published specimen — sizes and licenses are in the
+delivery notes below. The binary lives in the published artifact or the
+project's own repo, never in standards.
+
 ## Delivery notes (agents, mind the sandbox)
 
 - **Apps**: self-host woff2 (Fontshare and Velvetyne provide files;

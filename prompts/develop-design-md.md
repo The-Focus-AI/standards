@@ -135,13 +135,17 @@ Rules for the variants:
   AI-default face as display, and give every variant a named signature
   move. The note's "checkable anti-boring rules" belong in the final
   DESIGN.md's typography section.
-- **Specimens show the real face or say they don't.** Embed the actual
-  display face as a subsetted woff2 data URI (Fontshare, Velvetyne, and
-  Google faces run 15–55 KB per cut — the note has sources and license
-  terms). Where embedding isn't worth it, print the fallback in the
-  specimen's own chrome ("rendered in Trebuchet; spec face is Gill Sans").
-  A silent fallback is a wrong answer the user can't see they're
-  approving.
+- **Specimens mock faces from descriptions, and say so.** Early rounds
+  don't need font files: use the approximation recipes in the typography
+  note (each face described sharply enough to fake its silhouette — family
+  stack, weight, case, tracking, leading together, not just a family
+  swap), and print the approximation in the specimen's own chrome
+  ("rendered in fallback; spec face is Le Murmure"). A silent fallback is
+  a wrong answer the user can't see they're approving. Only a
+  high-fidelity final round embeds the real woff2 — into the published
+  specimen or the project's repo, never into standards. The DESIGN.md
+  itself always names the real face, its license, and its mock recipe, so
+  any agent can approximate it without the file.
 - **Never propose the AI-default looks** unless the user explicitly asks for
   one: warm cream ground + serif display + terracotta/clay accent (the
   ubiquitous "Claude look"), near-black with a lone acid-green pop, or a
