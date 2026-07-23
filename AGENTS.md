@@ -26,8 +26,9 @@ Start with these files, depending on the work being requested:
 - `prompts/setup-project.md` — prompt for applying these standards to a new project.
 - `prompts/standardize-project.md` — inspect-first prompt for auditing an existing project against these markdown standards, proposing a diff, and migrating to mise/fnox/1Password safely.
 - `prompts/generate-dockerfile.md` — prompt for regenerating the standards container Dockerfile.
+- `prompts/develop-design-md.md` — prompt for developing a project's brand/`DESIGN.md` via the `grill-me` and `prototype` skills.
 - `architecture/` — design notes and decisions for this standards repo itself.
-- `reports/` — longer research/reference material, including fnox secrets and the skills CLI.
+- `reports/` — longer research/reference material, including fnox secrets, the skills CLI, and creative typography for DESIGN.md work.
 - `tests/` — validation scripts for this standards repo.
 
 ## How to inspect a project

@@ -1,0 +1,1067 @@
+<title>DESIGN.md Direction Gallery</title>
+<style>
+  /* Display faces are named in the stacks below but NOT embedded in the repo copy —
+     font binaries stay out of the standards repo. At publish time, inject subsetted
+     woff2 data URIs here for the named faces (Special Elite, Le Murmure, Zodiak,
+     Departure Mono), or let the labeled system fallbacks stand. Approximation
+     recipes: reports/2026-07-23-creative-typography.md. */
+
+  /* ============ chrome tokens ============ */
+  :root {
+    --c-bg: #F7F7F5;
+    --c-surface: #FFFFFF;
+    --c-ink: #20201E;
+    --c-muted: #6D6C66;
+    --c-border: #E4E3DE;
+    --c-accent: #A32C22;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --c-bg: #161615;
+      --c-surface: #1E1E1C;
+      --c-ink: #ECEBE6;
+      --c-muted: #96948C;
+      --c-border: #2E2E2B;
+    }
+  }
+  :root[data-theme="dark"] {
+    --c-bg: #161615; --c-surface: #1E1E1C; --c-ink: #ECEBE6;
+    --c-muted: #96948C; --c-border: #2E2E2B;
+  }
+  :root[data-theme="light"] {
+    --c-bg: #F7F7F5; --c-surface: #FFFFFF; --c-ink: #20201E;
+    --c-muted: #6D6C66; --c-border: #E4E3DE;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--c-bg);
+    color: var(--c-ink);
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    line-height: 1.5;
+  }
+
+  .chrome-head {
+    padding: 1.25rem 1.5rem 0;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .chrome-head .eyebrow {
+    font-size: 0.6875rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--c-muted);
+  }
+  .chrome-head h1 {
+    font-size: 1.25rem;
+    font-weight: 650;
+    margin: 0.2rem 0 0.3rem;
+  }
+  .chrome-head p {
+    margin: 0;
+    max-width: 62ch;
+    color: var(--c-muted);
+    font-size: 0.875rem;
+  }
+  .chrome-head p b { color: var(--c-ink); font-weight: 600; }
+
+  .tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.375rem;
+    max-width: 1100px;
+    margin: 1.1rem auto 0;
+    padding: 0 1.5rem;
+  }
+  .tabs button {
+    appearance: none;
+    border: 1px solid var(--c-border);
+    background: var(--c-surface);
+    color: var(--c-muted);
+    font: inherit;
+    font-size: 0.8125rem;
+    font-weight: 550;
+    padding: 0.45rem 0.85rem;
+    border-radius: 999px;
+    cursor: pointer;
+  }
+  .tabs button:hover { color: var(--c-ink); }
+  .tabs button:focus-visible { outline: 2px solid var(--c-accent); outline-offset: 2px; }
+  .tabs button[aria-selected="true"] {
+    background: var(--c-accent);
+    border-color: var(--c-accent);
+    color: #fff;
+  }
+  .tabs .swatch {
+    display: inline-block;
+    width: 0.55em; height: 0.55em;
+    border-radius: 50%;
+    margin-right: 0.45em;
+    background: currentColor;
+  }
+  .tabs button[aria-selected="true"] .swatch { background: #fff; }
+
+  .stage-wrap {
+    max-width: 1100px;
+    margin: 1.1rem auto 3rem;
+    padding: 0 1.5rem;
+  }
+  .stage {
+    border: 1px solid var(--c-border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .variant { display: none; }
+  .variant.active { display: block; }
+
+  .meta-strip {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.5rem;
+    align-items: baseline;
+    padding: 0.7rem 1.5rem;
+    border-bottom: 1px solid var(--c-border);
+    background: var(--c-surface);
+    font-size: 0.8125rem;
+    color: var(--c-muted);
+  }
+  .meta-strip .fam { font-weight: 600; color: var(--c-ink); }
+
+  /* ============ shared specimen scaffolding (visuals come from variant vars) ============ */
+  .spec {
+    background: var(--v-bg);
+    color: var(--v-ink);
+    font-family: var(--v-body);
+    padding: 0;
+  }
+  .spec section { padding: 2.2rem 2rem; border-bottom: 1px solid var(--v-line); }
+  .spec section:last-child { border-bottom: none; }
+  .spec .label {
+    font-family: var(--v-utility);
+    font-size: 0.6875rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--v-muted);
+    margin: 0 0 1.1rem;
+  }
+
+  /* nav */
+  .spec .nav {
+    display: flex; align-items: center; gap: 1.4rem;
+    padding: 0.9rem 2rem;
+    border-bottom: 1px solid var(--v-line);
+    background: var(--v-navbg);
+    color: var(--v-navink);
+  }
+  .spec .nav .logo { font-family: var(--v-display); font-weight: var(--v-dispweight); font-size: 1.05rem; letter-spacing: var(--v-logospace); }
+  .spec .nav a { color: var(--v-navink); opacity: 0.75; text-decoration: none; font-size: 0.85rem; font-family: var(--v-utility); }
+  .spec .nav a:hover { opacity: 1; }
+  .spec .nav .spacer { flex: 1; }
+
+  /* hero */
+  .spec .hero h2 {
+    font-family: var(--v-display);
+    font-weight: var(--v-dispweight);
+    font-size: clamp(2rem, 5vw, var(--v-herosize));
+    line-height: 1.05;
+    letter-spacing: var(--v-dispspace);
+    text-transform: var(--v-herocase);
+    margin: 0 0 0.8rem;
+    max-width: 18ch;
+    text-wrap: balance;
+  }
+  .spec .hero p.lede { font-size: 1.05rem; max-width: 52ch; color: var(--v-muted); margin: 0 0 1.5rem; }
+  .spec .cta-row { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+
+  /* buttons */
+  .spec .btn {
+    font-family: var(--v-utility);
+    font-size: 0.875rem;
+    font-weight: 600;
+    padding: 0.62rem 1.15rem;
+    border-radius: var(--v-radius);
+    border: 1px solid transparent;
+    cursor: pointer;
+    text-transform: var(--v-btncase);
+    letter-spacing: var(--v-btnspace);
+  }
+  .spec .btn:focus-visible { outline: 2px solid var(--v-accent); outline-offset: 2px; }
+  .spec .btn.primary { background: var(--v-accent); color: var(--v-onaccent); }
+  .spec .btn.primary:hover { background: var(--v-accenthover); }
+  .spec .btn.secondary { background: transparent; color: var(--v-ink); border-color: var(--v-inkline); }
+  .spec .btn.secondary:hover { background: var(--v-wash); }
+  .spec .btn.ghost { background: transparent; color: var(--v-muted); }
+  .spec .btn.ghost:hover { color: var(--v-ink); }
+  .spec .btn.destructive { background: var(--v-danger); color: #fff; }
+  .spec .btn[disabled] { opacity: 0.45; cursor: not-allowed; }
+
+  /* type scale */
+  .spec .scale-row { display: flex; align-items: baseline; gap: 1.25rem; margin-bottom: 0.9rem; }
+  .spec .scale-row .px { font-family: var(--v-utility); font-size: 0.6875rem; color: var(--v-muted); min-width: 6.5rem; }
+  .spec .t-display { font-family: var(--v-display); font-weight: var(--v-dispweight); font-size: 2.4rem; line-height: 1.05; letter-spacing: var(--v-dispspace); text-transform: var(--v-herocase); }
+  .spec .t-h2 { font-family: var(--v-display); font-weight: var(--v-dispweight); font-size: 1.5rem; }
+  .spec .t-body { font-size: 1rem; max-width: 58ch; }
+  .spec .t-caption { font-family: var(--v-utility); font-size: 0.75rem; color: var(--v-muted); letter-spacing: 0.04em; }
+
+  /* colors */
+  .spec .swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 0.75rem; }
+  .spec .swatch-card { border: 1px solid var(--v-line); border-radius: var(--v-radius); overflow: hidden; background: var(--v-surface); }
+  .spec .swatch-card .chip { height: 3.4rem; }
+  .spec .swatch-card .info { padding: 0.5rem 0.65rem; }
+  .spec .swatch-card .tok { font-family: var(--v-mono); font-size: 0.72rem; }
+  .spec .swatch-card .hex { font-family: var(--v-mono); font-size: 0.68rem; color: var(--v-muted); }
+
+  /* components grid */
+  .spec .comp-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.25rem; align-items: start; }
+  .spec .panel {
+    background: var(--v-surface);
+    border: 1px solid var(--v-line);
+    border-radius: var(--v-radius);
+    padding: 1.1rem;
+    box-shadow: var(--v-shadow);
+  }
+  .spec .panel h4 { margin: 0 0 0.3rem; font-family: var(--v-display); font-weight: var(--v-dispweight); font-size: 1.05rem; }
+  .spec .panel p { margin: 0 0 0.9rem; font-size: 0.85rem; color: var(--v-muted); }
+  .spec .field label { display: block; font-family: var(--v-utility); font-size: 0.72rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--v-muted); margin-bottom: 0.35rem; }
+  .spec .field input {
+    width: 100%;
+    font: inherit; font-size: 0.9rem;
+    color: var(--v-ink);
+    background: var(--v-fieldbg);
+    border: 1px solid var(--v-inkline);
+    border-radius: var(--v-radius);
+    padding: 0.55rem 0.7rem;
+  }
+  .spec .field input:focus { outline: 2px solid var(--v-accent); outline-offset: 1px; }
+  .spec .field { margin-bottom: 0.9rem; }
+
+  .spec table { width: 100%; border-collapse: collapse; font-size: 0.85rem; font-variant-numeric: tabular-nums; }
+  .spec th { font-family: var(--v-utility); font-size: 0.68rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--v-muted); text-align: left; padding: 0.45rem 0.6rem; border-bottom: 1px solid var(--v-inkline); }
+  .spec td { padding: 0.55rem 0.6rem; border-bottom: 1px solid var(--v-line); }
+  .spec .pill { font-family: var(--v-utility); font-size: 0.68rem; font-weight: 600; padding: 0.15rem 0.55rem; border-radius: 999px; }
+  .spec .pill.ok { background: var(--v-okbg); color: var(--v-ok); }
+  .spec .pill.warn { background: var(--v-warnbg); color: var(--v-warn); }
+
+  /* voice */
+  .spec .voice { font-family: var(--v-display); font-weight: var(--v-dispweight); font-size: 1.3rem; max-width: 40ch; margin: 0 0 0.4rem; }
+  .spec .voice-note { font-size: 0.85rem; color: var(--v-muted); max-width: 60ch; margin: 0 0 1.4rem; }
+  .spec .voice-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; align-items: start; }
+  .spec ol.rules { margin: 0; padding-left: 1.2rem; font-size: 0.875rem; }
+  .spec ol.rules li { margin-bottom: 0.55rem; }
+  .spec ol.rules li:last-child { margin-bottom: 0; font-style: italic; color: var(--v-muted); }
+  .spec .rw-label {
+    font-family: var(--v-utility); font-size: 0.66rem; font-weight: 700;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    margin: 0 0 0.3rem; color: var(--v-muted);
+  }
+  .spec .rw-label.good { color: var(--v-accent); }
+  .spec .rw {
+    font-size: 0.9rem; margin: 0 0 1rem;
+    padding: 0.6rem 0.8rem;
+    border-left: 3px solid var(--v-inkline);
+    background: var(--v-wash);
+  }
+  .spec .rw.after { border-left-color: var(--v-accent); margin-bottom: 0; }
+  .spec .rw.before { text-decoration: line-through; text-decoration-thickness: 1px; text-decoration-color: var(--v-muted); color: var(--v-muted); }
+  .spec .banned { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.9rem; }
+  .spec .banned span {
+    font-family: var(--v-mono); font-size: 0.72rem;
+    padding: 0.2rem 0.55rem;
+    border: 1px solid var(--v-inkline);
+    border-radius: var(--v-radius);
+    color: var(--v-muted);
+    text-decoration: line-through;
+  }
+
+  /* tokens + prompt */
+  .spec pre {
+    font-family: var(--v-mono);
+    font-size: 0.78rem;
+    line-height: 1.55;
+    background: var(--v-codebg);
+    color: var(--v-codeink);
+    border: 1px solid var(--v-line);
+    border-radius: var(--v-radius);
+    padding: 1rem 1.1rem;
+    overflow-x: auto;
+    margin: 0;
+    white-space: pre;
+  }
+  .spec .prompt-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 0.8rem; }
+  .spec .copy-btn {
+    font-family: var(--v-utility); font-size: 0.78rem; font-weight: 600;
+    background: var(--v-accent); color: var(--v-onaccent);
+    border: none; border-radius: var(--v-radius);
+    padding: 0.45rem 0.9rem; cursor: pointer;
+  }
+  .spec .copy-btn:focus-visible { outline: 2px solid var(--v-accent); outline-offset: 2px; }
+  .spec .prompt-text { white-space: pre-wrap; }
+
+  @media (max-width: 640px) {
+    .spec section, .spec .nav { padding-left: 1.1rem; padding-right: 1.1rem; }
+    .spec .scale-row { flex-direction: column; gap: 0.2rem; }
+  }
+
+  /* ============ variant worlds ============ */
+
+  /* 1 — 1950s Bureau Dossier */
+  .stage[data-v="dossier"] .spec {
+    --v-bg: #E7DCC3; --v-surface: #F0E7D2; --v-wash: #DDD0B2;
+    --v-ink: #2B2620; --v-muted: #6E6250; --v-line: #C9BC9C; --v-inkline: #8A7B5E;
+    --v-accent: #A32C22; --v-accenthover: #8A241C; --v-onaccent: #F0E7D2;
+    --v-danger: #A32C22;
+    --v-ok: #4A5D3A; --v-okbg: #D8D6B8; --v-warn: #7A5215; --v-warnbg: #E4D5AC;
+    --v-navbg: #2B2620; --v-navink: #E7DCC3;
+    --v-fieldbg: #F0E7D2; --v-codebg: #2B2620; --v-codeink: #D9CDA8;
+    --v-display: "Special Elite", "Courier New", Courier, monospace;
+    --v-body: "Courier New", Courier, monospace;
+    --v-utility: "Courier New", Courier, monospace;
+    --v-mono: "Courier New", Courier, monospace;
+    --v-dispweight: 400; --v-dispspace: 0.04em; --v-logospace: 0.12em;
+    --v-herosize: 2.7rem; --v-herocase: uppercase;
+    --v-btncase: uppercase; --v-btnspace: 0.1em;
+    --v-radius: 0px; --v-shadow: none;
+  }
+  .stage[data-v="dossier"] .hero { position: relative; }
+  .stage[data-v="dossier"] .hero::after {
+    content: "CONFIDENTIAL";
+    position: absolute; top: 2rem; right: 2rem;
+    font-family: "Courier New", Courier, monospace;
+    font-weight: 700; font-size: 0.95rem; letter-spacing: 0.18em;
+    color: #A32C22; border: 3px double #A32C22;
+    padding: 0.3rem 0.75rem;
+    transform: rotate(-7deg);
+    opacity: 0.75;
+    pointer-events: none;
+  }
+
+  /* 2 — Japanese Technical Specification */
+  .stage[data-v="jis"] .spec {
+    --v-bg: #FCFCFA; --v-surface: #FFFFFF; --v-wash: #F2F2EE;
+    --v-ink: #1C1C1A; --v-muted: #61615C; --v-line: #D9D9D2; --v-inkline: #8F8F87;
+    --v-accent: #D43D2A; --v-accenthover: #B93321; --v-onaccent: #FFFFFF;
+    --v-danger: #B93321;
+    --v-ok: #2E6E4E; --v-okbg: #E4EFE8; --v-warn: #8A6116; --v-warnbg: #F3ECD4;
+    --v-navbg: #FFFFFF; --v-navink: #1C1C1A;
+    --v-fieldbg: #FFFFFF; --v-codebg: #1C1C1A; --v-codeink: #E8E8E2;
+    --v-display: "Hiragino Kaku Gothic ProN", "Yu Gothic", Meiryo, "Segoe UI", sans-serif;
+    --v-body: "Hiragino Kaku Gothic ProN", "Yu Gothic", Meiryo, "Segoe UI", sans-serif;
+    --v-utility: "Hiragino Kaku Gothic ProN", "Yu Gothic", Meiryo, sans-serif;
+    --v-mono: ui-monospace, "SF Mono", Menlo, monospace;
+    --v-dispweight: 600; --v-dispspace: 0.01em; --v-logospace: 0.06em;
+    --v-herosize: 2.1rem; --v-herocase: none; --v-btncase: none; --v-btnspace: 0;
+    --v-radius: 0px; --v-shadow: none;
+  }
+
+  /* 3 — Flat-Pack Manual */
+  .stage[data-v="flatpack"] .spec {
+    --v-bg: #FFFFFF; --v-surface: #FFFFFF; --v-wash: #F5F5F5;
+    --v-ink: #111111; --v-muted: #6B6B6B; --v-line: #111111; --v-inkline: #111111;
+    --v-accent: #0058A3; --v-accenthover: #004B8C; --v-onaccent: #FFFFFF;
+    --v-danger: #CC0008;
+    --v-ok: #1F7A3D; --v-okbg: #E4F1E8; --v-warn: #8A6500; --v-warnbg: #FFF2C2;
+    --v-navbg: #0058A3; --v-navink: #FFDB00;
+    --v-fieldbg: #FFFFFF; --v-codebg: #111111; --v-codeink: #EEEEEE;
+    --v-display: Verdana, "DejaVu Sans", Geneva, sans-serif;
+    --v-body: Verdana, "DejaVu Sans", Geneva, sans-serif;
+    --v-utility: Verdana, "DejaVu Sans", sans-serif;
+    --v-mono: ui-monospace, Menlo, monospace;
+    --v-dispweight: 700; --v-dispspace: -0.01em; --v-logospace: 0.02em;
+    --v-herosize: 2.8rem; --v-herocase: none; --v-btncase: none; --v-btnspace: 0;
+    --v-radius: 10px; --v-shadow: none;
+  }
+
+  /* 4 — Italo-Futurismo */
+  .stage[data-v="futurismo"] .spec {
+    --v-bg: #EFE3CB; --v-surface: #F5ECD8; --v-wash: #E5D6B4;
+    --v-ink: #17130E; --v-muted: #5E5540; --v-line: #17130E; --v-inkline: #17130E;
+    --v-accent: #C8281E; --v-accenthover: #A81F16; --v-onaccent: #F5ECD8;
+    --v-danger: #C8281E;
+    --v-ok: #17130E; --v-okbg: #E5D6B4; --v-warn: #17130E; --v-warnbg: #F0D9B0;
+    --v-navbg: #17130E; --v-navink: #EFE3CB;
+    --v-fieldbg: #F5ECD8; --v-codebg: #17130E; --v-codeink: #E8D9B4;
+    --v-display: "Le Murmure", "Arial Narrow", Haettenschweiler, "Franklin Gothic Medium", Impact, sans-serif;
+    --v-body: "Helvetica Neue", Arial, sans-serif;
+    --v-utility: "Arial Narrow", "Franklin Gothic Medium", Arial, sans-serif;
+    --v-mono: ui-monospace, Menlo, monospace;
+    --v-dispweight: 400; --v-dispspace: 0.02em; --v-logospace: 0.08em;
+    --v-herosize: 4.6rem; --v-herocase: uppercase;
+    --v-btncase: uppercase; --v-btnspace: 0.1em;
+    --v-radius: 0px; --v-shadow: none;
+  }
+  .stage[data-v="futurismo"] .hero h2,
+  .stage[data-v="futurismo"] .t-display {
+    transform: skewX(-6deg);
+    transform-origin: 0 100%;
+  }
+
+  /* 5 — Apollo Flight Manual */
+  .stage[data-v="apollo"] .spec {
+    --v-bg: #F4F4F0; --v-surface: #FFFFFF; --v-wash: #E9E9E2;
+    --v-ink: #14181D; --v-muted: #5B6470; --v-line: #C9CDD2; --v-inkline: #8A93A0;
+    --v-accent: #0B3D91; --v-accenthover: #092F70; --v-onaccent: #FFFFFF;
+    --v-danger: #D2311E;
+    --v-ok: #1F6E43; --v-okbg: #E1EDE5; --v-warn: #8A6116; --v-warnbg: #F3ECD4;
+    --v-navbg: #0B3D91; --v-navink: #F4F4F0;
+    --v-fieldbg: #FFFFFF; --v-codebg: #14181D; --v-codeink: #D7DDE5;
+    --v-display: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --v-body: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --v-utility: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --v-mono: ui-monospace, "SF Mono", Menlo, monospace;
+    --v-dispweight: 700; --v-dispspace: 0.05em; --v-logospace: 0.1em;
+    --v-herosize: 2.5rem; --v-herocase: uppercase;
+    --v-btncase: uppercase; --v-btnspace: 0.08em;
+    --v-radius: 2px; --v-shadow: none;
+  }
+
+  /* 6 — Marber-Grid Paperback */
+  .stage[data-v="paperback"] .spec {
+    --v-bg: #F7F1E3; --v-surface: #FBF7EC; --v-wash: #EFE6D0;
+    --v-ink: #17150F; --v-muted: #6A6455; --v-line: #D9CFB6; --v-inkline: #17150F;
+    --v-accent: #F05A28; --v-accenthover: #D44A1C; --v-onaccent: #17150F;
+    --v-danger: #B03A2E;
+    --v-ok: #3E5A3A; --v-okbg: #E2E5CD; --v-warn: #8A6116; --v-warnbg: #F0E3BE;
+    --v-navbg: #F05A28; --v-navink: #17150F;
+    --v-fieldbg: #FBF7EC; --v-codebg: #17150F; --v-codeink: #EFE6D0;
+    --v-display: "Gill Sans", "Gill Sans MT", "Trebuchet MS", Verdana, sans-serif;
+    --v-body: "Gill Sans", "Gill Sans MT", "Trebuchet MS", Verdana, sans-serif;
+    --v-utility: "Gill Sans", "Gill Sans MT", "Trebuchet MS", sans-serif;
+    --v-mono: ui-monospace, Menlo, monospace;
+    --v-dispweight: 600; --v-dispspace: 0; --v-logospace: 0.04em;
+    --v-herosize: 3rem; --v-herocase: none; --v-btncase: none; --v-btnspace: 0;
+    --v-radius: 0px; --v-shadow: none;
+  }
+  .stage[data-v="paperback"] .hero { border-top: 6px solid var(--v-ink); }
+
+  /* 7 — Field Naturalist */
+  .stage[data-v="naturalist"] .spec {
+    --v-bg: #F3EAD7; --v-surface: #F9F3E4; --v-wash: #EBDFC4;
+    --v-ink: #3E3226; --v-muted: #7C6E58; --v-line: #DCCFAF; --v-inkline: #A28F6C;
+    --v-accent: #5A6B44; --v-accenthover: #495736; --v-onaccent: #F9F3E4;
+    --v-danger: #9C4A2E;
+    --v-ok: #5A6B44; --v-okbg: #E2E3C8; --v-warn: #8A6116; --v-warnbg: #EFE3BE;
+    --v-navbg: #3E3226; --v-navink: #F3EAD7;
+    --v-fieldbg: #F9F3E4; --v-codebg: #3E3226; --v-codeink: #E4D8B8;
+    --v-display: "Zodiak", Georgia, "Iowan Old Style", "Times New Roman", serif;
+    --v-body: Georgia, "Iowan Old Style", serif;
+    --v-utility: Georgia, serif;
+    --v-mono: ui-monospace, Menlo, monospace;
+    --v-dispweight: 700; --v-dispspace: 0; --v-logospace: 0.03em;
+    --v-herosize: 2.9rem; --v-herocase: none; --v-btncase: none; --v-btnspace: 0.02em;
+    --v-radius: 2px; --v-shadow: none;
+  }
+  .stage[data-v="naturalist"] .voice,
+  .stage[data-v="naturalist"] .hero h2 { font-style: italic; }
+
+  /* 8 — Industrial Hardware Panel */
+  .stage[data-v="hardware"] .spec {
+    --v-bg: #D9D9D6; --v-surface: #E4E4E1; --v-wash: #CFCFCB;
+    --v-ink: #1B1B1A; --v-muted: #5F5F5C; --v-line: #B9B9B4; --v-inkline: #8C8C87;
+    --v-accent: #FF4D00; --v-accenthover: #E04300; --v-onaccent: #FFFFFF;
+    --v-danger: #C0271A;
+    --v-ok: #2E7D4F; --v-okbg: #C9DCD0; --v-warn: #8A6116; --v-warnbg: #E5DDC2;
+    --v-navbg: #1B1B1A; --v-navink: #E4E4E1;
+    --v-fieldbg: #EDEDEA; --v-codebg: #1B1B1A; --v-codeink: #D5D5D0;
+    --v-display: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --v-body: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --v-utility: "Departure Mono", ui-monospace, "SF Mono", Menlo, monospace;
+    --v-mono: "Departure Mono", ui-monospace, "SF Mono", Menlo, monospace;
+    --v-dispweight: 700; --v-dispspace: -0.01em; --v-logospace: 0.14em;
+    --v-herosize: 2.4rem; --v-herocase: none;
+    --v-btncase: uppercase; --v-btnspace: 0.12em;
+    --v-radius: 3px; --v-shadow: inset 0 1px 0 rgba(255,255,255,0.5);
+  }
+</style>
+
+<header class="chrome-head">
+  <div class="eyebrow">Prototype · throwaway · DESIGN.md exploration</div>
+  <h1>DESIGN.md Direction Gallery</h1>
+  <p>Eight concept-driven visual directions, each rendering the <b>same product specimen</b> — a fictional
+  note-taking tool called Fieldnote. Browse, pick what resonates, steal across directions, then copy
+  that direction's <b>starter prompt</b> to grill and generate a real DESIGN.md.</p>
+</header>
+
+<nav class="tabs" role="tablist" aria-label="Design directions" id="tabs"></nav>
+
+<div class="stage-wrap">
+  <div class="stage" id="stage">
+    <div class="meta-strip" id="meta"></div>
+    <div id="panels"></div>
+  </div>
+</div>
+
+<script>
+const VARIANTS = [
+  {
+    id: "dossier",
+    name: "1950s Bureau Dossier",
+    accent: "#A32C22",
+    family: "Typewriter bureaucracy · FOIA scans · case-file archives",
+    mood: "Manila folder, carbon-copy typewriter type, stamped red accents, hard rules. The interface as an open case file.",
+    face: "Display: Special Elite (embedded) — spec face Redaction when self-hosting",
+    tokens:
+`name: fieldnote-dossier
+colors:
+  manila: "#E7DCC3"       # aged folder stock
+  carbon: "#2B2620"       # typewriter ribbon ink
+  stamp: "#A32C22"        # rubber-stamp red; stamps and actions only
+typography:
+  display: { fontFamily: "Special Elite", fontWeight: 400,
+             textTransform: "uppercase", letterSpacing: "0.04em" }
+  body:    { fontFamily: "Courier Prime", fontSize: "15px",
+             lineHeight: 1.6 }
+rounded: { all: 0px }
+spacing: { sm: 8px, md: 16px, lg: 32px, section: 72px }
+components:
+  button-primary:
+    backgroundColor: "{colors.stamp}"
+    textColor: "{colors.manila}"
+    rounded: "{rounded.all}"
+  emphasis-redaction:
+    backgroundColor: "{colors.carbon}"   # redaction bar motif`,
+    prompt:
+`Create a DESIGN.md (google-labs-code/design.md spec: YAML tokens + prose sections) for <PROJECT> in a 1950s BUREAU DOSSIER direction: manila-folder ground, typewriter monospace for every role, rubber-stamp red reserved for stamps and primary actions, redaction-bar motifs for emphasis, hard 1px rules, zero radius, and document furniture (file numbers, dates, PAGE 3 OF 12) as UI chrome. Never: gradients, rounded corners, friendly icons, drop shadows. Include a Voice & Tone rulebook with numbered writing rules, banned words, and five before/after rewrite pairs — the voice is a bureau memo: dated, numbered, dispassionate. Grill me first one question at a time on how far the conceit goes (errors as CASE NOTES? empty states as MISSING EVIDENCE?) and where legibility must win over theme.`
+  },
+  {
+    id: "jis",
+    name: "Japanese Technical Spec",
+    accent: "#D43D2A",
+    family: "JIS engineering drawings · Muji restraint · dimension lines",
+    mood: "Bright white, small dense type, hairline rule grids, one vermilion hanko stamp. Everything numbered, nothing decorated.",
+    face: "Display: system JP sans fallback — spec face Noto Sans JP",
+    tokens:
+`name: fieldnote-jis
+colors:
+  paper: "#FCFCFA"
+  sumi: "#1C1C1A"         # ink black
+  shu: "#D43D2A"          # vermilion; the hanko — one stamp per view
+  rule: "#D9D9D2"         # hairline grid
+typography:
+  display: { fontFamily: "Noto Sans JP", fontWeight: 600,
+             fontSize: "28px" }        # spec sheets whisper
+  body:    { fontFamily: "Noto Sans JP", fontSize: "13px",
+             lineHeight: 1.7 }
+rounded: { all: 0px }
+spacing: { sm: 4px, md: 8px, lg: 24px, section: 56px }
+components:
+  button-primary:
+    backgroundColor: "{colors.shu}"
+    textColor: "#FFFFFF"
+    rounded: "{rounded.all}"
+  divider-dimension:
+    borderColor: "{colors.rule}"       # drawn like a dimension line`,
+    prompt:
+`Create a DESIGN.md (google-labs-code/design.md spec) for <PROJECT> in a JAPANESE TECHNICAL SPECIFICATION direction: bright white ground, small dense sans (Noto Sans JP energy), hairline rule grids drawn like an engineering drawing, dimension-line dividers, clause and figure numbering (§4.2, 図1, 表3) as UI furniture, and exactly one vermilion accent used like a hanko stamp — once per view. Display type stays small; hierarchy comes from numbering and rules, not size. Never: large hero type, decorative color, shadows, roundness. Include a Voice & Tone rulebook with numbered writing rules, banned words, and five before/after rewrite pairs — the voice is specification language: 'shall', tolerances, numbered clauses, zero adjectives. Grill me first one question at a time on density limits and how much of the numbering conceit real users can absorb.`
+  },
+  {
+    id: "flatpack",
+    name: "Flat-Pack Manual",
+    accent: "#0058A3",
+    family: "Flat-pack assembly manuals · airline safety cards · pictogram wayfinding",
+    mood: "White page, thick black diagram lines, one blue and one yellow, giant step numerals. Words are a last resort.",
+    face: "Display: Verdana (authentic to the manual genre)",
+    tokens:
+`name: fieldnote-flatpack
+colors:
+  page: "#FFFFFF"
+  outline: "#111111"      # thick diagram stroke (2-3px)
+  blue: "#0058A3"
+  yellow: "#FFDB00"       # highlights and the wordmark only
+typography:
+  display: { fontFamily: "Noto Sans", fontWeight: 700 }
+  body:    { fontFamily: "Noto Sans", fontSize: "15px",
+             lineHeight: 1.5 }
+  stepNumeral: { fontSize: "48px", fontWeight: 700 }
+rounded: { sm: 6px, md: 10px }
+spacing: { sm: 8px, md: 16px, lg: 40px, section: 96px }
+components:
+  button-primary:
+    backgroundColor: "{colors.blue}"
+    textColor: "#FFFFFF"
+    rounded: "{rounded.md}"
+  step-marker:
+    typography: "{typography.stepNumeral}"`,
+    prompt:
+`Create a DESIGN.md (google-labs-code/design.md spec) for <PROJECT> in a FLAT-PACK MANUAL direction: white ground, thick black outline strokes (2-3px) on every illustration and container, giant step numerals doing the sequencing, one blue + one yellow with fixed roles, pictograms wherever prose could be deleted, and warning blocks drawn like safety-card callouts. Friendly rounded geometry, generous white space. Never: long paragraphs, decorative gradients, more than two brand colors. Include a Voice & Tone rulebook with numbered writing rules, banned words, and five before/after rewrite pairs — the voice barely speaks: single imperative verbs, numbers over connectives ('1. Open. 2. Write. 3. Share.'). Grill me first one question at a time on where wordlessness breaks down (errors, legal, onboarding) and what the pictogram library needs to cover.`
+  },
+  {
+    id: "futurismo",
+    name: "Italo-Futurismo",
+    accent: "#C8281E",
+    family: "Depero · Marinetti · 1910s manifesto posters",
+    mood: "Aged cream, black and vermilion, heavy condensed caps set at a slant. Velocity as a design principle.",
+    face: "Display: Le Murmure, Velvetyne (embedded)",
+    tokens:
+`name: fieldnote-futurismo
+colors:
+  crema: "#EFE3CB"        # aged poster stock
+  nero: "#17130E"
+  rosso: "#C8281E"        # the collision color
+typography:
+  display: { fontFamily: "Le Murmure", fontWeight: 400,
+             textTransform: "uppercase", fontStyle: "italic",
+             letterSpacing: "0.02em" }   # set at speed, skew -6deg
+  body:    { fontFamily: "Archivo", fontSize: "16px",
+             lineHeight: 1.45 }
+rounded: { all: 0px }
+spacing: { sm: 8px, md: 16px, lg: 40px, section: 104px }
+components:
+  button-primary:
+    backgroundColor: "{colors.rosso}"
+    textColor: "{colors.crema}"
+    rounded: "{rounded.all}"
+  headline-diagonal:
+    typography: "{typography.display}"   # allowed to rotate, collide`,
+    prompt:
+`Create a DESIGN.md (google-labs-code/design.md spec) for <PROJECT> in an ITALO-FUTURIST direction: aged-cream poster ground, black + vermilion only, heavy condensed uppercase display set in italic at a slant (parole in libertà energy — headlines may rotate and collide), diagonal section geometry, hard edges, zero radius, zero shadows. Body text stays disciplined so the display can be violent. Never: pastels, roundness, centered politeness, minimalist restraint. Include a Voice & Tone rulebook with numbered writing rules, banned words, and five before/after rewrite pairs — the voice is a manifesto: declarations, verbs of motion and machinery, and this is the one direction where exclamation marks are mandatory rather than banned. Grill me first one question at a time on how much aggression the product can carry and which surfaces (errors, billing) must stand down from the manifesto.`
+  },
+  {
+    id: "apollo",
+    name: "Apollo Flight Manual",
+    accent: "#0B3D91",
+    family: "1969 NASA systems handbooks · mission checklists",
+    mood: "Paper white, NASA blue and signal red, stenciled uppercase headers, checklist furniture. Nominal is praise enough.",
+    face: "Display: Helvetica (authentic — the 1969 handbooks used it)",
+    tokens:
+`name: fieldnote-apollo
+colors:
+  paper: "#F4F4F0"
+  ink: "#14181D"
+  nasa-blue: "#0B3D91"
+  signal-red: "#D2311E"   # WARNING only; never decoration
+typography:
+  display: { fontFamily: "IBM Plex Sans", fontWeight: 700,
+             textTransform: "uppercase", letterSpacing: "0.05em" }
+  body:    { fontFamily: "IBM Plex Sans", fontSize: "15px",
+             lineHeight: 1.55 }
+  data:    { fontFamily: "IBM Plex Mono",
+             fontVariantNumeric: "tabular-nums" }
+rounded: { sm: 2px }
+spacing: { sm: 8px, md: 16px, lg: 32px, section: 80px }
+components:
+  button-primary:
+    backgroundColor: "{colors.nasa-blue}"
+    textColor: "#FFFFFF"
+    rounded: "{rounded.sm}"
+  callout-warning:
+    backgroundColor: "{colors.signal-red}"
+    textColor: "#FFFFFF"`,
+    prompt:
+`Create a DESIGN.md (google-labs-code/design.md spec) for <PROJECT> in an APOLLO FLIGHT MANUAL direction: paper-white ground, NASA blue for structure and actions, signal red strictly reserved for WARNING, stenciled uppercase section headers with reference numbers (SEC 4.1.2), checklist rows and callout boxes as core furniture, monospace tabular numerals for all data. A fixed three-step severity ladder: NOTE, CAUTION, WARNING — never decorated, never skipped. Never: playful color, soft shadows, marketing exuberance. Include a Voice & Tone rulebook with numbered writing rules, banned words, and five before/after rewrite pairs — the voice is checklist grammar: VERB — NOUN — RESULT, 'nominal' as the only compliment. Grill me first one question at a time on how literal the checklist conceit gets and what the severity ladder maps to in the real product.`
+  },
+  {
+    id: "paperback",
+    name: "Marber-Grid Paperback",
+    accent: "#F05A28",
+    family: "Romek Marber's Penguin Crime grid · 1960s paperback covers",
+    mood: "Cream stock, one saturated cover color, Gill-esque humanist sans, strict horizontal bands. The type is the cover art.",
+    face: "Display: Gill Sans where installed, Trebuchet fallback — labeled, not silent",
+    tokens:
+`name: fieldnote-paperback
+colors:
+  cream: "#F7F1E3"        # book stock
+  ink: "#17150F"
+  cover: "#F05A28"        # the series color; bands and actions
+typography:
+  display: { fontFamily: "Gill Sans Nova", fontWeight: 600 }
+  body:    { fontFamily: "Gill Sans Nova", fontSize: "16px",
+             lineHeight: 1.55 }
+rounded: { all: 0px }
+spacing: { sm: 8px, md: 16px, lg: 32px, section: 88px }
+grid:
+  bands: "horizontal thirds; content sits in bands, never floats"
+components:
+  button-primary:
+    backgroundColor: "{colors.cover}"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.all}"
+  band-rule:
+    borderColor: "{colors.ink}"        # 4-6px horizontal rules`,
+    prompt:
+`Create a DESIGN.md (google-labs-code/design.md spec) for <PROJECT> in a MID-CENTURY PAPERBACK direction built on the Marber grid: cream book stock, one saturated series color per section of the product (bands and actions only), black humanist sans in the Gill tradition, strict horizontal band composition with thick rules dividing title, author, and imprint zones — content lives in bands, nothing floats. Typographic covers: no imagery, the type is the art. Never: gradients, shadows, more than one series color per view, caps-lock shouting. Include a Voice & Tone rulebook with numbered writing rules, banned words, and five before/after rewrite pairs — the voice is book-jacket economy: one dry line where others use a paragraph. Grill me first one question at a time on whether sections of the product get different series colors (as Penguin genres did) and how far the band grid extends into dense views.`
+  },
+  {
+    id: "naturalist",
+    name: "Field Naturalist",
+    accent: "#5A6B44",
+    family: "Victorian specimen labels · field notebooks · herbarium sheets",
+    mood: "Sepia paper, ink-brown serif with true italics, moss green accents, specimen-label furniture. Wonder through exactness.",
+    face: "Display: Zodiak 700 + true italic, Fontshare (embedded)",
+    tokens:
+`name: fieldnote-naturalist
+colors:
+  sepia: "#F3EAD7"        # herbarium sheet
+  ink: "#3E3226"          # iron-gall brown
+  moss: "#5A6B44"         # collection labels and actions
+  rust: "#9C4A2E"         # rare; damaged-specimen warnings
+typography:
+  display: { fontFamily: "Zodiak", fontWeight: 700,
+             fontStyle: "italic" }
+  body:    { fontFamily: "Crimson Pro", fontSize: "17px",
+             lineHeight: 1.6 }
+  labels:  { fontFamily: "Crimson Pro", fontVariant: "small-caps",
+             letterSpacing: "0.06em" }
+rounded: { sm: 2px }
+spacing: { sm: 8px, md: 16px, lg: 32px, section: 88px }
+components:
+  button-primary:
+    backgroundColor: "{colors.moss}"
+    textColor: "{colors.sepia}"
+    rounded: "{rounded.sm}"
+  specimen-label:
+    typography: "{typography.labels}"   # date · locality · collector`,
+    prompt:
+`Create a DESIGN.md (google-labs-code/design.md spec) for <PROJECT> in a FIELD NATURALIST direction: sepia herbarium-sheet ground, iron-gall brown serif with true italics for display, small-caps specimen labels (date · source · collector) as metadata furniture, moss green for actions, hairline rules, marginalia-style captions in the gutters. Every record is a labeled specimen; every list a collection drawer. Never: sans-serif display, saturated color, dark mode by default, decorative flourish beyond the label system. Include a Voice & Tone rulebook with numbered writing rules, banned words, and five before/after rewrite pairs — the voice is observational past tense with collector's precision: '12 of 14 reviewed, 12 March', never 'almost done!'. Grill me first one question at a time on how the specimen-label metadata maps to real fields and where the antique conceit must yield to speed.`
+  },
+  {
+    id: "hardware",
+    name: "Hardware Panel",
+    accent: "#FF4D00",
+    family: "Teenage Engineering · Braun dials · rack-mount gear",
+    mood: "Aluminum gray, engraved lowercase labels, one safety orange, LED-dot states. An interface you could screw to a rack.",
+    face: "Labels: Departure Mono (embedded); display Helvetica",
+    tokens:
+`name: fieldnote-hardware
+colors:
+  alu: "#D9D9D6"          # brushed panel
+  ink: "#1B1B1A"          # engraved text
+  safety: "#FF4D00"       # the one hot color; actions + active LEDs
+  led-ok: "#2E7D4F"
+typography:
+  display: { fontFamily: "Neue Haas Grotesk", fontWeight: 700 }
+  body:    { fontFamily: "Neue Haas Grotesk", fontSize: "15px",
+             lineHeight: 1.5 }
+  labels:  { fontFamily: "Departure Mono", fontSize: "11px",
+             letterSpacing: "0.08em" }  # engraved panel labels
+rounded: { sm: 3px }
+spacing: { sm: 4px, md: 12px, lg: 24px, section: 64px }
+components:
+  button-primary:
+    backgroundColor: "{colors.safety}"
+    textColor: "#FFFFFF"
+    rounded: "{rounded.sm}"
+  led-indicator:
+    size: "8px"                        # state as a light, not a sentence`,
+    prompt:
+`Create a DESIGN.md (google-labs-code/design.md spec) for <PROJECT> in an INDUSTRIAL HARDWARE PANEL direction: brushed-aluminum gray ground, engraved near-black text, tiny lowercase monospace panel labels, one safety orange for primary actions and active states, LED-dot indicators instead of status sentences, knob-and-button geometry with 3px radii and subtle inset highlights, engraved-line dividers. Density like a well-laid-out mixer: compact but never cramped. Never: gradients-as-decoration, big friendly marketing type, more than one hot color. Include a Voice & Tone rulebook with numbered writing rules, banned words, and five before/after rewrite pairs — the voice is panel-label speak: function words only, states as lights ('sync ok · 14 in · 0 err'). Grill me first one question at a time on real information density needs and which flows (billing, onboarding) need full sentences after all.`
+  }
+];
+
+const SPEC = (v) => `
+  <div class="spec">
+    <div class="nav">
+      <span class="logo">Fieldnote</span>
+      <a href="#" onclick="return false">Notebooks</a>
+      <a href="#" onclick="return false">Library</a>
+      <a href="#" onclick="return false">Team</a>
+      <span class="spacer"></span>
+      <a href="#" onclick="return false">Sign in</a>
+    </div>
+
+    <section class="hero">
+      <p class="label">Hero</p>
+      <h2>Research notes your whole team can actually find.</h2>
+      <p class="lede">Fieldnote keeps interviews, references, and decisions in one shared place — so the answer to "didn't we already learn this?" is always yes, and linked.</p>
+      <div class="cta-row">
+        <button class="btn primary">Start a notebook</button>
+        <button class="btn secondary">See how it works</button>
+      </div>
+    </section>
+
+    <section>
+      <p class="label">Type scale</p>
+      <div class="scale-row"><span class="px">display / 38-64</span><span class="t-display">Field notes</span></div>
+      <div class="scale-row"><span class="px">heading / 24</span><span class="t-h2">Interviews from the March study</span></div>
+      <div class="scale-row"><span class="px">body / 15-17</span><span class="t-body">Every note gets an owner, a date, and a link back to the raw source, so claims stay checkable long after the project ships.</span></div>
+      <div class="scale-row"><span class="px">caption / 12</span><span class="t-caption">UPDATED 2 HOURS AGO · 14 NOTES</span></div>
+    </section>
+
+    <section>
+      <p class="label">Color roles</p>
+      <div class="swatches" id="sw-${v.id}"></div>
+    </section>
+
+    <section>
+      <p class="label">Components</p>
+      <div class="comp-grid">
+        <div class="panel">
+          <h4>Buttons</h4>
+          <p>Primary, secondary, ghost, destructive, disabled.</p>
+          <div class="cta-row" style="margin-bottom:0.75rem">
+            <button class="btn primary">Save note</button>
+            <button class="btn secondary">Duplicate</button>
+          </div>
+          <div class="cta-row">
+            <button class="btn ghost">Cancel</button>
+            <button class="btn destructive">Delete notebook</button>
+            <button class="btn primary" disabled>Saving…</button>
+          </div>
+        </div>
+        <div class="panel">
+          <h4>Invite a teammate</h4>
+          <p>Anyone with a link can read; editors need an invite.</p>
+          <div class="field">
+            <label for="em-${v.id}">Email</label>
+            <input id="em-${v.id}" type="email" placeholder="ana@studio.co">
+          </div>
+          <button class="btn primary">Send invite</button>
+        </div>
+        <div class="panel">
+          <h4>Recent notes</h4>
+          <p>Status is reviewed or needs-review.</p>
+          <div style="overflow-x:auto">
+          <table>
+            <thead><tr><th>Note</th><th>Owner</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td>Pricing interview — Lena K.</td><td>Sam</td><td><span class="pill ok">Reviewed</span></td></tr>
+              <tr><td>Onboarding drop-off numbers</td><td>Priya</td><td><span class="pill warn">Needs review</span></td></tr>
+              <tr><td>Competitor teardown: Basecamp</td><td>Jo</td><td><span class="pill ok">Reviewed</span></td></tr>
+            </tbody>
+          </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <p class="label">Voice — the rulebook</p>
+      <p class="voice">${v.voice}</p>
+      <p class="voice-note">${v.voiceNote}</p>
+      <div class="voice-grid">
+        <div class="panel">
+          <h4>House rules</h4>
+          <p>Numbered, checkable, Orwell-style. A rule you can't test against a sentence isn't a rule.</p>
+          <ol class="rules">${v.rules.map(r => `<li>${r}</li>`).join("")}</ol>
+        </div>
+        <div class="panel">
+          <h4>Rewrite</h4>
+          <p>The same announcement, off-brand then on-brand.</p>
+          <p class="rw-label">Off-brand</p>
+          <p class="rw before">${v.before}</p>
+          <p class="rw-label good">On-brand</p>
+          <p class="rw after">${v.after}</p>
+          <div class="banned">${v.banned.map(w => `<span>${w}</span>`).join("")}</div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <p class="label">Would-be DESIGN.md tokens</p>
+      <pre>${v.tokens.replace(/</g, "&lt;")}</pre>
+    </section>
+
+    <section>
+      <p class="label">Starter prompt</p>
+      <div class="prompt-head">
+        <p style="margin:0;font-size:0.85rem;color:var(--v-muted);max-width:56ch">Paste into a session with the grill-me and prototype skills, swap in your project, and it will interview you before writing the DESIGN.md.</p>
+        <button class="copy-btn" data-copy="${v.id}">Copy prompt</button>
+      </div>
+      <pre class="prompt-text">${v.prompt.replace(/</g, "&lt;")}</pre>
+    </section>
+  </div>`;
+
+// voice rulebooks per direction: creed, note, numbered rules,
+// one before/after rewrite of the same kind of announcement, and banned words.
+const VOICE = {
+  dossier: {
+    creed: "SUBJECT: FIELDNOTE. STATUS: ACTIVE.",
+    note: "Bureau memo voice: dated, numbered, dispassionate. The file does not get excited; the file accumulates.",
+    rules: [
+      "Every statement carries a date and a file reference.",
+      "Passive-official is permitted; enthusiasm is not.",
+      "Record what was observed, never what was felt.",
+      "When uncertain, redact rather than speculate.",
+      "Deviations from these rules will be noted in the file."
+    ],
+    before: "We're thrilled to share that your notes synced perfectly! 🎉",
+    after: "14 MAR. Subject exported 14 notes. No conflicts observed. File remains open.",
+    banned: ["thrilled", "🎉", "perfectly", "excited to share", "journey"]
+  },
+  jis: {
+    creed: "§4.2 — 検索 shall complete within 200 ms.",
+    note: "Specification language: numbered clauses, tolerances, 'shall'. If a sentence cannot be verified with an instrument, it does not belong in the document.",
+    rules: [
+      "Write in clauses: one requirement, one number, one 'shall'.",
+      "State tolerances, not adjectives: '±2px', never 'pixel-perfect'.",
+      "Reference every figure and table by number (図1, 表3).",
+      "Omit the subject where the requirement is unambiguous.",
+      "A clause that cannot be tested shall be deleted."
+    ],
+    before: "Our blazingly fast search gives you results in the blink of an eye!",
+    after: "Search shall return results within 200 ms (§4.2, 表3).",
+    banned: ["blazingly", "blink of an eye", "intuitive", "robust", "world-class"]
+  },
+  flatpack: {
+    creed: "1 → 2 → 3. Klart!",
+    note: "Words are a last resort. The diagram carries the meaning; text appears only where a picture would fail.",
+    rules: [
+      "If a pictogram can say it, delete the sentence.",
+      "One imperative verb per step: Open. Write. Share.",
+      "Numbers do the sequencing; never 'next' or 'then'.",
+      "Warnings are one pictogram plus one line. No apology.",
+      "If the manual needs a paragraph, redesign the product."
+    ],
+    before: "In order to get started, you'll first want to open the app and then create your very first note.",
+    after: "1. Open. 2. Write. 3. Share.",
+    banned: ["in order to", "you'll want to", "simply", "please note", "getting started"]
+  },
+  futurismo: {
+    creed: "NOTES AT THE VELOCITY OF THOUGHT!",
+    note: "A manifesto, not a memo. Short violent verbs, declarations set at speed. The only voice here allowed exclamation marks — and it uses them.",
+    rules: [
+      "Declare, never describe: 'ARCHIVE THE PAST!' not 'archiving is supported'.",
+      "Verbs of motion and machinery: launch, hurl, accelerate, ignite.",
+      "No nostalgia, no apology, no maybe.",
+      "Set the loudest word largest and let it collide with the grid.",
+      "Any rule that slows the sentence down is abolished!"
+    ],
+    before: "We've made some small improvements to help you organize your notes a little better.",
+    after: "SEARCH DEVOURS THE ARCHIVE! 14 NOTES HURLED INTO ORDER!",
+    banned: ["small improvements", "a little better", "we hope", "gently", "classic"]
+  },
+  apollo: {
+    creed: "SYNC — COMPLETE. 14 NOTES NOMINAL.",
+    note: "Checklist voice: verb–noun pairs, a fixed severity ladder, no adjective that can't be measured from the cockpit.",
+    rules: [
+      "Checklist grammar: VERB — NOUN — RESULT.",
+      "Three severities only: NOTE, CAUTION, WARNING. Never decorate them.",
+      "'Nominal' is praise enough.",
+      "Numbers get units; units get checked twice.",
+      "If a step can be misread in an emergency, rewrite the step."
+    ],
+    before: "Great news! Everything synced smoothly and you're all set to go!",
+    after: "SYNC — COMPLETE. 14 NOTES NOMINAL. PROCEED TO REVIEW.",
+    banned: ["great news", "smoothly", "all set", "awesome", "oops"]
+  },
+  paperback: {
+    creed: "Fieldnote. Where good ideas go to be found.",
+    note: "Book-jacket economy: one good line where others use a paragraph, wit dry enough to shelve. The type is the cover art.",
+    rules: [
+      "One line of wit per surface; the rest is set straight.",
+      "Title case for titles, sentence case for sentences, no caps-lock shouting.",
+      "Never explain the joke or the feature twice.",
+      "If it wouldn't survive on a book cover, cut until it would.",
+      "Break any of these rules sooner than write anything barbarous."
+    ],
+    before: "Fieldnote is your all-in-one knowledge management solution for modern teams!",
+    after: "Fieldnote. Where good ideas go to be found.",
+    banned: ["all-in-one", "solution", "empower", "revolutionary", "for modern teams"]
+  },
+  naturalist: {
+    creed: "Collected: 14 notes. 12 March. Det. S. Marsh.",
+    note: "Observational past tense with specimen-label precision: date, source, collector. Wonder is expressed through exactness.",
+    rules: [
+      "Label every specimen: date, source, collector — in that order.",
+      "Observed past tense: 'was recorded', 'appeared', 'measured'.",
+      "Precision is the poetry: '12 of 14 reviewed', never 'almost done'.",
+      "Margins are for remarks; the record itself stays clean.",
+      "Never claim a sighting you cannot pin to a page."
+    ],
+    before: "You're crushing it! Almost all your notes are done!",
+    after: "12 of 14 notes reviewed, 12 March, pricing study. Two remain in the field.",
+    banned: ["crushing it", "almost done", "tons", "super", "vibes"]
+  },
+  hardware: {
+    creed: "sync ok · 14 in · 0 err",
+    note: "Panel-label speak: function words only, engraved lowercase, states as lights. If it doesn't fit next to a knob, it's too long.",
+    rules: [
+      "Labels name functions, not benefits: 'sync', never 'stay in sync'.",
+      "State machine grammar: ok / busy / err — shown as a light.",
+      "Lowercase engraving; caps reserved for warnings.",
+      "Three words maximum between any two rules of the panel.",
+      "When in doubt, ship the shorter label and a better default."
+    ],
+    before: "Synchronization completed successfully! All of your fourteen notes are now up to date.",
+    after: "sync ok · 14 in · 0 err",
+    banned: ["successfully", "up to date", "all of your", "now you can", "easily"]
+  }
+};
+
+const swatchDefs = {
+  dossier: [["manila","#E7DCC3"],["carbon","#2B2620"],["stamp","#A32C22"],["tab","#8A7B5E"],["rule","#C9BC9C"]],
+  jis: [["paper","#FCFCFA"],["sumi","#1C1C1A"],["shu","#D43D2A"],["rule","#D9D9D2"],["grid","#8F8F87"]],
+  flatpack: [["page","#FFFFFF"],["outline","#111111"],["blue","#0058A3"],["yellow","#FFDB00"],["ok","#1F7A3D"]],
+  futurismo: [["crema","#EFE3CB"],["nero","#17130E"],["rosso","#C8281E"]],
+  apollo: [["paper","#F4F4F0"],["ink","#14181D"],["nasa-blue","#0B3D91"],["signal-red","#D2311E"],["ok","#1F6E43"]],
+  paperback: [["cream","#F7F1E3"],["ink","#17150F"],["cover","#F05A28"],["band","#D9CFB6"]],
+  naturalist: [["sepia","#F3EAD7"],["ink","#3E3226"],["moss","#5A6B44"],["rust","#9C4A2E"],["rule","#DCCFAF"]],
+  hardware: [["alu","#D9D9D6"],["ink","#1B1B1A"],["safety","#FF4D00"],["panel","#E4E4E1"],["led-ok","#2E7D4F"]]
+};
+
+const tabs = document.getElementById("tabs");
+const panels = document.getElementById("panels");
+const meta = document.getElementById("meta");
+const stage = document.getElementById("stage");
+
+VARIANTS.forEach(v => {
+  const vo = VOICE[v.id];
+  v.voice = vo.creed;
+  v.voiceNote = vo.note;
+  v.rules = vo.rules;
+  v.before = vo.before;
+  v.after = vo.after;
+  v.banned = vo.banned;
+
+  const b = document.createElement("button");
+  b.role = "tab";
+  b.id = "tab-" + v.id;
+  b.setAttribute("aria-selected", "false");
+  b.innerHTML = `<span class="swatch" style="background:${v.accent}"></span>${v.name}`;
+  b.addEventListener("click", () => select(v.id, true));
+  tabs.appendChild(b);
+
+  const p = document.createElement("div");
+  p.className = "variant";
+  p.id = "panel-" + v.id;
+  p.setAttribute("role", "tabpanel");
+  p.innerHTML = SPEC(v);
+  panels.appendChild(p);
+
+  const sw = p.querySelector("#sw-" + v.id);
+  swatchDefs[v.id].forEach(([tok, hex]) => {
+    const card = document.createElement("div");
+    card.className = "swatch-card";
+    card.innerHTML = `<div class="chip" style="background:${hex}"></div>
+      <div class="info"><div class="tok">colors.${tok}</div><div class="hex">${hex}</div></div>`;
+    sw.appendChild(card);
+  });
+});
+
+function select(id, push) {
+  const v = VARIANTS.find(x => x.id === id) || VARIANTS[0];
+  VARIANTS.forEach(x => {
+    document.getElementById("tab-" + x.id).setAttribute("aria-selected", String(x.id === v.id));
+    document.getElementById("panel-" + x.id).classList.toggle("active", x.id === v.id);
+  });
+  stage.dataset.v = v.id;
+  document.documentElement.style.setProperty("--c-accent", v.accent);
+  meta.innerHTML = `<span class="fam">${v.name}</span><span>${v.family}</span><span>${v.mood}</span><span>${v.face}</span>`;
+  if (push) {
+    const u = new URL(location.href);
+    u.searchParams.set("variant", v.id);
+    history.replaceState(null, "", u);
+  }
+}
+
+document.addEventListener("click", (e) => {
+  const btn = e.target.closest("[data-copy]");
+  if (!btn) return;
+  const v = VARIANTS.find(x => x.id === btn.dataset.copy);
+  navigator.clipboard.writeText(v.prompt).then(() => {
+    const old = btn.textContent;
+    btn.textContent = "Copied";
+    setTimeout(() => { btn.textContent = old; }, 1200);
+  });
+});
+
+document.addEventListener("keydown", (e) => {
+  if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
+  if (/INPUT|TEXTAREA/.test(document.activeElement.tagName)) return;
+  const idx = VARIANTS.findIndex(x => x.id === stage.dataset.v);
+  const next = (idx + (e.key === "ArrowRight" ? 1 : VARIANTS.length - 1)) % VARIANTS.length;
+  select(VARIANTS[next].id, true);
+});
+
+select(new URLSearchParams(location.search).get("variant") || "dossier", false);
+</script>
