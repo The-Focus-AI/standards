@@ -1,0 +1,754 @@
+<title>DESIGN.md Direction Gallery</title>
+<style>
+  /* ============ chrome tokens ============ */
+  :root {
+    --c-bg: #F7F7F5;
+    --c-surface: #FFFFFF;
+    --c-ink: #20201E;
+    --c-muted: #6D6C66;
+    --c-border: #E4E3DE;
+    --c-accent: #C3512F;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --c-bg: #161615;
+      --c-surface: #1E1E1C;
+      --c-ink: #ECEBE6;
+      --c-muted: #96948C;
+      --c-border: #2E2E2B;
+    }
+  }
+  :root[data-theme="dark"] {
+    --c-bg: #161615; --c-surface: #1E1E1C; --c-ink: #ECEBE6;
+    --c-muted: #96948C; --c-border: #2E2E2B;
+  }
+  :root[data-theme="light"] {
+    --c-bg: #F7F7F5; --c-surface: #FFFFFF; --c-ink: #20201E;
+    --c-muted: #6D6C66; --c-border: #E4E3DE;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--c-bg);
+    color: var(--c-ink);
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    line-height: 1.5;
+  }
+
+  .chrome-head {
+    padding: 1.25rem 1.5rem 0;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .chrome-head .eyebrow {
+    font-size: 0.6875rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--c-muted);
+  }
+  .chrome-head h1 {
+    font-size: 1.25rem;
+    font-weight: 650;
+    margin: 0.2rem 0 0.3rem;
+  }
+  .chrome-head p {
+    margin: 0;
+    max-width: 62ch;
+    color: var(--c-muted);
+    font-size: 0.875rem;
+  }
+  .chrome-head p b { color: var(--c-ink); font-weight: 600; }
+
+  .tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.375rem;
+    max-width: 1100px;
+    margin: 1.1rem auto 0;
+    padding: 0 1.5rem;
+  }
+  .tabs button {
+    appearance: none;
+    border: 1px solid var(--c-border);
+    background: var(--c-surface);
+    color: var(--c-muted);
+    font: inherit;
+    font-size: 0.8125rem;
+    font-weight: 550;
+    padding: 0.45rem 0.85rem;
+    border-radius: 999px;
+    cursor: pointer;
+  }
+  .tabs button:hover { color: var(--c-ink); }
+  .tabs button:focus-visible { outline: 2px solid var(--c-accent); outline-offset: 2px; }
+  .tabs button[aria-selected="true"] {
+    background: var(--c-accent);
+    border-color: var(--c-accent);
+    color: #fff;
+  }
+  .tabs .swatch {
+    display: inline-block;
+    width: 0.55em; height: 0.55em;
+    border-radius: 50%;
+    margin-right: 0.45em;
+    background: currentColor;
+  }
+  .tabs button[aria-selected="true"] .swatch { background: #fff; }
+
+  .stage-wrap {
+    max-width: 1100px;
+    margin: 1.1rem auto 3rem;
+    padding: 0 1.5rem;
+  }
+  .stage {
+    border: 1px solid var(--c-border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .variant { display: none; }
+  .variant.active { display: block; }
+
+  .meta-strip {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.5rem;
+    align-items: baseline;
+    padding: 0.7rem 1.5rem;
+    border-bottom: 1px solid var(--c-border);
+    background: var(--c-surface);
+    font-size: 0.8125rem;
+    color: var(--c-muted);
+  }
+  .meta-strip .fam { font-weight: 600; color: var(--c-ink); }
+
+  /* ============ shared specimen scaffolding (visuals come from variant vars) ============ */
+  .spec {
+    background: var(--v-bg);
+    color: var(--v-ink);
+    font-family: var(--v-body);
+    padding: 0;
+  }
+  .spec section { padding: 2.2rem 2rem; border-bottom: 1px solid var(--v-line); }
+  .spec section:last-child { border-bottom: none; }
+  .spec .label {
+    font-family: var(--v-utility);
+    font-size: 0.6875rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--v-muted);
+    margin: 0 0 1.1rem;
+  }
+
+  /* nav */
+  .spec .nav {
+    display: flex; align-items: center; gap: 1.4rem;
+    padding: 0.9rem 2rem;
+    border-bottom: 1px solid var(--v-line);
+    background: var(--v-navbg);
+    color: var(--v-navink);
+  }
+  .spec .nav .logo { font-family: var(--v-display); font-weight: var(--v-dispweight); font-size: 1.05rem; letter-spacing: var(--v-logospace); }
+  .spec .nav a { color: var(--v-navink); opacity: 0.75; text-decoration: none; font-size: 0.85rem; font-family: var(--v-utility); }
+  .spec .nav a:hover { opacity: 1; }
+  .spec .nav .spacer { flex: 1; }
+
+  /* hero */
+  .spec .hero h2 {
+    font-family: var(--v-display);
+    font-weight: var(--v-dispweight);
+    font-size: clamp(2rem, 5vw, var(--v-herosize));
+    line-height: 1.05;
+    letter-spacing: var(--v-dispspace);
+    text-transform: var(--v-herocase);
+    margin: 0 0 0.8rem;
+    max-width: 18ch;
+    text-wrap: balance;
+  }
+  .spec .hero p.lede { font-size: 1.05rem; max-width: 52ch; color: var(--v-muted); margin: 0 0 1.5rem; }
+  .spec .cta-row { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+
+  /* buttons */
+  .spec .btn {
+    font-family: var(--v-utility);
+    font-size: 0.875rem;
+    font-weight: 600;
+    padding: 0.62rem 1.15rem;
+    border-radius: var(--v-radius);
+    border: 1px solid transparent;
+    cursor: pointer;
+    text-transform: var(--v-btncase);
+    letter-spacing: var(--v-btnspace);
+  }
+  .spec .btn:focus-visible { outline: 2px solid var(--v-accent); outline-offset: 2px; }
+  .spec .btn.primary { background: var(--v-accent); color: var(--v-onaccent); }
+  .spec .btn.primary:hover { background: var(--v-accenthover); }
+  .spec .btn.secondary { background: transparent; color: var(--v-ink); border-color: var(--v-inkline); }
+  .spec .btn.secondary:hover { background: var(--v-wash); }
+  .spec .btn.ghost { background: transparent; color: var(--v-muted); }
+  .spec .btn.ghost:hover { color: var(--v-ink); }
+  .spec .btn.destructive { background: var(--v-danger); color: #fff; }
+  .spec .btn[disabled] { opacity: 0.45; cursor: not-allowed; }
+
+  /* type scale */
+  .spec .scale-row { display: flex; align-items: baseline; gap: 1.25rem; margin-bottom: 0.9rem; }
+  .spec .scale-row .px { font-family: var(--v-utility); font-size: 0.6875rem; color: var(--v-muted); min-width: 6.5rem; }
+  .spec .t-display { font-family: var(--v-display); font-weight: var(--v-dispweight); font-size: 2.4rem; line-height: 1.05; letter-spacing: var(--v-dispspace); text-transform: var(--v-herocase); }
+  .spec .t-h2 { font-family: var(--v-display); font-weight: var(--v-dispweight); font-size: 1.5rem; }
+  .spec .t-body { font-size: 1rem; max-width: 58ch; }
+  .spec .t-caption { font-family: var(--v-utility); font-size: 0.75rem; color: var(--v-muted); letter-spacing: 0.04em; }
+
+  /* colors */
+  .spec .swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 0.75rem; }
+  .spec .swatch-card { border: 1px solid var(--v-line); border-radius: var(--v-radius); overflow: hidden; background: var(--v-surface); }
+  .spec .swatch-card .chip { height: 3.4rem; }
+  .spec .swatch-card .info { padding: 0.5rem 0.65rem; }
+  .spec .swatch-card .tok { font-family: var(--v-mono); font-size: 0.72rem; }
+  .spec .swatch-card .hex { font-family: var(--v-mono); font-size: 0.68rem; color: var(--v-muted); }
+
+  /* components grid */
+  .spec .comp-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.25rem; align-items: start; }
+  .spec .panel {
+    background: var(--v-surface);
+    border: 1px solid var(--v-line);
+    border-radius: var(--v-radius);
+    padding: 1.1rem;
+    box-shadow: var(--v-shadow);
+  }
+  .spec .panel h4 { margin: 0 0 0.3rem; font-family: var(--v-display); font-weight: var(--v-dispweight); font-size: 1.05rem; }
+  .spec .panel p { margin: 0 0 0.9rem; font-size: 0.85rem; color: var(--v-muted); }
+  .spec .field label { display: block; font-family: var(--v-utility); font-size: 0.72rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--v-muted); margin-bottom: 0.35rem; }
+  .spec .field input {
+    width: 100%;
+    font: inherit; font-size: 0.9rem;
+    color: var(--v-ink);
+    background: var(--v-fieldbg);
+    border: 1px solid var(--v-inkline);
+    border-radius: var(--v-radius);
+    padding: 0.55rem 0.7rem;
+  }
+  .spec .field input:focus { outline: 2px solid var(--v-accent); outline-offset: 1px; }
+  .spec .field { margin-bottom: 0.9rem; }
+
+  .spec table { width: 100%; border-collapse: collapse; font-size: 0.85rem; font-variant-numeric: tabular-nums; }
+  .spec th { font-family: var(--v-utility); font-size: 0.68rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--v-muted); text-align: left; padding: 0.45rem 0.6rem; border-bottom: 1px solid var(--v-inkline); }
+  .spec td { padding: 0.55rem 0.6rem; border-bottom: 1px solid var(--v-line); }
+  .spec .pill { font-family: var(--v-utility); font-size: 0.68rem; font-weight: 600; padding: 0.15rem 0.55rem; border-radius: 999px; }
+  .spec .pill.ok { background: var(--v-okbg); color: var(--v-ok); }
+  .spec .pill.warn { background: var(--v-warnbg); color: var(--v-warn); }
+
+  /* voice */
+  .spec .voice { font-family: var(--v-display); font-weight: var(--v-dispweight); font-size: 1.3rem; max-width: 40ch; margin: 0 0 0.4rem; }
+  .spec .voice-note { font-size: 0.85rem; color: var(--v-muted); max-width: 60ch; }
+
+  /* tokens + prompt */
+  .spec pre {
+    font-family: var(--v-mono);
+    font-size: 0.78rem;
+    line-height: 1.55;
+    background: var(--v-codebg);
+    color: var(--v-codeink);
+    border: 1px solid var(--v-line);
+    border-radius: var(--v-radius);
+    padding: 1rem 1.1rem;
+    overflow-x: auto;
+    margin: 0;
+    white-space: pre;
+  }
+  .spec .prompt-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 0.8rem; }
+  .spec .copy-btn {
+    font-family: var(--v-utility); font-size: 0.78rem; font-weight: 600;
+    background: var(--v-accent); color: var(--v-onaccent);
+    border: none; border-radius: var(--v-radius);
+    padding: 0.45rem 0.9rem; cursor: pointer;
+  }
+  .spec .copy-btn:focus-visible { outline: 2px solid var(--v-accent); outline-offset: 2px; }
+  .spec .prompt-text { white-space: pre-wrap; }
+
+  @media (max-width: 640px) {
+    .spec section, .spec .nav { padding-left: 1.1rem; padding-right: 1.1rem; }
+    .spec .scale-row { flex-direction: column; gap: 0.2rem; }
+  }
+
+  /* ============ variant worlds ============ */
+
+  /* A — Warm Editorial (Claude / Anthropic family) */
+  .stage[data-v="editorial"] .spec {
+    --v-bg: #F6F1E7; --v-surface: #FDFAF3; --v-wash: #EFE7D8;
+    --v-ink: #262117; --v-muted: #6E6555; --v-line: #E4DAC8; --v-inkline: #C9BCA2;
+    --v-accent: #B4441F; --v-accenthover: #983917; --v-onaccent: #FDFAF3;
+    --v-danger: #8C2F1B;
+    --v-ok: #3D5A32; --v-okbg: #E2E8D4; --v-warn: #7A5215; --v-warnbg: #F0E4C8;
+    --v-navbg: #F6F1E7; --v-navink: #262117;
+    --v-fieldbg: #FDFAF3; --v-codebg: #2A2419; --v-codeink: #E8DFC9;
+    --v-display: "Iowan Old Style", Georgia, "Times New Roman", serif;
+    --v-body: Georgia, "Iowan Old Style", serif;
+    --v-utility: ui-sans-serif, system-ui, sans-serif;
+    --v-mono: ui-monospace, "SF Mono", Menlo, monospace;
+    --v-dispweight: 500; --v-dispspace: -0.01em; --v-logospace: 0;
+    --v-herosize: 3.4rem; --v-herocase: none; --v-btncase: none; --v-btnspace: 0;
+    --v-radius: 6px; --v-shadow: none;
+  }
+
+  /* B — Ultra-minimal SaaS (Linear / Vercel family) */
+  .stage[data-v="minimal"] .spec {
+    --v-bg: #0B0B0E; --v-surface: #131316; --v-wash: #1B1B20;
+    --v-ink: #EDEDEF; --v-muted: #86868E; --v-line: #222227; --v-inkline: #3A3A42;
+    --v-accent: #6E7BF2; --v-accenthover: #5A68E8; --v-onaccent: #FFFFFF;
+    --v-danger: #E5484D;
+    --v-ok: #6CD9A2; --v-okbg: #12291D; --v-warn: #E2B93B; --v-warnbg: #2A2410;
+    --v-navbg: #0B0B0E; --v-navink: #EDEDEF;
+    --v-fieldbg: #0F0F12; --v-codebg: #0F0F12; --v-codeink: #C9C9D1;
+    --v-display: "Helvetica Neue", Helvetica, Arial, ui-sans-serif, sans-serif;
+    --v-body: "Helvetica Neue", Helvetica, Arial, ui-sans-serif, sans-serif;
+    --v-utility: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --v-mono: ui-monospace, "SF Mono", Menlo, monospace;
+    --v-dispweight: 600; --v-dispspace: -0.03em; --v-logospace: -0.02em;
+    --v-herosize: 3.2rem; --v-herocase: none; --v-btncase: none; --v-btnspace: 0;
+    --v-radius: 6px; --v-shadow: 0 0 0 1px rgba(255,255,255,0.02);
+  }
+
+  /* C — Terminal Mono (Warp / Ollama family) */
+  .stage[data-v="terminal"] .spec {
+    --v-bg: #0C1210; --v-surface: #101815; --v-wash: #16211D;
+    --v-ink: #D7E4DC; --v-muted: #7C9187; --v-line: #1D2B25; --v-inkline: #2E4238;
+    --v-accent: #3FD68F; --v-accenthover: #2FBF7C; --v-onaccent: #06110C;
+    --v-danger: #E06C5A;
+    --v-ok: #3FD68F; --v-okbg: #10281C; --v-warn: #D8B44A; --v-warnbg: #27210E;
+    --v-navbg: #0C1210; --v-navink: #D7E4DC;
+    --v-fieldbg: #0A0F0D; --v-codebg: #0A0F0D; --v-codeink: #9FE8C4;
+    --v-display: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    --v-body: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    --v-utility: ui-monospace, "SF Mono", Menlo, monospace;
+    --v-mono: ui-monospace, "SF Mono", Menlo, monospace;
+    --v-dispweight: 700; --v-dispspace: 0; --v-logospace: 0;
+    --v-herosize: 2.5rem; --v-herocase: none; --v-btncase: none; --v-btnspace: 0;
+    --v-radius: 2px; --v-shadow: none;
+  }
+
+  /* D — Playful Product (Figma / Zapier family) */
+  .stage[data-v="playful"] .spec {
+    --v-bg: #FFFFFF; --v-surface: #FFFFFF; --v-wash: #F3F0FF;
+    --v-ink: #1E1B2E; --v-muted: #6B6684; --v-line: #ECE9F4; --v-inkline: #CFC9E4;
+    --v-accent: #7B3FF2; --v-accenthover: #6930D8; --v-onaccent: #FFFFFF;
+    --v-danger: #E5484D;
+    --v-ok: #0F8A5F; --v-okbg: #DCF5EA; --v-warn: #A16207; --v-warnbg: #FCEFC7;
+    --v-navbg: #FFFFFF; --v-navink: #1E1B2E;
+    --v-fieldbg: #FFFFFF; --v-codebg: #241F3A; --v-codeink: #E4DEFA;
+    --v-display: "Avenir Next", Avenir, Seravek, "Trebuchet MS", ui-rounded, sans-serif;
+    --v-body: "Avenir Next", Avenir, Seravek, "Trebuchet MS", sans-serif;
+    --v-utility: "Avenir Next", Avenir, Seravek, sans-serif;
+    --v-mono: ui-monospace, Menlo, monospace;
+    --v-dispweight: 700; --v-dispspace: -0.01em; --v-logospace: 0;
+    --v-herosize: 3.3rem; --v-herocase: none; --v-btncase: none; --v-btnspace: 0;
+    --v-radius: 14px;
+    --v-shadow: 0 4px 14px rgba(30, 27, 46, 0.07);
+  }
+
+  /* E — Swiss / Brutalist (WIRED / Nike family) */
+  .stage[data-v="swiss"] .spec {
+    --v-bg: #FFFFFF; --v-surface: #FFFFFF; --v-wash: #F2F2F2;
+    --v-ink: #0A0A0A; --v-muted: #555555; --v-line: #0A0A0A; --v-inkline: #0A0A0A;
+    --v-accent: #E10600; --v-accenthover: #B80500; --v-onaccent: #FFFFFF;
+    --v-danger: #E10600;
+    --v-ok: #0A0A0A; --v-okbg: #F2F2F2; --v-warn: #0A0A0A; --v-warnbg: #FFE8E7;
+    --v-navbg: #0A0A0A; --v-navink: #FFFFFF;
+    --v-fieldbg: #FFFFFF; --v-codebg: #0A0A0A; --v-codeink: #F2F2F2;
+    --v-display: "Helvetica Neue", Helvetica, "Arial Narrow", Arial, sans-serif;
+    --v-body: Helvetica, Arial, sans-serif;
+    --v-utility: Helvetica, Arial, sans-serif;
+    --v-mono: ui-monospace, Menlo, monospace;
+    --v-dispweight: 800; --v-dispspace: -0.02em; --v-logospace: 0.05em;
+    --v-herosize: 4rem; --v-herocase: uppercase;
+    --v-btncase: uppercase; --v-btnspace: 0.08em;
+    --v-radius: 0px; --v-shadow: none;
+  }
+
+  /* F — Institutional Trust (Stripe / Wise fintech family) */
+  .stage[data-v="trust"] .spec {
+    --v-bg: #F6F8FB; --v-surface: #FFFFFF; --v-wash: #EDF1F7;
+    --v-ink: #0A2540; --v-muted: #52667E; --v-line: #E1E7EF; --v-inkline: #B9C6D6;
+    --v-accent: #2456E5; --v-accenthover: #1B46C4; --v-onaccent: #FFFFFF;
+    --v-danger: #C0392B;
+    --v-ok: #14724B; --v-okbg: #DCEFE6; --v-warn: #8A6116; --v-warnbg: #F5EBD0;
+    --v-navbg: #0A2540; --v-navink: #F6F8FB;
+    --v-fieldbg: #FFFFFF; --v-codebg: #0A2540; --v-codeink: #D4E0F0;
+    --v-display: "Segoe UI", Frutiger, "Helvetica Neue", ui-sans-serif, sans-serif;
+    --v-body: "Segoe UI", "Helvetica Neue", ui-sans-serif, sans-serif;
+    --v-utility: "Segoe UI", "Helvetica Neue", sans-serif;
+    --v-mono: ui-monospace, Menlo, monospace;
+    --v-dispweight: 650; --v-dispspace: -0.015em; --v-logospace: 0;
+    --v-herosize: 3rem; --v-herocase: none; --v-btncase: none; --v-btnspace: 0;
+    --v-radius: 8px;
+    --v-shadow: 0 1px 3px rgba(10, 37, 64, 0.08);
+  }
+</style>
+
+<header class="chrome-head">
+  <div class="eyebrow">Prototype · throwaway · DESIGN.md exploration</div>
+  <h1>DESIGN.md Direction Gallery</h1>
+  <p>Six contrasting visual directions, each rendering the <b>same product specimen</b> — a fictional
+  note-taking tool called Fieldnote. Browse, pick what resonates, steal across directions, then copy
+  that direction's <b>starter prompt</b> to grill and generate a real DESIGN.md.</p>
+</header>
+
+<nav class="tabs" role="tablist" aria-label="Design directions" id="tabs"></nav>
+
+<div class="stage-wrap">
+  <div class="stage" id="stage">
+    <div class="meta-strip" id="meta"></div>
+    <div id="panels"></div>
+  </div>
+</div>
+
+<script>
+const VARIANTS = [
+  {
+    id: "editorial",
+    name: "Warm Editorial",
+    accent: "#B4441F",
+    family: "Claude · Anthropic · Notion-serif family",
+    mood: "Paper-warm, serif-led, airy. Feels considered and human; reads like a well-set book.",
+    tokens:
+`name: fieldnote-editorial
+colors:
+  paper: "#F6F1E7"        # warm limestone ground
+  ink: "#262117"
+  clay: "#B4441F"         # single accent; actions only
+  on-clay: "#FDFAF3"
+typography:
+  display: { fontFamily: "Source Serif 4", fontWeight: 500 }
+  body:    { fontFamily: "Source Serif 4", fontSize: "17px", lineHeight: 1.6 }
+  utility: { fontFamily: "Inter", fontSize: "13px" }
+rounded: { sm: 4px, md: 6px }
+spacing: { sm: 8px, md: 16px, lg: 32px, section: 96px }
+components:
+  button-primary:
+    backgroundColor: "{colors.clay}"
+    textColor: "{colors.on-clay}"
+    rounded: "{rounded.md}"`,
+    prompt:
+`Create a DESIGN.md (google-labs-code/design.md spec: YAML tokens + prose sections) for <PROJECT> in a WARM EDITORIAL direction: warm paper ground (not pure white), serif display and body, one earthy accent reserved for actions, generous whitespace on an 8px scale, opacity-based text hierarchy, minimal shadows. Never: pure black/white, multiple accent colors, dense layouts. Before writing, grill me one question at a time about positioning, personality traits, and non-negotiables.`
+  },
+  {
+    id: "minimal",
+    name: "Ultra-minimal SaaS",
+    accent: "#6E7BF2",
+    family: "Linear · Vercel · Raycast family",
+    mood: "Near-black, tight negative-tracked sans, one electric accent. Quiet, fast, engineered.",
+    tokens:
+`name: fieldnote-minimal
+colors:
+  ground: "#0B0B0E"       # near-black, never #000
+  surface: "#131316"
+  ink: "#EDEDEF"
+  iris: "#6E7BF2"         # electric accent, sparing
+typography:
+  display: { fontFamily: "Inter", fontWeight: 600, letterSpacing: "-0.03em" }
+  body:    { fontFamily: "Inter", fontSize: "15px", lineHeight: 1.55 }
+rounded: { sm: 4px, md: 6px }
+spacing: { sm: 4px, md: 12px, lg: 24px, section: 64px }
+components:
+  button-primary:
+    backgroundColor: "{colors.iris}"
+    textColor: "#FFFFFF"
+    rounded: "{rounded.md}"`,
+    prompt:
+`Create a DESIGN.md (google-labs-code/design.md spec) for <PROJECT> in an ULTRA-MINIMAL SAAS direction: near-black ground (#0B-ish, never pure black), single geometric sans with tight negative letter-spacing on display sizes, one electric accent used sparingly, hairline borders over shadows, compact 4px-based spacing, restrained motion. Never: gradients as decoration, more than one accent, rounded-pill buttons. Grill me first on audience, density tolerance, and light-mode requirements.`
+  },
+  {
+    id: "terminal",
+    name: "Terminal Mono",
+    accent: "#3FD68F",
+    family: "Warp · Ollama · ClickHouse family",
+    mood: "Monospace everything, phosphor green on soot. Honest, technical, zero ornament.",
+    tokens:
+`name: fieldnote-terminal
+colors:
+  soot: "#0C1210"
+  ink: "#D7E4DC"
+  phosphor: "#3FD68F"     # success AND primary action
+  amber: "#D8B44A"        # warnings only
+typography:
+  display: { fontFamily: "JetBrains Mono", fontWeight: 700 }
+  body:    { fontFamily: "JetBrains Mono", fontSize: "14px", lineHeight: 1.6 }
+rounded: { sm: 0px, md: 2px }
+spacing: { sm: 8px, md: 16px, lg: 24px, section: 48px }
+components:
+  button-primary:
+    backgroundColor: "{colors.phosphor}"
+    textColor: "#06110C"
+    rounded: "{rounded.md}"`,
+    prompt:
+`Create a DESIGN.md (google-labs-code/design.md spec) for <PROJECT> in a TERMINAL MONO direction: monospace for every role including display, dark soot-green ground, phosphor-green accent doing double duty as success and primary action, square corners (0-2px), visible structure (borders not shadows), dense but breathable line-height 1.6. Never: serifs, gradients, decorative imagery. Grill me first on how technical the audience is and whether a light mode is genuinely needed.`
+  },
+  {
+    id: "playful",
+    name: "Playful Product",
+    accent: "#7B3FF2",
+    family: "Figma · Zapier · Miro family",
+    mood: "White ground, chunky rounded type, confident color, big radii. Friendly without being childish.",
+    tokens:
+`name: fieldnote-playful
+colors:
+  ground: "#FFFFFF"
+  ink: "#1E1B2E"          # violet-biased near-black
+  violet: "#7B3FF2"       # primary
+  mint: "#0F8A5F"         # success
+  sun: "#F5B80C"          # highlights, sparingly
+typography:
+  display: { fontFamily: "Nunito Sans", fontWeight: 700 }
+  body:    { fontFamily: "Nunito Sans", fontSize: "16px", lineHeight: 1.55 }
+rounded: { sm: 8px, md: 14px, lg: 24px }
+spacing: { sm: 8px, md: 16px, lg: 32px, section: 88px }
+components:
+  button-primary:
+    backgroundColor: "{colors.violet}"
+    textColor: "#FFFFFF"
+    rounded: "{rounded.md}"`,
+    prompt:
+`Create a DESIGN.md (google-labs-code/design.md spec) for <PROJECT> in a PLAYFUL PRODUCT direction: clean white ground, hue-biased near-black ink, a small palette of 2-3 confident accents with clear roles, rounded humanist sans at heavy display weights, generous radii (14px+), soft colored shadows, micro-interactions on hover. Never: beige/corporate greys, thin fonts, sharp corners. Grill me first on brand personality traits and where the line is between playful and unserious.`
+  },
+  {
+    id: "swiss",
+    name: "Swiss / Brutalist",
+    accent: "#E10600",
+    family: "WIRED · Nike · International Typographic family",
+    mood: "Stark white, huge uppercase grotesque, hard black rules, one signal red. Loud and disciplined.",
+    tokens:
+`name: fieldnote-swiss
+colors:
+  white: "#FFFFFF"
+  black: "#0A0A0A"
+  signal: "#E10600"       # one red; alarm and action alike
+typography:
+  display: { fontFamily: "Helvetica Neue", fontWeight: 800,
+             textTransform: "uppercase", letterSpacing: "-0.02em" }
+  body:    { fontFamily: "Helvetica Neue", fontSize: "16px", lineHeight: 1.5 }
+rounded: { all: 0px }
+spacing: { sm: 8px, md: 24px, lg: 48px, section: 120px }
+components:
+  button-primary:
+    backgroundColor: "{colors.signal}"
+    textColor: "{colors.white}"
+    rounded: "{rounded.all}"`,
+    tokensNote: "grid: strict 12-col, visible rules",
+    prompt:
+`Create a DESIGN.md (google-labs-code/design.md spec) for <PROJECT> in a SWISS/BRUTALIST direction: pure white ground, near-black ink, heavy grotesque display set uppercase at extreme sizes, strict 12-column grid with visible hairline/heavy rules as structure, exactly one signal accent, zero border radius, zero shadows — hierarchy from scale and weight alone. Never: rounded corners, soft shadows, more than one accent, decorative icons. Grill me first on how loud the brand can be and where restraint matters (forms, tables, errors).`
+  },
+  {
+    id: "trust",
+    name: "Institutional Trust",
+    accent: "#2456E5",
+    family: "Stripe · Wise · Coinbase family",
+    mood: "Navy authority, cool light ground, precise humanist sans, tabular data everywhere. Built to be believed.",
+    tokens:
+`name: fieldnote-trust
+colors:
+  navy: "#0A2540"         # brand ink + dark surfaces
+  ground: "#F6F8FB"
+  surface: "#FFFFFF"
+  action: "#2456E5"
+typography:
+  display: { fontFamily: "Söhne", fontWeight: 650, letterSpacing: "-0.015em" }
+  body:    { fontFamily: "Söhne", fontSize: "15px", lineHeight: 1.55 }
+  data:    { fontVariantNumeric: "tabular-nums" }
+rounded: { sm: 6px, md: 8px }
+spacing: { sm: 8px, md: 16px, lg: 32px, section: 80px }
+components:
+  button-primary:
+    backgroundColor: "{colors.action}"
+    textColor: "#FFFFFF"
+    rounded: "{rounded.md}"`,
+    prompt:
+`Create a DESIGN.md (google-labs-code/design.md spec) for <PROJECT> in an INSTITUTIONAL TRUST direction: deep navy as brand ink and dark surfaces, cool near-white ground, precise humanist sans with modest negative tracking, subtle 1px-blur shadows, tabular numerals for all data, semantic green/amber/red kept separate from the action blue. Never: playful gradients, warm creams, loud accents. Grill me first on regulatory/compliance tone requirements and how much density the data views need.`
+  }
+];
+
+const SPEC = (v) => `
+  <div class="spec">
+    <div class="nav">
+      <span class="logo">Fieldnote</span>
+      <a href="#" onclick="return false">Notebooks</a>
+      <a href="#" onclick="return false">Library</a>
+      <a href="#" onclick="return false">Team</a>
+      <span class="spacer"></span>
+      <a href="#" onclick="return false">Sign in</a>
+    </div>
+
+    <section class="hero">
+      <p class="label">Hero</p>
+      <h2>Research notes your whole team can actually find.</h2>
+      <p class="lede">Fieldnote keeps interviews, references, and decisions in one shared place — so the answer to "didn't we already learn this?" is always yes, and linked.</p>
+      <div class="cta-row">
+        <button class="btn primary">Start a notebook</button>
+        <button class="btn secondary">See how it works</button>
+      </div>
+    </section>
+
+    <section>
+      <p class="label">Type scale</p>
+      <div class="scale-row"><span class="px">display / 38-64</span><span class="t-display">Field notes</span></div>
+      <div class="scale-row"><span class="px">heading / 24</span><span class="t-h2">Interviews from the March study</span></div>
+      <div class="scale-row"><span class="px">body / 15-17</span><span class="t-body">Every note gets an owner, a date, and a link back to the raw source, so claims stay checkable long after the project ships.</span></div>
+      <div class="scale-row"><span class="px">caption / 12</span><span class="t-caption">UPDATED 2 HOURS AGO · 14 NOTES</span></div>
+    </section>
+
+    <section>
+      <p class="label">Color roles</p>
+      <div class="swatches" id="sw-${v.id}"></div>
+    </section>
+
+    <section>
+      <p class="label">Components</p>
+      <div class="comp-grid">
+        <div class="panel">
+          <h4>Buttons</h4>
+          <p>Primary, secondary, ghost, destructive, disabled.</p>
+          <div class="cta-row" style="margin-bottom:0.75rem">
+            <button class="btn primary">Save note</button>
+            <button class="btn secondary">Duplicate</button>
+          </div>
+          <div class="cta-row">
+            <button class="btn ghost">Cancel</button>
+            <button class="btn destructive">Delete notebook</button>
+            <button class="btn primary" disabled>Saving…</button>
+          </div>
+        </div>
+        <div class="panel">
+          <h4>Invite a teammate</h4>
+          <p>Anyone with a link can read; editors need an invite.</p>
+          <div class="field">
+            <label for="em-${v.id}">Email</label>
+            <input id="em-${v.id}" type="email" placeholder="ana@studio.co">
+          </div>
+          <button class="btn primary">Send invite</button>
+        </div>
+        <div class="panel">
+          <h4>Recent notes</h4>
+          <p>Status is reviewed or needs-review.</p>
+          <div style="overflow-x:auto">
+          <table>
+            <thead><tr><th>Note</th><th>Owner</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td>Pricing interview — Lena K.</td><td>Sam</td><td><span class="pill ok">Reviewed</span></td></tr>
+              <tr><td>Onboarding drop-off numbers</td><td>Priya</td><td><span class="pill warn">Needs review</span></td></tr>
+              <tr><td>Competitor teardown: Basecamp</td><td>Jo</td><td><span class="pill ok">Reviewed</span></td></tr>
+            </tbody>
+          </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <p class="label">Voice</p>
+      <p class="voice">${v.voice || "Write it down once. Find it forever."}</p>
+      <p class="voice-note">${v.voiceNote || ""}</p>
+    </section>
+
+    <section>
+      <p class="label">Would-be DESIGN.md tokens</p>
+      <pre>${v.tokens.replace(/</g, "&lt;")}</pre>
+    </section>
+
+    <section>
+      <p class="label">Starter prompt</p>
+      <div class="prompt-head">
+        <p style="margin:0;font-size:0.85rem;color:var(--v-muted);max-width:56ch">Paste into a session with the grill-me and prototype skills, swap in your project, and it will interview you before writing the DESIGN.md.</p>
+        <button class="copy-btn" data-copy="${v.id}">Copy prompt</button>
+      </div>
+      <pre class="prompt-text">${v.prompt.replace(/</g, "&lt;")}</pre>
+    </section>
+  </div>`;
+
+// voice lines per direction
+const VOICE = {
+  editorial: ["Good research is a conversation your future self can join.", "Calm, literate, first-person plural. Reads like an editor's note, never like marketing."],
+  minimal: ["Capture. Link. Move on.", "Terse, lowercase-comfortable, verbs first. Confidence through omission."],
+  terminal: ["$ fieldnote sync — 14 notes, 0 conflicts.", "Speaks in operations and outcomes. Precise counts beat adjectives."],
+  playful: ["Your team's brain, but searchable.", "Warm, plain-spoken, a little wry. Jokes allowed; sarcasm never."],
+  swiss: ["EVIDENCE OVER OPINION.", "Declarative. Short sentences. No qualifiers, no exclamation marks."],
+  trust: ["Every claim, sourced. Every decision, dated.", "Measured and exact. Numbers carry the persuasion; adjectives stay home."]
+};
+
+const swatchDefs = {
+  editorial: [["paper","#F6F1E7"],["ink","#262117"],["clay","#B4441F"],["line","#E4DAC8"],["ok","#3D5A32"]],
+  minimal: [["ground","#0B0B0E"],["surface","#131316"],["ink","#EDEDEF"],["iris","#6E7BF2"],["ok","#6CD9A2"]],
+  terminal: [["soot","#0C1210"],["ink","#D7E4DC"],["phosphor","#3FD68F"],["amber","#D8B44A"],["rust","#E06C5A"]],
+  playful: [["ground","#FFFFFF"],["ink","#1E1B2E"],["violet","#7B3FF2"],["mint","#0F8A5F"],["sun","#F5B80C"]],
+  swiss: [["white","#FFFFFF"],["black","#0A0A0A"],["signal","#E10600"],["grey","#F2F2F2"]],
+  trust: [["navy","#0A2540"],["ground","#F6F8FB"],["action","#2456E5"],["ok","#14724B"],["warn","#8A6116"]]
+};
+
+const tabs = document.getElementById("tabs");
+const panels = document.getElementById("panels");
+const meta = document.getElementById("meta");
+const stage = document.getElementById("stage");
+
+VARIANTS.forEach(v => {
+  v.voice = VOICE[v.id][0];
+  v.voiceNote = VOICE[v.id][1];
+
+  const b = document.createElement("button");
+  b.role = "tab";
+  b.id = "tab-" + v.id;
+  b.setAttribute("aria-selected", "false");
+  b.innerHTML = `<span class="swatch" style="background:${v.accent}"></span>${v.name}`;
+  b.addEventListener("click", () => select(v.id, true));
+  tabs.appendChild(b);
+
+  const p = document.createElement("div");
+  p.className = "variant";
+  p.id = "panel-" + v.id;
+  p.setAttribute("role", "tabpanel");
+  p.innerHTML = SPEC(v);
+  panels.appendChild(p);
+
+  const sw = p.querySelector("#sw-" + v.id);
+  swatchDefs[v.id].forEach(([tok, hex]) => {
+    const card = document.createElement("div");
+    card.className = "swatch-card";
+    card.innerHTML = `<div class="chip" style="background:${hex}"></div>
+      <div class="info"><div class="tok">colors.${tok}</div><div class="hex">${hex}</div></div>`;
+    sw.appendChild(card);
+  });
+});
+
+function select(id, push) {
+  const v = VARIANTS.find(x => x.id === id) || VARIANTS[0];
+  VARIANTS.forEach(x => {
+    document.getElementById("tab-" + x.id).setAttribute("aria-selected", String(x.id === v.id));
+    document.getElementById("panel-" + x.id).classList.toggle("active", x.id === v.id);
+  });
+  stage.dataset.v = v.id;
+  document.documentElement.style.setProperty("--c-accent", v.accent);
+  meta.innerHTML = `<span class="fam">${v.name}</span><span>${v.family}</span><span>${v.mood}</span>`;
+  if (push) {
+    const u = new URL(location.href);
+    u.searchParams.set("variant", v.id);
+    history.replaceState(null, "", u);
+  }
+}
+
+document.addEventListener("click", (e) => {
+  const btn = e.target.closest("[data-copy]");
+  if (!btn) return;
+  const v = VARIANTS.find(x => x.id === btn.dataset.copy);
+  navigator.clipboard.writeText(v.prompt).then(() => {
+    const old = btn.textContent;
+    btn.textContent = "Copied";
+    setTimeout(() => { btn.textContent = old; }, 1200);
+  });
+});
+
+document.addEventListener("keydown", (e) => {
+  if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
+  if (/INPUT|TEXTAREA/.test(document.activeElement.tagName)) return;
+  const idx = VARIANTS.findIndex(x => x.id === stage.dataset.v);
+  const next = (idx + (e.key === "ArrowRight" ? 1 : VARIANTS.length - 1)) % VARIANTS.length;
+  select(VARIANTS[next].id, true);
+});
+
+select(new URLSearchParams(location.search).get("variant") || "editorial", false);
+</script>
