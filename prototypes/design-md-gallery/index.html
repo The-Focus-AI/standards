@@ -7,7 +7,7 @@
     --c-ink: #20201E;
     --c-muted: #6D6C66;
     --c-border: #E4E3DE;
-    --c-accent: #C3512F;
+    --c-accent: #C8A96A;
   }
   @media (prefers-color-scheme: dark) {
     :root {
@@ -239,7 +239,34 @@
 
   /* voice */
   .spec .voice { font-family: var(--v-display); font-weight: var(--v-dispweight); font-size: 1.3rem; max-width: 40ch; margin: 0 0 0.4rem; }
-  .spec .voice-note { font-size: 0.85rem; color: var(--v-muted); max-width: 60ch; }
+  .spec .voice-note { font-size: 0.85rem; color: var(--v-muted); max-width: 60ch; margin: 0 0 1.4rem; }
+  .spec .voice-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; align-items: start; }
+  .spec ol.rules { margin: 0; padding-left: 1.2rem; font-size: 0.875rem; }
+  .spec ol.rules li { margin-bottom: 0.55rem; }
+  .spec ol.rules li:last-child { margin-bottom: 0; font-style: italic; color: var(--v-muted); }
+  .spec .rw-label {
+    font-family: var(--v-utility); font-size: 0.66rem; font-weight: 700;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    margin: 0 0 0.3rem; color: var(--v-muted);
+  }
+  .spec .rw-label.good { color: var(--v-accent); }
+  .spec .rw {
+    font-size: 0.9rem; margin: 0 0 1rem;
+    padding: 0.6rem 0.8rem;
+    border-left: 3px solid var(--v-inkline);
+    background: var(--v-wash);
+  }
+  .spec .rw.after { border-left-color: var(--v-accent); margin-bottom: 0; }
+  .spec .rw.before { text-decoration: line-through; text-decoration-thickness: 1px; text-decoration-color: var(--v-muted); color: var(--v-muted); }
+  .spec .banned { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.9rem; }
+  .spec .banned span {
+    font-family: var(--v-mono); font-size: 0.72rem;
+    padding: 0.2rem 0.55rem;
+    border: 1px solid var(--v-inkline);
+    border-radius: var(--v-radius);
+    color: var(--v-muted);
+    text-decoration: line-through;
+  }
 
   /* tokens + prompt */
   .spec pre {
@@ -272,22 +299,22 @@
 
   /* ============ variant worlds ============ */
 
-  /* A — Warm Editorial (Claude / Anthropic family) */
-  .stage[data-v="editorial"] .spec {
-    --v-bg: #F6F1E7; --v-surface: #FDFAF3; --v-wash: #EFE7D8;
-    --v-ink: #262117; --v-muted: #6E6555; --v-line: #E4DAC8; --v-inkline: #C9BCA2;
-    --v-accent: #B4441F; --v-accenthover: #983917; --v-onaccent: #FDFAF3;
-    --v-danger: #8C2F1B;
-    --v-ok: #3D5A32; --v-okbg: #E2E8D4; --v-warn: #7A5215; --v-warnbg: #F0E4C8;
-    --v-navbg: #F6F1E7; --v-navink: #262117;
-    --v-fieldbg: #FDFAF3; --v-codebg: #2A2419; --v-codeink: #E8DFC9;
-    --v-display: "Iowan Old Style", Georgia, "Times New Roman", serif;
-    --v-body: Georgia, "Iowan Old Style", serif;
-    --v-utility: ui-sans-serif, system-ui, sans-serif;
+  /* A — Luxury Dark (BMW / Ferrari / Lamborghini automotive family) */
+  .stage[data-v="luxury"] .spec {
+    --v-bg: #0E0D0B; --v-surface: #15130F; --v-wash: #1D1A14;
+    --v-ink: #EDE7DA; --v-muted: #97907F; --v-line: #262218; --v-inkline: #4A4232;
+    --v-accent: #C8A96A; --v-accenthover: #B69350; --v-onaccent: #0E0D0B;
+    --v-danger: #B0442E;
+    --v-ok: #C8A96A; --v-okbg: #241F14; --v-warn: #97907F; --v-warnbg: #1D1A14;
+    --v-navbg: #0E0D0B; --v-navink: #EDE7DA;
+    --v-fieldbg: #0B0A08; --v-codebg: #0B0A08; --v-codeink: #CFC5AE;
+    --v-display: Didot, "Bodoni MT", "Playfair Display", Georgia, serif;
+    --v-body: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --v-utility: "Helvetica Neue", Helvetica, Arial, sans-serif;
     --v-mono: ui-monospace, "SF Mono", Menlo, monospace;
-    --v-dispweight: 500; --v-dispspace: -0.01em; --v-logospace: 0;
-    --v-herosize: 3.4rem; --v-herocase: none; --v-btncase: none; --v-btnspace: 0;
-    --v-radius: 6px; --v-shadow: none;
+    --v-dispweight: 500; --v-dispspace: 0.06em; --v-logospace: 0.22em;
+    --v-herosize: 3.1rem; --v-herocase: none; --v-btncase: uppercase; --v-btnspace: 0.14em;
+    --v-radius: 2px; --v-shadow: none;
   }
 
   /* B — Ultra-minimal SaaS (Linear / Vercel family) */
@@ -404,31 +431,31 @@
 <script>
 const VARIANTS = [
   {
-    id: "editorial",
-    name: "Warm Editorial",
-    accent: "#B4441F",
-    family: "Claude · Anthropic · Notion-serif family",
-    mood: "Paper-warm, serif-led, airy. Feels considered and human; reads like a well-set book.",
+    id: "luxury",
+    name: "Luxury Dark",
+    accent: "#C8A96A",
+    family: "BMW · Ferrari · Lamborghini automotive family",
+    mood: "Cinema black, champagne gold, wide-tracked high-contrast serif. Understated, expensive, unhurried.",
     tokens:
-`name: fieldnote-editorial
+`name: fieldnote-luxury
 colors:
-  paper: "#F6F1E7"        # warm limestone ground
-  ink: "#262117"
-  clay: "#B4441F"         # single accent; actions only
-  on-clay: "#FDFAF3"
+  onyx: "#0E0D0B"         # cinema black, never #000
+  ivory: "#EDE7DA"
+  gold: "#C8A96A"         # hairlines and actions; never fills
 typography:
-  display: { fontFamily: "Source Serif 4", fontWeight: 500 }
-  body:    { fontFamily: "Source Serif 4", fontSize: "17px", lineHeight: 1.6 }
-  utility: { fontFamily: "Inter", fontSize: "13px" }
-rounded: { sm: 4px, md: 6px }
-spacing: { sm: 8px, md: 16px, lg: 32px, section: 96px }
+  display: { fontFamily: "Didot", fontWeight: 500,
+             letterSpacing: "0.06em" }
+  body:    { fontFamily: "Neue Haas Grotesk", fontSize: "15px",
+             lineHeight: 1.7 }
+rounded: { sm: 0px, md: 2px }
+spacing: { sm: 8px, md: 24px, lg: 48px, section: 140px }
 components:
   button-primary:
-    backgroundColor: "{colors.clay}"
-    textColor: "{colors.on-clay}"
+    backgroundColor: "{colors.gold}"
+    textColor: "{colors.onyx}"
     rounded: "{rounded.md}"`,
     prompt:
-`Create a DESIGN.md (google-labs-code/design.md spec: YAML tokens + prose sections) for <PROJECT> in a WARM EDITORIAL direction: warm paper ground (not pure white), serif display and body, one earthy accent reserved for actions, generous whitespace on an 8px scale, opacity-based text hierarchy, minimal shadows. Never: pure black/white, multiple accent colors, dense layouts. Before writing, grill me one question at a time about positioning, personality traits, and non-negotiables.`
+`Create a DESIGN.md (google-labs-code/design.md spec: YAML tokens + prose sections) for <PROJECT> in a LUXURY DARK direction: cinema-black ground (never pure #000), ivory ink, champagne-gold accent used only for hairlines and primary actions, high-contrast serif display with wide letter-spacing over a quiet grotesque body, vast section spacing (120px+), square corners, no shadows — depth from tone alone. Never: bright colors, discount-y urgency, exclamation marks. Include a Voice & Tone rulebook with numbered writing rules, banned words, and five before/after rewrite pairs. Before writing, grill me one question at a time about positioning, personality traits, voice rules, and non-negotiables.`
   },
   {
     id: "minimal",
@@ -454,7 +481,7 @@ components:
     textColor: "#FFFFFF"
     rounded: "{rounded.md}"`,
     prompt:
-`Create a DESIGN.md (google-labs-code/design.md spec) for <PROJECT> in an ULTRA-MINIMAL SAAS direction: near-black ground (#0B-ish, never pure black), single geometric sans with tight negative letter-spacing on display sizes, one electric accent used sparingly, hairline borders over shadows, compact 4px-based spacing, restrained motion. Never: gradients as decoration, more than one accent, rounded-pill buttons. Grill me first on audience, density tolerance, and light-mode requirements.`
+`Create a DESIGN.md (google-labs-code/design.md spec) for <PROJECT> in an ULTRA-MINIMAL SAAS direction: near-black ground (#0B-ish, never pure black), single geometric sans with tight negative letter-spacing on display sizes, one electric accent used sparingly, hairline borders over shadows, compact 4px-based spacing, restrained motion. Never: gradients as decoration, more than one accent, rounded-pill buttons. Include a Voice & Tone rulebook with numbered writing rules, banned words, and five before/after rewrite pairs. Grill me first on audience, density tolerance, voice rules, and light-mode requirements.`
   },
   {
     id: "terminal",
@@ -480,7 +507,7 @@ components:
     textColor: "#06110C"
     rounded: "{rounded.md}"`,
     prompt:
-`Create a DESIGN.md (google-labs-code/design.md spec) for <PROJECT> in a TERMINAL MONO direction: monospace for every role including display, dark soot-green ground, phosphor-green accent doing double duty as success and primary action, square corners (0-2px), visible structure (borders not shadows), dense but breathable line-height 1.6. Never: serifs, gradients, decorative imagery. Grill me first on how technical the audience is and whether a light mode is genuinely needed.`
+`Create a DESIGN.md (google-labs-code/design.md spec) for <PROJECT> in a TERMINAL MONO direction: monospace for every role including display, dark soot-green ground, phosphor-green accent doing double duty as success and primary action, square corners (0-2px), visible structure (borders not shadows), dense but breathable line-height 1.6. Never: serifs, gradients, decorative imagery. Include a Voice & Tone rulebook with numbered writing rules, banned words, and five before/after rewrite pairs. Grill me first on how technical the audience is and whether a light mode is genuinely needed.`
   },
   {
     id: "playful",
@@ -507,7 +534,7 @@ components:
     textColor: "#FFFFFF"
     rounded: "{rounded.md}"`,
     prompt:
-`Create a DESIGN.md (google-labs-code/design.md spec) for <PROJECT> in a PLAYFUL PRODUCT direction: clean white ground, hue-biased near-black ink, a small palette of 2-3 confident accents with clear roles, rounded humanist sans at heavy display weights, generous radii (14px+), soft colored shadows, micro-interactions on hover. Never: beige/corporate greys, thin fonts, sharp corners. Grill me first on brand personality traits and where the line is between playful and unserious.`
+`Create a DESIGN.md (google-labs-code/design.md spec) for <PROJECT> in a PLAYFUL PRODUCT direction: clean white ground, hue-biased near-black ink, a small palette of 2-3 confident accents with clear roles, rounded humanist sans at heavy display weights, generous radii (14px+), soft colored shadows, micro-interactions on hover. Never: beige/corporate greys, thin fonts, sharp corners. Include a Voice & Tone rulebook with numbered writing rules, banned words, and five before/after rewrite pairs. Grill me first on brand personality traits and where the line is between playful and unserious.`
   },
   {
     id: "swiss",
@@ -534,7 +561,7 @@ components:
     rounded: "{rounded.all}"`,
     tokensNote: "grid: strict 12-col, visible rules",
     prompt:
-`Create a DESIGN.md (google-labs-code/design.md spec) for <PROJECT> in a SWISS/BRUTALIST direction: pure white ground, near-black ink, heavy grotesque display set uppercase at extreme sizes, strict 12-column grid with visible hairline/heavy rules as structure, exactly one signal accent, zero border radius, zero shadows — hierarchy from scale and weight alone. Never: rounded corners, soft shadows, more than one accent, decorative icons. Grill me first on how loud the brand can be and where restraint matters (forms, tables, errors).`
+`Create a DESIGN.md (google-labs-code/design.md spec) for <PROJECT> in a SWISS/BRUTALIST direction: pure white ground, near-black ink, heavy grotesque display set uppercase at extreme sizes, strict 12-column grid with visible hairline/heavy rules as structure, exactly one signal accent, zero border radius, zero shadows — hierarchy from scale and weight alone. Never: rounded corners, soft shadows, more than one accent, decorative icons. Include a Voice & Tone rulebook with numbered writing rules, banned words, and five before/after rewrite pairs. Grill me first on how loud the brand can be and where restraint matters (forms, tables, errors).`
   },
   {
     id: "trust",
@@ -561,7 +588,7 @@ components:
     textColor: "#FFFFFF"
     rounded: "{rounded.md}"`,
     prompt:
-`Create a DESIGN.md (google-labs-code/design.md spec) for <PROJECT> in an INSTITUTIONAL TRUST direction: deep navy as brand ink and dark surfaces, cool near-white ground, precise humanist sans with modest negative tracking, subtle 1px-blur shadows, tabular numerals for all data, semantic green/amber/red kept separate from the action blue. Never: playful gradients, warm creams, loud accents. Grill me first on regulatory/compliance tone requirements and how much density the data views need.`
+`Create a DESIGN.md (google-labs-code/design.md spec) for <PROJECT> in an INSTITUTIONAL TRUST direction: deep navy as brand ink and dark surfaces, cool near-white ground, precise humanist sans with modest negative tracking, subtle 1px-blur shadows, tabular numerals for all data, semantic green/amber/red kept separate from the action blue. Never: playful gradients, warm creams, loud accents. Include a Voice & Tone rulebook with numbered writing rules, banned words, and five before/after rewrite pairs. Grill me first on regulatory/compliance tone requirements and how much density the data views need.`
   }
 ];
 
@@ -642,9 +669,25 @@ const SPEC = (v) => `
     </section>
 
     <section>
-      <p class="label">Voice</p>
-      <p class="voice">${v.voice || "Write it down once. Find it forever."}</p>
-      <p class="voice-note">${v.voiceNote || ""}</p>
+      <p class="label">Voice — the rulebook</p>
+      <p class="voice">${v.voice}</p>
+      <p class="voice-note">${v.voiceNote}</p>
+      <div class="voice-grid">
+        <div class="panel">
+          <h4>House rules</h4>
+          <p>Numbered, checkable, Orwell-style. A rule you can't test against a sentence isn't a rule.</p>
+          <ol class="rules">${v.rules.map(r => `<li>${r}</li>`).join("")}</ol>
+        </div>
+        <div class="panel">
+          <h4>Rewrite</h4>
+          <p>The same announcement, off-brand then on-brand.</p>
+          <p class="rw-label">Off-brand</p>
+          <p class="rw before">${v.before}</p>
+          <p class="rw-label good">On-brand</p>
+          <p class="rw after">${v.after}</p>
+          <div class="banned">${v.banned.map(w => `<span>${w}</span>`).join("")}</div>
+        </div>
+      </div>
     </section>
 
     <section>
@@ -662,18 +705,97 @@ const SPEC = (v) => `
     </section>
   </div>`;
 
-// voice lines per direction
+// voice rulebooks per direction: creed, note, numbered rules (Orwell-style),
+// one before/after rewrite of the same announcement, and banned words.
 const VOICE = {
-  editorial: ["Good research is a conversation your future self can join.", "Calm, literate, first-person plural. Reads like an editor's note, never like marketing."],
-  minimal: ["Capture. Link. Move on.", "Terse, lowercase-comfortable, verbs first. Confidence through omission."],
-  terminal: ["$ fieldnote sync — 14 notes, 0 conflicts.", "Speaks in operations and outcomes. Precise counts beat adjectives."],
-  playful: ["Your team's brain, but searchable.", "Warm, plain-spoken, a little wry. Jokes allowed; sarcasm never."],
-  swiss: ["EVIDENCE OVER OPINION.", "Declarative. Short sentences. No qualifiers, no exclamation marks."],
-  trust: ["Every claim, sourced. Every decision, dated.", "Measured and exact. Numbers carry the persuasion; adjectives stay home."]
+  luxury: {
+    creed: "Few words, chosen slowly.",
+    note: "Understatement is the whole trick: the product is the superlative, the prose never is. Addresses the reader as a connoisseur, not a shopper.",
+    rules: [
+      "Understate. If a sentence praises the product, cut the praise and keep the fact.",
+      "No urgency, ever: no countdowns, no “don't miss out”, no exclamation marks.",
+      "Prefer the definite article: “the March release”, not “our exciting new release”.",
+      "Silence over filler — a short line and white space beat a full paragraph.",
+      "Break any of these rules sooner than write anything barbarous."
+    ],
+    before: "Don't miss out — our amazing new export feature is finally here!!",
+    after: "Export is ready. Your notes, typeset.",
+    banned: ["amazing", "don't miss out", "finally here", "!!", "unlock"]
+  },
+  minimal: {
+    creed: "Capture. Link. Move on.",
+    note: "Terse, verbs first, confidence through omission. Strunk's “omit needless words” applied without mercy.",
+    rules: [
+      "Verbs first: say what happened, not how anyone feels about it.",
+      "If the sentence works without a word, the word goes.",
+      "Never announce — state. “Search covers archives” beats “we're launching archival search”.",
+      "One idea per sentence. One sentence per idea.",
+      "Break any of these rules sooner than write anything barbarous."
+    ],
+    before: "We're super excited to announce our brand-new, more powerful search experience!",
+    after: "Search now covers archived notes.",
+    banned: ["excited to announce", "experience", "powerful", "brand-new", "supercharge"]
+  },
+  terminal: {
+    creed: "$ fieldnote sync — 14 notes, 0 conflicts.",
+    note: "Speaks in operations and outcomes. Counts beat adjectives; the next command beats an apology.",
+    rules: [
+      "Report counts, not feelings: “2 conflicts”, never “oops, something went wrong”.",
+      "Errors name what failed and print the next command. No apologies, no emoji.",
+      "Present tense, active voice; omit the subject when the system is the actor.",
+      "Every noun is greppable: use the exact name of the thing, every time.",
+      "Break any of these rules sooner than write anything barbarous."
+    ],
+    before: "Oops! Something went wrong while syncing your notes 😢 Please try again later.",
+    after: "sync failed: 2 conflicts in 'pricing'. Run fieldnote resolve.",
+    banned: ["oops", "something went wrong", "please try again", "😢", "seamlessly"]
+  },
+  playful: {
+    creed: "Your team's brain, but searchable.",
+    note: "A smart friend, not a mascot. Warm and plain-spoken with an occasional wink — never at the user's expense.",
+    rules: [
+      "Write like a smart friend, not a mascot: no forced puns, no “yay!”.",
+      "One joke per screen; zero in error messages.",
+      "Contractions always. Exclamation marks roughly once a week.",
+      "Errors stay kind and concrete: what happened, what to do, no blame.",
+      "Break any of these rules sooner than write anything barbarous."
+    ],
+    before: "Error 422: Payload validation failed for attachment entity.",
+    after: "That file's too big — anything under 10 MB works.",
+    banned: ["yay!", "whoops!", "payload", "entity", "invalid input"]
+  },
+  swiss: {
+    creed: "EVIDENCE OVER OPINION.",
+    note: "Declarative and disciplined. Orwell's cuts applied at poster scale: scale and weight do the shouting so the words don't have to.",
+    rules: [
+      "Sentences under twelve words.",
+      "Cut every qualifier: very, really, just, simply, basically.",
+      "Never use the passive where the active will do.",
+      "No metaphors you've seen in print before.",
+      "Break any of these rules sooner than write anything barbarous."
+    ],
+    before: "We just wanted to let you know that your report is basically ready to view.",
+    after: "Your report is ready.",
+    banned: ["just wanted to", "basically", "very", "simply", "we believe"]
+  },
+  trust: {
+    creed: "Every claim, sourced. Every decision, dated.",
+    note: "Measured and exact. Numbers carry the persuasion; adjectives stay home. Risk is stated before benefit.",
+    rules: [
+      "Every number gets a source; every promise gets a date.",
+      "Prefer the plain word: use, not leverage; before, not prior to.",
+      "State the risk before the benefit — readers trust what admits limits.",
+      "No superlatives without a benchmark you can cite.",
+      "Break any of these rules sooner than write anything barbarous."
+    ],
+    before: "Leverage our cutting-edge platform to supercharge your team's workflows prior to onboarding.",
+    after: "Import runs in under two minutes (median, March cohort). Notes stay encrypted at rest.",
+    banned: ["leverage", "cutting-edge", "supercharge", "prior to", "world-class"]
+  }
 };
 
 const swatchDefs = {
-  editorial: [["paper","#F6F1E7"],["ink","#262117"],["clay","#B4441F"],["line","#E4DAC8"],["ok","#3D5A32"]],
+  luxury: [["onyx","#0E0D0B"],["ivory","#EDE7DA"],["gold","#C8A96A"],["line","#262218"],["rust","#B0442E"]],
   minimal: [["ground","#0B0B0E"],["surface","#131316"],["ink","#EDEDEF"],["iris","#6E7BF2"],["ok","#6CD9A2"]],
   terminal: [["soot","#0C1210"],["ink","#D7E4DC"],["phosphor","#3FD68F"],["amber","#D8B44A"],["rust","#E06C5A"]],
   playful: [["ground","#FFFFFF"],["ink","#1E1B2E"],["violet","#7B3FF2"],["mint","#0F8A5F"],["sun","#F5B80C"]],
@@ -687,8 +809,13 @@ const meta = document.getElementById("meta");
 const stage = document.getElementById("stage");
 
 VARIANTS.forEach(v => {
-  v.voice = VOICE[v.id][0];
-  v.voiceNote = VOICE[v.id][1];
+  const vo = VOICE[v.id];
+  v.voice = vo.creed;
+  v.voiceNote = vo.note;
+  v.rules = vo.rules;
+  v.before = vo.before;
+  v.after = vo.after;
+  v.banned = vo.banned;
 
   const b = document.createElement("button");
   b.role = "tab";
@@ -750,5 +877,5 @@ document.addEventListener("keydown", (e) => {
   select(VARIANTS[next].id, true);
 });
 
-select(new URLSearchParams(location.search).get("variant") || "editorial", false);
+select(new URLSearchParams(location.search).get("variant") || "luxury", false);
 </script>

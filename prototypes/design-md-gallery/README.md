@@ -9,7 +9,7 @@ contrasting design directions drawn from the style families in
 
 | Variant | Family |
 | --- | --- |
-| `editorial` | Claude / Anthropic warm-serif |
+| `luxury` | BMW / Ferrari cinema-black + gold |
 | `minimal` | Linear / Vercel near-black SaaS |
 | `terminal` | Warp / Ollama monospace |
 | `playful` | Figma / Zapier rounded multicolor |
@@ -17,7 +17,8 @@ contrasting design directions drawn from the style families in
 | `trust` | Stripe / Wise fintech navy |
 
 Each variant shows the same content — hero, type scale, color roles,
-components with states, voice line — plus its would-be DESIGN.md YAML tokens
+components with states, and a voice rulebook (numbered Orwell-style rules,
+a before/after rewrite, banned words) — plus its would-be DESIGN.md YAML tokens
 and a copyable **starter prompt** that kicks off the grill-me → prototype →
 DESIGN.md flow in `prompts/develop-design-md.md`.
 
@@ -27,7 +28,7 @@ Open `index.html` in a browser, or:
 
 ```bash
 python3 -m http.server -d prototypes/design-md-gallery 8899
-# http://localhost:8899/?variant=editorial|minimal|terminal|playful|swiss|trust
+# http://localhost:8899/?variant=luxury|minimal|terminal|playful|swiss|trust
 ```
 
 Left/right arrow keys cycle variants.
