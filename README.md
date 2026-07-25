@@ -33,6 +33,7 @@ Sessions are ephemeral — lost when the container exits. Mount a volume to
 | `mise.toml`         | Tool declarations (mise is the only dependency — everything else flows from here)                            |
 | `Dockerfile`        | Minimal container: `debian:stable-slim`, mise, bash, tmux, git, gh. `/app` is left empty for your project.   |
 | `skills-lock.json`  | Company-approved skills (locked hashes for reproducibility)                                                  |
+| `skills/`           | Skills authored here — `activity-report` (live prod usage + git history → client-ready report)               |
 | `best-practices/`   | Deployment, Vercel, GCP, GCE Gaia, Clerk, security, skills, pi extensions, project organization             |
 | `prompts/`          | Pi prompts — `setup-project.md` scaffolds new projects, `generate-dockerfile.md` regenerates this Dockerfile |
 | `reports/`          | Technical research (fnox secrets reference, skills CLI guide, electron shell)                               |

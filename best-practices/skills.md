@@ -48,6 +48,25 @@ skills that are not part of TheFocus.AI standards.
 | `firecrawl` + 8 `firecrawl-*` | firecrawl/cli | `skills/firecrawl-*` |
 | `find-skills` | vercel-labs/skills | `skills/find-skills` |
 
+### Reporting
+
+| Skill | Source repo | Skill folder |
+| --- | --- | --- |
+| `activity-report` | The-Focus-AI/standards | `skills/activity-report` |
+
+`activity-report` is authored here, in this repository, and installed like any other
+skill:
+
+```bash
+skills add The-Focus-AI/standards --skill activity-report -y
+```
+
+It pulls live production usage plus git history for a project and writes an
+interpreted, client-ready markdown report — correlating error spikes against the
+commits that caused and fixed them. It is read-only against production by policy
+(`SELECT` only) and prefers the project's MCP database connection over a connection
+string, so prod credentials never enter the agent's context.
+
 ### Running a browser
 
 | Skill | Source repo | Skill folder |
@@ -120,6 +139,19 @@ local fallbacks, and Wayfinder operations in `docs/agents/issue-workflow.md`.
 `mattpocock/skills` renamed `to-prd` → `to-spec` and merged `to-plan` /
 `to-issues` → `to-tickets`. Do not install the deprecated `to-prd` or
 `to-issues` skills in new projects.
+
+## Authoring a skill in this repository
+
+Skills we own live under `skills/<skill-name>/SKILL.md` at the root of this repo, one
+folder per skill, so `skills add The-Focus-AI/standards --skill <skill-name>` works the
+same way as any third-party source. Write the frontmatter `description` for triggering —
+say what the skill does *and* the phrases that should invoke it. `writing-great-skills`
+is the reference for the rest.
+
+Once the skill is on `main`, run `skills add` against it from a project so the CLI
+computes and records the hash in that project's `skills-lock.json`; commit the standards
+copy of the lock file from the same run. Never hand-write a `computedHash` — a wrong
+hash makes `experimental_install` non-reproducible.
 
 ## Adding a new skill
 

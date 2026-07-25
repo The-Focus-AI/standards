@@ -19,6 +19,8 @@ Start with these files, depending on the work being requested:
 - `best-practices/pi-extensions.md` — pi installation and required pi extensions.
 - `best-practices/organization.md` — organization-level structure guidance. Review when setting up or auditing repo layout.
 - `skills-lock.json` — locked, reproducible list of installed/approved skills and hashes.
+- `skills/` — skills authored and hosted by this repository, one folder per skill
+  (`skills/<name>/SKILL.md`), installable with `skills add The-Focus-AI/standards --skill <name>`.
 - `mise.toml` — this standards repo's tool/task declaration; use as a reference for project bootstrapping.
 - `.pi/settings.json` — project-local pi configuration example.
 - `scripts/setup-default-project.sh` — quick bootstrap script for new/empty projects; copies default `mise.toml`, `.pi/settings.json`, `skills-lock.json`, `AGENTS.md`, and issue-workflow docs, then runs `mise trust`, `mise install`, setup, and locked skill installation.
