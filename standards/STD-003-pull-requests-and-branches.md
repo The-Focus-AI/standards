@@ -13,8 +13,8 @@ author: W. Schenk
 
 `STD-002` requires that work on an issue arrive as a branch and a pull request.
 This standard specifies their shape: how a branch is named, how a pull request
-links back to the issue that justified it, what an agent says on it, and who is
-allowed to merge.
+links back to the issue that justified it, what its description must contain and
+prove, what an agent says on it, and who is allowed to merge.
 
 The chain is issue → branch → pull request → merge, and each link names the one
 before it. A repository worked by several agents at once has no other way to
@@ -38,9 +38,10 @@ repositories still running it can find out what replaced it.
 A branch MUST be named `<issue-number>-<slug>`.
 
 The number comes first so the issue is derivable from the branch with no
-metadata, no lookup table, and no naming convention to remember: `142-preview-
-check-not-comment`. The slug is lowercase, hyphenated, and describes the change
-rather than the ticket. Branches sort by issue as a side effect.
+metadata, no lookup table, and no naming convention to remember:
+`142-preview-check-not-comment`. The slug is lowercase, hyphenated, and
+describes the change rather than the ticket. Branches sort by issue as a side
+effect.
 
 ```sh
 gh issue view "$N" --json title \
@@ -75,14 +76,58 @@ A pull request with no linked issue is work nobody accepted.
 
 ### 3.5
 
-A pull request description MUST state what changed and why, in the standard's
-voice.
+A pull request description MUST carry the sections in section 4, in that order.
 
-Not a diff summary — the diff is already there. Name the behaviour that is
-different now and the requirement it satisfies. Follow `DESIGN.md`: factual, no
-enthusiasm, no emoji, no restating the ticket title.
+Success criteria, why, what changed, evidence. The order is the requirement, not
+a suggestion: a reviewer opening the page reads what "working" means before
+reading anything else, and can then judge everything below against it.
 
 ### 3.6
+
+Success criteria MUST be the first content in the description.
+
+Above the why, above the diff summary, above everything. A reviewer who has to
+scroll to find out what the change is supposed to achieve will review the code
+they were shown instead of the outcome that was wanted — and an agent that
+writes the criteria first has to decide what done means before it starts.
+
+### 3.7
+
+Every success criterion MUST be a statement someone else can check.
+
+"A reviewer can open the preview URL from the check list" is checkable. "Preview
+deployments work properly" is not. Write each one so that a person who did not
+do the work, and did not read the diff, can determine whether it holds.
+
+### 3.8
+
+A pull request for a feature build MUST evidence every success criterion.
+
+A feature build is any change to behaviour a person can observe. Each criterion
+names the artefact that proves it: a screenshot, a recording, command output, or
+a test name. An unevidenced criterion is an assertion, and the reviewer is the
+one who ends up testing it by hand.
+
+### 3.9
+
+A pull request that changes a visible surface MUST include a screenshot of that
+surface after the change.
+
+Prose describing a layout is not reviewable. Where the change alters something
+that already existed, show before and after. A reviewer should not have to run
+the branch to find out what it looks like — that is what the preview deployment
+and the screenshot are both for.
+
+### 3.10
+
+A pull request that changes an interaction or a multi-step flow SHOULD include a
+recording.
+
+A screenshot cannot show a transition, a loading state, an error path, or the
+order in which things happen. Where those are the change, record the flow. Keep
+it short and unnarrated; the point is evidence, not a demo.
+
+### 3.11
 
 A pull request that is not ready for review MUST be opened as a draft.
 
@@ -90,7 +135,7 @@ Opening early is encouraged: it publishes intent, gives CI somewhere to run, and
 lets another agent see the work exists before duplicating it. Draft status is
 how that happens without requesting attention nobody has time to give.
 
-### 3.7
+### 3.12
 
 An agent MUST NOT merge a pull request it authored.
 
@@ -99,16 +144,16 @@ the issue `ready`, and a person accepts the result by approving the pull
 request. Everything between them is unattended. An agent that merges its own
 work removes the second gate and leaves the fleet grading its own homework.
 
-### 3.8
+### 3.13
 
 A pull request MAY merge without human approval when its issue carries the
 `auto-merge` label and every required check passes.
 
 The label is set by a person at triage, on the issue, before the work starts —
 so the decision to let a change land unattended is made by a human who has read
-the requirement, not by the agent that wrote the code. Without it, 3.7 stands.
+the requirement, not by the agent that wrote the code. Without it, 3.12 stands.
 
-### 3.9
+### 3.14
 
 An agent MUST NOT merge a pull request with a failing required check.
 
@@ -116,7 +161,7 @@ A red check is a statement that the change does not work. Overriding it converts
 a broken build into a broken main branch, and every agent that branches
 afterwards inherits it.
 
-### 3.10
+### 3.15
 
 An agent MUST establish whether a failing check also fails on the default
 branch, and MUST say which in the pull request.
@@ -125,7 +170,7 @@ A pre-existing failure is not this change's defect and must not be silently
 fixed inside an unrelated pull request; it also must not be used to wave the
 change through. Say which it is, once, and act accordingly.
 
-### 3.11
+### 3.16
 
 An agent MUST NOT force-push a branch after a human has reviewed it.
 
@@ -133,7 +178,7 @@ Force-pushing discards the commits a reviewer read and invalidates approvals
 without saying so. Before review, rewriting history freely is fine and often
 tidier; after it, append.
 
-### 3.12
+### 3.17
 
 An agent MUST comment on the pull request when it changes the work in response
 to review.
@@ -141,7 +186,7 @@ to review.
 Say what changed and where. A silent push after a review comment leaves the
 reviewer re-reading the whole diff to find out whether they were heard.
 
-### 3.13
+### 3.18
 
 An agent SHOULD NOT comment on a pull request to narrate routine progress.
 
@@ -150,7 +195,7 @@ when a review is answered, when a check fails for a reason outside the change,
 or when the agent stops. Everything else is noise in a thread a person has to
 read.
 
-### 3.14
+### 3.19
 
 A merged branch MUST be deleted.
 
@@ -158,16 +203,16 @@ The pull request retains the history. A repository worked by many agents
 accumulates dead branches faster than anyone prunes them, and a stale branch is
 an invitation to cut new work from the wrong base.
 
-### 3.15
+### 3.20
 
 A pull request that supersedes another MUST say so, and the superseded one MUST
 be closed.
 
-Two open pull requests against one issue is the state `3.3` exists to prevent;
+Two open pull requests against one issue is the state 3.3 exists to prevent;
 when it happens anyway — usually a lost claim race under `STD-002 §3.8` — the
 loser closes with a reference to the winner rather than lingering.
 
-### 3.16
+### 3.21
 
 An agent that abandons work MUST return the issue to the frontier.
 
@@ -175,23 +220,64 @@ Close the pull request or leave it draft, remove the `active` label, unassign
 itself, and comment saying what was learned and what is left. Work an agent
 walked away from silently is work that looks claimed forever.
 
-## 4. The lifecycle
+## 4. The description
+
+Four sections, in this order. A change that is not a feature build — a refactor,
+a dependency bump, a docs fix — still carries success criteria and why, and may
+reduce evidence to the check that proves it.
+
+````markdown
+## Success criteria
+
+- [ ] A reviewer can reach the preview from the pull request check list
+- [ ] The preview serves this branch's build, not the default branch's
+- [ ] Preview secrets resolve from the preview vault, not production
+- [ ] The preview is gone within an hour of merge
+
+## Why
+
+Closes #142. Reviews were being approved without anyone opening the change,
+because the only preview link was a comment that scrolled away under the
+review thread.
+
+## What changed
+
+The preview URL is now published as a commit status rather than a comment,
+so it stays pinned to the head commit and appears in the check list. Secret
+resolution moved to the preview vault.
+
+## Evidence
+
+| Criterion | Evidence |
+| --- | --- |
+| Preview reachable from checks | ![check list](https://…/checks.png) |
+| Serves this branch's build | ![banner showing SHA](https://…/build.png) |
+| Secrets from preview vault | `fnox list --env preview` output below |
+| Torn down after merge | [recording](https://…/teardown.mp4) |
+````
+
+Evidence lives in the pull request, not in a link that expires. Attach images
+and recordings to the pull request itself rather than referencing a temporary
+build artefact or a chat message.
+
+## 5. The lifecycle
 
 ```mermaid
 flowchart TD
     A["issue is ready and claimed<br/>(STD-002 3.6 to 3.8)"] --> B["branch: 142-slug<br/>cut from default (3.1, 3.2)"]
-    B --> C["draft pull request<br/>Closes #142 (3.4, 3.6)"]
-    C --> D{"checks green?"}
-    D -->|no| E["fix, or report a<br/>pre-existing failure (3.9, 3.10)"]
-    E --> D
-    D -->|yes| F{"issue labelled<br/>auto-merge?"}
-    F -->|yes| H["merge (3.8)"]
-    F -->|no| G["human approval (3.7)"]
-    G --> H
-    H --> I["issue closes by keyword<br/>branch deleted (3.14)"]
+    B --> C["draft pull request<br/>Closes #142 (3.4, 3.11)"]
+    C --> D["description: criteria, why,<br/>what, evidence (3.5 to 3.10)"]
+    D --> E{"checks green?"}
+    E -->|no| F["fix, or report a<br/>pre-existing failure (3.14, 3.15)"]
+    F --> E
+    E -->|yes| G{"issue labelled<br/>auto-merge?"}
+    G -->|yes| I["merge (3.13)"]
+    G -->|no| H["human approval (3.12)"]
+    H --> I
+    I --> J["issue closes by keyword<br/>branch deleted (3.19)"]
 ```
 
-## 5. References
+## 6. References
 
 [1] Bradner, S., *Key words for use in RFCs to Indicate Requirement Levels*,
 BCP 14, RFC 2119, March 1997.
