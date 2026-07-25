@@ -1,3 +1,14 @@
+---
+title: "Building an A2A agent"
+kind: guide
+issued: "2026-07-25"
+author: W. Schenk
+status: Current
+verified: "2026-07-25"
+---
+
+> Rules extracted to STD-010; this is the reference walkthrough.
+
 # Building an A2A Agent
 
 How to spin up a new A2A-discoverable AI agent on Vercel using the AI Gateway, with MCP-emitted UI resources, typed refusals + citations, and Postgres session tracking.
@@ -687,8 +698,8 @@ Items not yet in the template but planned:
 
 ## See also
 
-- [`deployment.md`](./deployment.md) — Vercel deploy specifics, env management.
-- [`organization.md`](./organization.md) — monorepo + workspace conventions.
+- `STD-008` — deployment rules; `best-practices/vercel-deployment.md` for Vercel specifics.
+- Repository layout conventions are not yet written; see the gap register in `reports/`.
 - [`security.md`](./security.md) — secrets management, Clerk patterns.
 - [`AGENTS.md`](./AGENTS.md) — how AI coding agents work in Focus repos.
 - Reference implementation: ask in `#engineering` for the current pointer — read its `app/` and the workspace-package directory.

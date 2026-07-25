@@ -1,10 +1,21 @@
+---
+title: "Vercel deployment"
+kind: guide
+issued: "2026-07-25"
+author: W. Schenk
+status: Current
+verified: "2026-07-25"
+---
+
+> Rules extracted to STD-008; this is the platform walkthrough.
+
 # Vercel deployment
 
 Canonical pattern for Next.js apps on Vercel with GitHub previews, fnox-backed
 secrets, Neon, Vercel Blob, and Clerk. Reference implementation: the **habitats**
 repo (`mise.toml` `vercel:sync`, `fnox.toml`, Neon + Blob + Clerk).
 
-For remote-server / pi / tmux setup see @deployment.md. For Clerk domain and
+For remote-server / pi / tmux setup see `local-environment.md`. For Clerk domain and
 OAuth rules see @clerk.md. For the full fnox playbook see
 `reports/fnox-secrets.md`.
 

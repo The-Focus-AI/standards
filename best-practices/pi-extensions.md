@@ -1,3 +1,14 @@
+---
+title: "pi extensions"
+kind: guide
+issued: "2026-07-25"
+author: W. Schenk
+status: Current
+verified: "2026-07-25"
+---
+
+> Bootstrap rules are STD-005; this is the package list.
+
 # Pi extensions
 
 Make sure that pi is installed using

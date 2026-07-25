@@ -4,7 +4,7 @@ title: How a standard is written
 category: Process
 status: In force
 issued: "2026-07-25"
-revision: R1
+revision: R2
 applies-to: Every document in standards/
 author: W. Schenk
 ---
@@ -56,9 +56,14 @@ author: W. Schenk
 ---
 ```
 
-### 3.2
+### 3.2 DEPRECATED
 
 The `category` field MUST be one of `Practice`, `Process` or `Guide`.
+
+**Obsoleted in R2 by 3.17.** Listing `Guide` as a category of standard
+contradicted section 4, which places guides outside `standards/`. A guide is
+not a standard with a weaker category — it is a different kind of document, and
+`STD-006` governs it.
 
 A **Practice** binds repositories and is written as clauses. A **Process**
 describes how the organisation works and is also written as clauses — this
@@ -72,8 +77,8 @@ Routing and index documents are not standards and do not live in `standards/`.
 
 The `status` field MUST be one of `Draft`, `In force` or `Obsoleted`.
 
-Category and status are separate axes. A Guide can be in force; a Practice can
-be a draft. Collapsing them into one field was a defect in the first cut of
+Category and status are separate axes: a Practice can be a draft, and a Process
+can be in force. Collapsing them into one field was a defect in the first cut of
 `DESIGN.md` and is corrected here.
 
 ### 3.4
@@ -225,11 +230,25 @@ reader lands on. Leaving a superseded standard reading `In force` is the
 undated-rule failure this whole corpus exists to prevent, and it is worst
 exactly when someone is following the old one.
 
+### 3.17
+
+The `category` field MUST be either `Practice` or `Process`.
+
+A **Practice** binds repositories; a **Process** describes how the organisation
+works. Both are written as clauses and both live in `standards/`. Long-form
+explanation is a guide, which is a document under `STD-006` rather than a
+standard — see 3.2, obsoleted.
+
 ## 4. File layout
 
 Standards live in `standards/`, one file per document, named
-`STD-<number>-<slug>.md`. Guides that are not standards remain in
-`best-practices/`.
+`STD-<number>-<slug>.md`.
+
+Guides live in `best-practices/` and are **not** standards. They are documents
+under `STD-006` with `kind: guide`, carrying explanation, walkthroughs, and
+reference implementations. When a guide turns out to contain rules, the rules
+move to a standard and the guide keeps the explanation — that migration is what
+produced `STD-007` through `STD-011`.
 
 Render and check conformance with:
 

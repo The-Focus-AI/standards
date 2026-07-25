@@ -1,3 +1,14 @@
+---
+title: "GCP deployment"
+kind: guide
+issued: "2026-07-25"
+author: W. Schenk
+status: Current
+verified: "2026-07-25"
+---
+
+> Rules extracted to STD-008; this is the platform walkthrough.
+
 # GCP deployment
 
 Canonical pattern for deploying and operating Focus projects on Google Cloud.

@@ -8,11 +8,10 @@ runnable with `mise dev` after setup.
 ## What to read first
 
 - `AGENTS.md` — mandatory tools, constraints, task structure
-- `best-practices/deployment.md` — mise + fnox activation, pi config
+- `best-practices/local-environment.md` — mise + fnox activation, pi config (rules: `STD-004`, `STD-005`)
 - `best-practices/security.md` — fnox + 1Password secrets setup
 - `best-practices/skills.md` — required skills to install
 - `best-practices/pi-extensions.md` — required pi extensions
-- `best-practices/organization.md` — project structure conventions
 - `reports/fnox-secrets.md` — full secrets reference
 
 ## Setup order (follow exactly, in this sequence)

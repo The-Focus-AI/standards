@@ -81,6 +81,23 @@ treatment.
 - TypeScript and pnpm conventions beyond two lines.
 - Database conventions beyond "use Neon".
 
+## Executed
+
+The migration below was carried out on the day this note was issued.
+
+- `STD-007` … `STD-011` extracted from the anti-pattern lists and the normative
+  sections of `security.md`, `clerk.md`, the three deployment guides,
+  `a2a-agent.md` §4, and `skills.md`.
+- `best-practices/organization.md` deleted — it was zero bytes.
+- `best-practices/security.md` deleted; fully absorbed by `STD-007`.
+- `best-practices/deployment.md` replaced by `best-practices/local-environment.md`,
+  which is what it actually contained.
+- `best-practices/AGENTS.md` reduced to the technology defaults that remain
+  undecided; its rules are now `STD-004` and `STD-011`.
+- Every remaining guide carries `kind: guide` frontmatter per `STD-006`.
+- `STD-001` revised to R2: `§3.2` deprecated and replaced by `§3.17`, because
+  listing Guide as a category of standard contradicted section 4.
+
 ## Recommended order
 
 1. **Extract the 29 anti-patterns into clauses.** Highest value, lowest

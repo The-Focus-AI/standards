@@ -1,3 +1,14 @@
+---
+title: "Standard skill set"
+kind: guide
+issued: "2026-07-25"
+author: W. Schenk
+status: Current
+verified: "2026-07-25"
+---
+
+> Rules extracted to STD-011; this is the skill inventory.
+
 # Standard Skills
 
 Skills are managed with the `skills` CLI (npm package `skills`), pinned in

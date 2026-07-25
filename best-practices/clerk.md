@@ -1,3 +1,14 @@
+---
+title: "Clerk authentication setup"
+kind: guide
+issued: "2026-07-25"
+author: W. Schenk
+status: Current
+verified: "2026-07-25"
+---
+
+> Rules extracted to STD-009; this is the per-provider walkthrough.
+
 # Clerk authentication
 
 Clerk is the default auth layer (see @AGENTS.md). These rules cover how to set

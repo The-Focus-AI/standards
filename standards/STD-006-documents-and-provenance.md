@@ -5,7 +5,7 @@ category: Process
 status: Draft
 issued: "2026-07-25"
 revision: R1
-applies-to: Research notes and decision records in every repository
+applies-to: Research notes, decision records, and guides
 author: W. Schenk
 ---
 
@@ -28,6 +28,9 @@ The existing corpus shows the cost of not having this. Of five documents in
 filename and nothing else, and two have neither. Nothing distinguishes a note
 verified last week from one written against a tool that has since changed twice.
 
+Guides belong here for the same reason: they are read long after they were
+written, by someone deciding whether they are still true.
+
 **Out of scope.** Standards themselves are `STD-001`. This standard does not say
 what research is worth doing or how a decision is reached, only what the
 resulting document must declare about itself.
@@ -46,7 +49,7 @@ repositories still running it can find out what replaced it.
 Every durable document MUST open with frontmatter declaring `title`, `kind`,
 `issued`, `author` and `status`.
 
-`kind` is `note` or `decision`. `issued` and `author` are what let a reader
+`kind` is `note`, `decision`, or `guide`. `issued` and `author` are what let a reader
 weigh the document; `status` is what stops them acting on something already
 overtaken. The field names match `STD-001` deliberately, so one parser reads the
 whole corpus.
@@ -131,7 +134,14 @@ worth revisiting first when something turns out wrong.
 | --- | --- | --- | --- |
 | `note` | `reports/` | `YYYY-MM-DD-slug.md` | `Current`, `Superseded` |
 | `decision` | `architecture/` | `slug.md` | `Proposed`, `Accepted`, `Superseded` |
+| `guide` | `best-practices/` | `slug.md` | `Current`, `Superseded` |
 | standard | `standards/` | `STD-nnn-slug.md` | see `STD-001 §3.3` |
+
+A **guide** is long-form explanation with no binding clauses: a walkthrough, a
+reference implementation, an inventory. `STD-001 §3.2` originally listed Guide
+as a category of standard; that was obsoleted in R2, because a guide is a
+different kind of document rather than a weaker standard. A guide that contains
+rules has a standard trapped inside it.
 
 A decision record is not date-prefixed because it is cited by name and its date
 is in its frontmatter; a note is, because notes are read as a timeline and
