@@ -9,9 +9,26 @@
      ------------------------------------------------------------------ */
 
   /* ============ gallery chrome (not part of any direction) ============ */
+  /* The chrome follows the viewer's theme; the specimens never do. The four
+     directions are light by decision — a standard is ink on paper — so the
+     chrome is the studio wall and the sheets stay printed on it. */
   :root {
     --c-bg: #f7f7f5; --c-surface: #fff; --c-ink: #20201e;
     --c-muted: #6d6c66; --c-border: #e4e3de; --c-accent: #7a1f2b;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --c-bg: #17171a; --c-surface: #1f1f23; --c-ink: #eceae6;
+      --c-muted: #97958e; --c-border: #2f2f34;
+    }
+  }
+  :root[data-theme="dark"] {
+    --c-bg: #17171a; --c-surface: #1f1f23; --c-ink: #eceae6;
+    --c-muted: #97958e; --c-border: #2f2f34;
+  }
+  :root[data-theme="light"] {
+    --c-bg: #f7f7f5; --c-surface: #fff; --c-ink: #20201e;
+    --c-muted: #6d6c66; --c-border: #e4e3de;
   }
   * { box-sizing: border-box; }
   body {
