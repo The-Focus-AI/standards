@@ -270,4 +270,4 @@ BCP 14, RFC 2119, March 1997.
 
 [2] The Focus AI, `STD-001` — How a standard is written. In force.
 
-[3] The Focus AI, `STD-003` — Pull requests and branches. Not yet issued.
+[3] The Focus AI, `STD-003` — Pull requests and branches. Draft.
