@@ -4,8 +4,58 @@ Throwaway prototype built per `prompts/develop-design-md.md` Phase 2.
 
 | File | Round | Question |
 | --- | --- | --- |
-| `index.html` | **2 — current** | Bulletin won on looks. Which grafts does it take? |
+| `index.html` | **3 — current** | Converging: RFC voice and structure on the settled look |
+| `round-2.html` | 2 — archived | Bulletin won on looks. Which grafts does it take? |
 | `round-1.html` | 1 — archived | Which visual direction should the site take? |
+
+## Round 3 — resolved
+
+Settled and no longer under test: **Bulletin's visual language** (cool near-white
+`#f1f3f0` on `#e4e7e4`, level bands, square, flat, no shadows) plus the **agent
+accent** (petrol `#2c5560` rule with a mono AGENT header, four accents). The
+reserved Georgia italic is **retired** — this surface has no privileged speaker.
+
+Round 3 adds the decisions taken after the look settled:
+
+- **Early-RFC voice and structure.** Header block, Status of This Standard,
+  RFC 2119 requirements language, numbered sections, references. This resolves
+  the tension parked in the personality branch: a standard can be "our current
+  understanding" *and* say MUST, because early RFCs are **humble in the frame
+  and absolute in the clause**. The memo requests comment; the clause does not
+  negotiate.
+- **The instrument strip is gone.** The RFC header block carries status, issue
+  date, revision, what it obsoletes, and what it applies to — with more
+  authority and no duplication. Killing it was a consequence of the voice
+  decision, not a separate one.
+- **Fleet state removed.** Adopted / drifted / pending counts are out of scope
+  for this repo. Logged below as a discovered ticket.
+- **A `DEMONSTRATION` block**, since standards are authored in MDX. It renders
+  the live component for the human *and* the text an agent receives from raw
+  source, in a `<details>`. A demonstration that only works rendered would be
+  invisible to the primary reader.
+- **A print treatment.** Bands become outlined rather than filled so they
+  survive a laser printer, URLs expand after their link text, clauses and
+  demonstrations avoid page breaks, chrome drops out. Toggle it in the
+  specimen, or print the page.
+
+`MAY` joins the level vocabulary alongside MUST / SHOULD / DEPRECATED, because
+RFC 2119 has it and §3.5 needed it.
+
+## Tickets discovered
+
+Capabilities the specimens implied that the codebase does not have. Per
+`prompts/develop-design-md.md`, these belong to `to-tickets`, not to the
+DESIGN.md.
+
+1. **Fleet distribution state.** Every round-1 and round-2 panel showed
+   adopted / drifted / pending counts. The site would have to know what each
+   repository is running. Out of scope here; the design must not assume it.
+2. **Standards authored in MDX** with a demonstration component that also emits
+   an agent-readable text rendering.
+3. **Revision addressing.** "Earlier revisions remain readable at their own
+   addresses" is asserted in the Status memo and needs a URL scheme.
+4. **Distribution mechanism.** "Distribute revision" is the primary act on the
+   page and has no implementation.
 
 ## Round 2 — Bulletin remixes
 
@@ -146,11 +196,13 @@ palettes clears WCAG AA on both the sheet and the page ground (worst pair
 
 ```bash
 mise run prototype:standards-site
-# round 2: http://localhost:8899/?variant=base|clause|rail|plate
+# round 3: http://localhost:8899/            (toggle the print treatment in the chrome)
+# round 2: http://localhost:8899/round-2.html?variant=base|clause|rail|plate
 # round 1: http://localhost:8899/round-1.html?variant=register|bulletin|decree|fieldguide
 ```
 
-Or open `index.html` directly. Left/right arrow keys cycle variants.
+Or open `index.html` directly. In the archived rounds, left/right arrow keys
+cycle variants.
 
 ## Status
 
