@@ -75,6 +75,9 @@ echo ""
 echo "==> Checking fnox secrets..."
 fnox check
 echo "  ✓ fnox secrets OK"
+echo ""
+echo "==> Validating DESIGN.md..."
+node scripts/validate-design.mjs
 '''
 
 [tasks."lint:fix"]
@@ -98,6 +101,10 @@ description = "Deploy standards"
 run = '''
 echo "==> Deploy: Standards are reference-only, nothing to deploy."
 '''
+
+[tasks."design:validate"]
+description = "Validate DESIGN.md: token references, WCAG AA pairs, and the measured-contrast table"
+run = "node scripts/validate-design.mjs"
 
 [tasks."prototype:standards-site"]
 description = "Serve the standards.thefocus.ai direction round (throwaway prototype)"

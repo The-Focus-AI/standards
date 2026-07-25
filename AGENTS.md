@@ -27,7 +27,12 @@ Start with these files, depending on the work being requested:
 - `prompts/standardize-project.md` — inspect-first prompt for auditing an existing project against these markdown standards, proposing a diff, and migrating to mise/fnox/1Password safely.
 - `prompts/generate-dockerfile.md` — prompt for regenerating the standards container Dockerfile.
 - `prompts/develop-design-md.md` — prompt for developing a project's brand/`DESIGN.md` via the `grill-me` and `prototype` skills.
-- `architecture/` — design notes and decisions for this standards repo itself.
+- `DESIGN.md` — the brand and design system for standards.thefocus.ai: tokens, colour roles, the
+  three type voices, RFC structure, print rules, the voice rulebook, and agent prompt snippets.
+  Read it before building or changing any surface of the standards site. Validate edits with
+  `mise run design:validate`.
+- `architecture/` — design notes and decisions for this standards repo itself, including
+  `standards-site-design-decisions.md`, the decision log behind `DESIGN.md`.
 - `reports/` — longer research/reference material, including fnox secrets, the skills CLI, and creative typography for DESIGN.md work.
 - `tests/` — validation scripts for this standards repo.
 
