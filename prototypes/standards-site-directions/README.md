@@ -1,7 +1,33 @@
-# Prototype: standards.thefocus.ai Direction Round 1 (THROWAWAY)
+# Prototype: standards.thefocus.ai Direction Rounds (THROWAWAY)
 
-Throwaway prototype built per `prompts/develop-design-md.md` Phase 2, to answer:
-**"Which visual direction should standards.thefocus.ai take?"**
+Throwaway prototype built per `prompts/develop-design-md.md` Phase 2.
+
+| File | Round | Question |
+| --- | --- | --- |
+| `index.html` | **2 — current** | Bulletin won on looks. Which grafts does it take? |
+| `round-1.html` | 1 — archived | Which visual direction should the site take? |
+
+## Round 2 — Bulletin remixes
+
+**Bulletin's visual language is fixed**: cool near-white `#f1f3f0` on `#e4e7e4`,
+level bands with reversed tabs, tight masthead, square rules, no shadows. Each
+remix changes **exactly one substantive thing**, so the comparison resolves one
+decision at a time. Every panel states its own change and the question it asks.
+
+| Variant | Change from control | Asks |
+| --- | --- | --- |
+| `base` | none — Bulletin as it won | the control |
+| `clause` | reserved Georgia italic returns on the normative clause; clause number promoted into the band | Does the seed's deepest rule survive Bulletin's shell, or does italic read soft where the band reads issued? |
+| `rail` | the satisfying command moves from prose into a fixed right rail | Does the rail earn its width, and what does an empty rail look like on a retired clause? |
+| `plate` | hatch replaced by the seed's annotation treatment — solid petrol rule + mono AGENT header; 3 accents become 4 | Does machine-facing material need its own colour, or was the hatch already saying it? |
+
+Round 2 palette, all measured on both grounds: `action #1f5fa8` (5.77 / 5.17),
+`in-force #1f6b44` (5.80 / 5.19), `attention #a8451c` (5.33 / 4.77), and in
+`plate` only, `agent #2c5560` (7.31 / 6.54). All AA or better.
+
+## Round 1 — the original question
+
+Round 1 asked which visual direction standards.thefocus.ai should take.
 
 ## Where this came from
 
@@ -120,7 +146,8 @@ palettes clears WCAG AA on both the sheet and the page ground (worst pair
 
 ```bash
 mise run prototype:standards-site
-# http://localhost:8899/?variant=register|bulletin|decree|fieldguide
+# round 2: http://localhost:8899/?variant=base|clause|rail|plate
+# round 1: http://localhost:8899/round-1.html?variant=register|bulletin|decree|fieldguide
 ```
 
 Or open `index.html` directly. Left/right arrow keys cycle variants.
@@ -130,10 +157,13 @@ Or open `index.html` directly. Left/right arrow keys cycle variants.
 Throwaway per the prototype skill — do not productionize. When a direction wins
 and its `DESIGN.md` is written, delete this directory.
 
-Round 1 open questions for the next grill: which stock; **what earns the reserved
-italic** (or whether it retires); whether the stamp in `decree` reads as authority
-or as costume; and whether the command rail in `fieldguide` survives clauses that
-have no command.
+**Round 1 verdict:** `bulletin` wins on looks — cool near-white stock, level
+bands, clinical composition. Stock settled. Round 2 resolves what it grafts.
+
+Still open after round 2 lands: the Phase 1 **voice rulebook** branch (banned
+words, how errors speak, where the dry wit is allowed) and **non-negotiables**
+(accessibility floor, whether standards must print to PDF cleanly, whether the
+markdown source is a first-class output surface).
 
 Judge the display voice on a machine that has Arial Narrow. Where no condensed
 face is installed the proportions are wrong and the specimen says so.

@@ -1,26 +1,25 @@
-<title>standards.thefocus.ai — Direction Round 1</title>
+<title>standards.thefocus.ai — Direction Round 2</title>
 <style>
   /* ------------------------------------------------------------------
-     TYPE COMES FROM THE SEED, NOT FROM THIS ROUND.
-     All four directions run the four voices specified in the Walking
-     Thoughts DESIGN.md — Barlow Condensed 600 display, Georgia italic as
-     the one reserved voice, system sans body, mono for measured facts.
-     The variable under test here is COMPOSITION, plus one typographic
-     question the transposition actually raises: on the trail, Georgia
-     italic means "the walker said this" — what does it mean on a
-     standards site? Each variant answers differently.
+     ROUND 2 — Bulletin won round 1 on looks. Its visual language is now
+     FIXED: cool near-white stock, level bands with reversed tabs, tight
+     grotesk-clinical masthead, square rules, no shadows.
 
-     Barlow Condensed is not embedded (font binaries stay out of the
-     standards repo). It renders through the DESIGN.md's own offline-safe
-     fallback, "Arial Narrow", system-ui, with the spec's recipe applied:
-     600 weight, uppercase, +0.03em, line-height .95. Georgia, system sans
-     and ui-monospace are real — three of the four voices render true.
+     Each remix changes exactly ONE substantive thing, so the comparison
+     answers one open question instead of four at once. Round 1 is kept
+     at round-1.html.
+
+     Type is inherited from the Walking Thoughts DESIGN.md and is not
+     re-opened: Barlow Condensed 600 caps display, Georgia italic as the
+     one reserved voice, system sans body, mono for measured facts.
+     Barlow Condensed is not embedded; the specimen probes the device and
+     reports which face actually resolved.
      ------------------------------------------------------------------ */
 
-  /* ============ gallery chrome (not part of any direction) ============ */
+  /* ============ gallery chrome (not part of the design) ============ */
   :root {
     --c-bg: #f7f7f5; --c-surface: #fff; --c-ink: #20201e;
-    --c-muted: #6d6c66; --c-border: #e4e3de; --c-accent: #7a1f2b;
+    --c-muted: #6d6c66; --c-border: #e4e3de; --c-accent: #1f5fa8;
   }
   @media (prefers-color-scheme: dark) {
     :root {
@@ -44,17 +43,13 @@
     line-height: 1.5;
   }
   .chrome-head { padding: 1.25rem 1.5rem 0; max-width: 1180px; margin: 0 auto; }
-  .chrome-head .eyebrow {
-    font-size: .6875rem; letter-spacing: .09em; text-transform: uppercase; color: var(--c-muted);
-  }
+  .chrome-head .eyebrow { font-size: .6875rem; letter-spacing: .09em; text-transform: uppercase; color: var(--c-muted); }
   .chrome-head h1 { font-size: 1.25rem; font-weight: 650; margin: .2rem 0 .3rem; }
-  .chrome-head p { margin: 0 0 .5rem; max-width: 70ch; color: var(--c-muted); font-size: .875rem; }
+  .chrome-head p { margin: 0 0 .5rem; max-width: 72ch; color: var(--c-muted); font-size: .875rem; }
   .chrome-head p b { color: var(--c-ink); font-weight: 600; }
+  .chrome-head a { color: var(--c-accent); }
 
-  .tabs {
-    display: flex; flex-wrap: wrap; gap: .375rem;
-    max-width: 1180px; margin: 1.1rem auto 0; padding: 0 1.5rem;
-  }
+  .tabs { display: flex; flex-wrap: wrap; gap: .375rem; max-width: 1180px; margin: 1.1rem auto 0; padding: 0 1.5rem; }
   .tabs button {
     appearance: none; border: 1px solid var(--c-border); background: var(--c-surface);
     color: var(--c-muted); font: inherit; font-size: .8125rem; font-weight: 550;
@@ -63,15 +58,12 @@
   .tabs button:hover { color: var(--c-ink); }
   .tabs button:focus-visible { outline: 2px solid var(--c-accent); outline-offset: 2px; }
   .tabs button[aria-selected="true"] { background: var(--c-accent); border-color: var(--c-accent); color: #fff; }
-  .tabs .sw { display: inline-block; width: .55em; height: .55em; margin-right: .45em; background: currentColor; }
-  .tabs button[aria-selected="true"] .sw { background: #fff; }
 
   .stage-wrap { max-width: 1180px; margin: 1.1rem auto 3rem; padding: 0 1.5rem; }
   .stage { border: 1px solid var(--c-border); border-radius: 10px; overflow: hidden; }
   .meta-strip {
-    display: flex; flex-wrap: wrap; gap: .35rem 1.15rem;
-    padding: .6rem .9rem; background: var(--c-surface);
-    border-bottom: 1px solid var(--c-border);
+    display: flex; flex-wrap: wrap; gap: .35rem 1.15rem; padding: .6rem .9rem;
+    background: var(--c-surface); border-bottom: 1px solid var(--c-border);
     font-size: .6875rem; color: var(--c-muted);
     font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   }
@@ -80,18 +72,20 @@
   .variant { display: none; }
   .variant.active { display: block; }
 
-  /* ============ the four voices — shared by every direction ============ */
+  /* ============ Bulletin — fixed visual language ============ */
   .doc {
-    /* voice 1 · DISPLAY — survey-sheet lettering. Spec face: Barlow Condensed 600.
-       Rendered through the DESIGN.md's own fallback stack with its recipe. */
+    /* four voices, inherited */
     --f-disp: "Barlow Condensed", "Arial Narrow", "Liberation Sans Narrow", system-ui, sans-serif;
-    --fw-disp: 600; --ls-disp: .03em; --tt-disp: uppercase; --lh-disp: .95;
-    /* voice 2 · RESERVED — Georgia italic. One speaker per system, never UI copy. */
+    --fw-disp: 600; --ls-disp: .03em; --lh-disp: .95;
     --f-quote: Georgia, "Iowan Old Style", "Times New Roman", serif;
-    /* voice 3 · BODY — system sans. The machine speaks upright. */
     --f-body: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-    /* voice 4 · MONO — every measured fact, tabular. */
     --f-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+    /* Bulletin stock and roles */
+    --page: #e4e7e4; --sheet: #f1f3f0; --ink: #141a17; --muted: #5c6560;
+    --r: rgba(20,26,23,.16); --rs: rgba(20,26,23,.42);
+    --action: #1f5fa8; --in-force: #1f6b44; --attention: #a8451c;
+    --agent: #141a17;              /* hatch treatment: agent is not hued */
+    --focus: #1f5fa8; --rad: 3px; --measure: 60rem;
 
     background: var(--page); color: var(--ink);
     font-family: var(--f-body); padding: 1.5rem 1rem 3rem;
@@ -99,29 +93,54 @@
   .doc *:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
   .sheet {
     background: var(--sheet); max-width: var(--measure); margin: 0 auto;
-    border: 1px solid var(--rs); padding: var(--pad);
+    border: 1px solid var(--rs); padding: 2.25rem 2.5rem 3rem;
   }
   .lbl {
     font-family: var(--f-mono); font-size: .625rem; font-weight: 700;
     letter-spacing: .1em; text-transform: uppercase; color: var(--muted);
   }
-  .mono { font-family: var(--f-mono); }
   .muted { color: var(--muted); }
-  /* the reserved voice. Applied to a DIFFERENT target in each direction. */
-  .reserved { font-family: var(--f-quote); font-style: italic; }
   .doc h2 {
-    font-family: var(--f-disp); font-weight: var(--fw-disp);
-    letter-spacing: var(--ls-disp); text-transform: var(--tt-disp); line-height: var(--lh-disp);
-    font-size: var(--s-sect); margin: 2.25rem 0 .75rem;
+    font-family: var(--f-disp); font-weight: var(--fw-disp); letter-spacing: var(--ls-disp);
+    text-transform: uppercase; line-height: var(--lh-disp); font-size: 1.15rem; margin: 2.25rem 0 .75rem;
   }
   .doc p { margin: 0 0 .85rem; font-size: .9375rem; line-height: 1.5; }
-  .doc a { color: var(--action); }
   .prose { max-width: 64ch; }
+
+  .masthead { display: flex; justify-content: space-between; align-items: flex-end; gap: 1rem; flex-wrap: wrap; border-bottom: 2px solid var(--ink); padding-bottom: .7rem; }
+  .masthead .name {
+    font-family: var(--f-disp); font-weight: var(--fw-disp); font-size: 1.7rem;
+    letter-spacing: var(--ls-disp); text-transform: uppercase; line-height: var(--lh-disp);
+  }
 
   .pip { display: inline-flex; align-items: center; gap: .4em; }
   .pip::before { content: ""; width: .55em; height: .55em; background: currentColor; flex: none; }
   .is-force { color: var(--in-force); }
   .is-attn { color: var(--attention); }
+
+  /* the level band — Bulletin's signature, unchanged in every remix */
+  .rule-row { margin: 1.5rem 0; border: 1px solid var(--r); }
+  .band { display: flex; flex-wrap: wrap; align-items: stretch; border-bottom: 1px solid var(--r); background: rgba(20,26,23,.035); }
+  .band .tab {
+    font-family: var(--f-disp); font-weight: var(--fw-disp); font-size: .95rem;
+    letter-spacing: .1em; text-transform: uppercase; line-height: 1;
+    padding: .55rem .8rem; color: var(--sheet); display: flex; align-items: center;
+  }
+  .band .tab.must { background: var(--ink); }
+  .band .tab.should { background: var(--action); }
+  .band .tab.dep { background: var(--attention); }
+  .band .ref { font-family: var(--f-mono); font-size: .68rem; padding: .55rem .8rem; color: var(--muted); display: flex; align-items: center; }
+  .rule-body { padding: .95rem 1rem 1.05rem; }
+  .norm { font-size: 1.05rem; line-height: 1.45; font-weight: 600; margin: 0 0 .55rem; }
+  .note { font-size: .875rem; }
+
+  .cmd {
+    font-family: var(--f-mono); font-size: .8rem; line-height: 1.7;
+    padding: .6rem .75rem; overflow-x: auto; white-space: pre; min-width: 0; max-width: 100%;
+    border: 1px solid var(--r);
+    background: repeating-linear-gradient(45deg, rgba(20,26,23,.05) 0 6px, transparent 6px 12px);
+  }
+  .rule-row > *, .split > * { min-width: 0; }
 
   .btn {
     font-family: var(--f-disp); font-size: .85rem; font-weight: var(--fw-disp);
@@ -146,14 +165,6 @@
   }
   .field input::placeholder { color: var(--muted); }
 
-  .cmd {
-    font-family: var(--f-mono); font-size: .8rem; line-height: 1.7;
-    background: rgba(0,0,0,.045); border-left: 3px solid var(--agent, var(--rs));
-    padding: .6rem .75rem; overflow-x: auto; white-space: pre;
-    min-width: 0; max-width: 100%;
-  }
-  .rule-row > * { min-width: 0; }
-
   .reg-scroll { overflow-x: auto; }
   table.reg { width: 100%; min-width: 30rem; border-collapse: collapse; font-size: .8125rem; }
   table.reg th {
@@ -164,7 +175,6 @@
   table.reg td { padding: .5rem; border-bottom: 1px solid var(--r); vertical-align: top; }
   table.reg td:first-child { font-family: var(--f-mono); white-space: nowrap; }
   table.reg tr.sup td { color: var(--muted); }
-
   .empty { border: 1px dashed var(--rs); padding: 1.1rem; }
   .empty p { max-width: 52ch; }
 
@@ -174,157 +184,47 @@
   .roles th { font-family: var(--f-mono); font-size: .6rem; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
   .roles .chip { width: 1.6rem; height: 1rem; display: block; border: 1px solid rgba(0,0,0,.15); }
   .roles code { font-family: var(--f-mono); font-size: .72rem; }
-  .voice-row { display: flex; flex-wrap: wrap; align-items: baseline; gap: .9rem; border-bottom: 1px solid var(--r); padding: .55rem 0; }
-  .voice-row .n { flex: none; width: 10rem; }
-  .voice-row > div:last-child { min-width: 0; overflow-wrap: anywhere; }
-  .voice-row.on { background: rgba(0,0,0,.035); }
-  pre.tokens {
-    font-family: var(--f-mono); font-size: .72rem; line-height: 1.6;
-    background: rgba(0,0,0,.045); padding: .8rem; overflow-x: auto; margin: 0;
-  }
+  pre.tokens { font-family: var(--f-mono); font-size: .72rem; line-height: 1.6; background: rgba(0,0,0,.045); padding: .8rem; overflow-x: auto; margin: 0; }
   .promptbox { border: 1px solid var(--rs); padding: .9rem; }
   .promptbox p { font-size: .82rem; }
+  .delta { border-left: 4px solid var(--action); background: rgba(31,95,168,.07); padding: .7rem .9rem; margin: 0 0 1.1rem; }
+  .delta p { margin: 0; font-size: .85rem; }
 
-  /* ============ A · REGISTER — the daily docket ============ */
-  [data-v="register"] {
-    --page: #ded6c2; --sheet: #ede7d8; --ink: #1e1b14; --muted: #5d5545;
-    --r: rgba(30,27,20,.20); --rs: rgba(30,27,20,.46);
-    --action: #7a1f2b; --in-force: #2f5d3a; --agent: #2a4a6b; --attention: #8a4114;
-    --focus: #2a4a6b; --rad: 2px; --measure: 62rem; --pad: 2rem 2.25rem 2.75rem;
-    --s-sect: 1.15rem; --s-title: 2.1rem;
-  }
-  /* reserved voice → THE NORMATIVE CLAUSE. The rule is the one that speaks. */
-  [data-v="register"] .norm { font-family: var(--f-quote); font-style: italic; }
-  [data-v="register"] .rule-row { display: grid; grid-template-columns: 6.5rem 1fr; gap: 1.25rem; padding: 1.4rem 0; border-bottom: 1px solid var(--r); }
-  [data-v="register"] .docket { text-align: right; }
-  [data-v="register"] .docket .num {
-    font-family: var(--f-disp); font-weight: var(--fw-disp); font-size: 4.2rem;
-    line-height: .82; letter-spacing: 0; display: block; font-variant-numeric: tabular-nums;
-  }
-  [data-v="register"] .docket .lvl { margin-top: .4rem; display: block; }
-  [data-v="register"] .norm { font-size: 1.08rem; line-height: 1.45; margin: 0 0 .6rem; }
-  [data-v="register"] .gazette { column-count: 2; column-gap: 2rem; column-rule: 1px solid var(--r); }
-  [data-v="register"] .gazette p { font-size: .82rem; line-height: 1.5; }
-  [data-v="register"] .masthead { border-bottom: 3px double var(--rs); padding-bottom: .9rem; }
-  [data-v="register"] .masthead .name {
-    font-family: var(--f-disp); font-weight: var(--fw-disp); font-size: 2.1rem;
-    letter-spacing: .18em; text-transform: uppercase; line-height: var(--lh-disp);
-  }
-
-  /* ============ B · BULLETIN — flight rules ============ */
-  [data-v="bulletin"] {
-    --page: #e4e7e4; --sheet: #f1f3f0; --ink: #141a17; --muted: #5c6560;
-    --r: rgba(20,26,23,.16); --rs: rgba(20,26,23,.42);
-    --action: #1f5fa8; --in-force: #1f6b44; --agent: #141a17; --attention: #a8451c;
-    --focus: #1f5fa8; --rad: 3px; --measure: 60rem; --pad: 2.25rem 2.5rem 3rem;
-    --s-sect: 1.15rem; --s-title: 1.7rem;
-  }
-  /* reserved voice → RETIRED. A standard has no personal voice; all upright.
-     This variant exists to test whether the seed's deepest rule survives at all. */
-  [data-v="bulletin"] .rule-row { margin: 1.5rem 0; border: 1px solid var(--r); }
-  [data-v="bulletin"] .band { display: flex; align-items: stretch; border-bottom: 1px solid var(--r); background: rgba(20,26,23,.035); }
-  [data-v="bulletin"] .band .tab {
-    font-family: var(--f-disp); font-weight: var(--fw-disp); font-size: .95rem;
-    letter-spacing: .1em; text-transform: uppercase; line-height: 1;
-    padding: .55rem .8rem; color: var(--sheet); display: flex; align-items: center;
-  }
-  [data-v="bulletin"] .band .tab.must { background: var(--ink); }
-  [data-v="bulletin"] .band .tab.should { background: var(--action); }
-  [data-v="bulletin"] .band .tab.dep { background: var(--attention); }
-  [data-v="bulletin"] .band .ref { font-family: var(--f-mono); font-size: .68rem; padding: .55rem .8rem; color: var(--muted); }
-  [data-v="bulletin"] .rule-body { padding: .95rem 1rem 1.05rem; }
-  [data-v="bulletin"] .norm { font-size: 1.05rem; line-height: 1.45; font-weight: 600; margin: 0 0 .55rem; }
-  [data-v="bulletin"] .masthead { display: flex; justify-content: space-between; align-items: flex-end; gap: 1rem; flex-wrap: wrap; border-bottom: 2px solid var(--ink); padding-bottom: .7rem; }
-  [data-v="bulletin"] .masthead .name {
-    font-family: var(--f-disp); font-weight: var(--fw-disp); font-size: 1.7rem;
-    letter-spacing: var(--ls-disp); text-transform: uppercase; line-height: var(--lh-disp);
-  }
-  [data-v="bulletin"] .cmd {
-    border-left: none; border: 1px solid var(--r);
-    background: repeating-linear-gradient(45deg, rgba(20,26,23,.05) 0 6px, transparent 6px 12px);
-  }
-
-  /* ============ C · DECREE — the issued order ============ */
-  [data-v="decree"] {
-    --page: #e9e6de; --sheet: #f6f4ee; --ink: #15140f; --muted: #63604f;
-    --r: rgba(21,20,15,.18); --rs: rgba(21,20,15,.45);
-    --action: #15140f; --in-force: #1e5b3c; --agent: #63604f; --attention: #8c1d2b;
-    --stamp: #8c1d2b; --focus: #8c1d2b; --rad: 0px; --measure: 47rem; --pad: 3rem 3.25rem 3.5rem;
-    --s-sect: 1.15rem; --s-title: clamp(2.2rem, 6vw, 3.4rem);
-  }
-  /* reserved voice → THE RATIONALE. The clause is stamped and impersonal;
-     the reasoning behind it is the human voice, and it is the part that is "said". */
-  [data-v="decree"] .note { font-family: var(--f-quote); font-style: italic; font-size: 1rem; }
-  [data-v="decree"] .sheet { position: relative; }
-  [data-v="decree"] .masthead { text-align: center; border-bottom: 1px solid var(--rs); padding-bottom: 1.4rem; }
-  [data-v="decree"] .masthead .name { font-family: var(--f-mono); font-size: .68rem; letter-spacing: .42em; text-transform: uppercase; color: var(--muted); }
-  [data-v="decree"] .masthead .title {
-    font-family: var(--f-disp); font-weight: var(--fw-disp); font-size: var(--s-title);
-    letter-spacing: var(--ls-disp); text-transform: uppercase; line-height: var(--lh-disp);
-    margin: .8rem 0 .6rem;
-  }
-  [data-v="decree"] .stamp {
-    position: absolute; top: 1.4rem; right: 1.1rem; transform: rotate(-7deg);
-    border: 2.5px solid var(--stamp); color: var(--stamp);
-    font-family: var(--f-disp); font-weight: var(--fw-disp); font-size: 1.05rem;
-    letter-spacing: .12em; text-transform: uppercase; line-height: 1.15;
-    padding: .4rem .7rem; text-align: center; opacity: .85;
-  }
-  [data-v="decree"] .stamp .d { display: block; font-family: var(--f-mono); font-size: .56rem; letter-spacing: .1em; margin-top: .2rem; }
-  [data-v="decree"] .rule-row { padding: 1.5rem 0; border-bottom: 1px solid var(--r); }
-  [data-v="decree"] .rule-row .head { display: flex; gap: .8rem; align-items: baseline; margin-bottom: .5rem; }
-  [data-v="decree"] .norm { font-size: 1.12rem; line-height: 1.45; margin: 0 0 .6rem; font-weight: 600; }
-  [data-v="decree"] .countersign { margin-top: 2.5rem; border-top: 1px solid var(--rs); padding-top: 1rem; display: flex; justify-content: space-between; gap: 1.5rem; flex-wrap: wrap; }
-  [data-v="decree"] .countersign .sig { border-bottom: 1px solid var(--ink); min-width: 12rem; height: 1.6rem; }
-
-  /* ============ D · FIELD GUIDE — the bench copy ============ */
-  [data-v="fieldguide"] {
-    --page: #e6e4da; --sheet: #f4f2e9; --band: #e2ebdd; --ink: #1a1c17; --muted: #5f6356;
-    --r: rgba(26,28,23,.17); --rs: rgba(26,28,23,.44);
-    --action: #1b3a6b; --in-force: #2e6b3e; --agent: #1b3a6b; --attention: #b3400f;
-    --focus: #b3400f; --rad: 3px; --measure: 66rem; --pad: 1.75rem 2rem 2.75rem;
-    --s-sect: 1.3rem; --s-title: clamp(2.6rem, 8.5vw, 5rem);
-  }
-  /* reserved voice → SUPERSEDED PRACTICE. Italic marks what is being quoted
-     from the past: the retired clause, the thing you used to do. */
-  [data-v="fieldguide"] .rule-row.dep .norm { font-family: var(--f-quote); font-style: italic; }
-  [data-v="fieldguide"] .masthead { border-bottom: 4px solid var(--ink); padding-bottom: .3rem; overflow: hidden; }
-  [data-v="fieldguide"] .masthead .title {
-    font-family: var(--f-disp); font-weight: var(--fw-disp); text-transform: uppercase;
-    font-size: var(--s-title); line-height: var(--lh-disp); letter-spacing: var(--ls-disp);
-    margin: .2rem 0 0; white-space: nowrap;
-  }
-  [data-v="fieldguide"] .rule-row { display: grid; grid-template-columns: 1fr 19rem; gap: 1.5rem; padding: 1.25rem 0; border-bottom: 1px solid var(--r); align-items: start; }
-  [data-v="fieldguide"] .rule-row:nth-of-type(even) { background: var(--band); }
-  [data-v="fieldguide"] .rule-row .ref {
-    font-family: var(--f-disp); font-weight: var(--fw-disp); font-size: 1.9rem;
+  /* ---- remix A · CLAUSE: reserved italic restored + promoted numeral ---- */
+  [data-v="clause"] .norm { font-family: var(--f-quote); font-style: italic; font-weight: 400; font-size: 1.12rem; }
+  [data-v="clause"] .band .bigref {
+    font-family: var(--f-disp); font-weight: var(--fw-disp); font-size: 1.5rem;
     letter-spacing: var(--ls-disp); line-height: 1; font-variant-numeric: tabular-nums;
+    padding: .4rem .8rem; display: flex; align-items: center; border-right: 1px solid var(--r);
   }
-  [data-v="fieldguide"] .norm { font-size: 1rem; line-height: 1.45; margin: .3rem 0 .5rem; }
-  [data-v="fieldguide"] .rail .lbl { display: block; margin-bottom: .3rem; }
 
-  @media (max-width: 800px) {
-    [data-v="fieldguide"] .rule-row { grid-template-columns: 1fr; }
-    [data-v="register"] .rule-row { grid-template-columns: 3.8rem 1fr; gap: .9rem; }
-    [data-v="register"] .docket .num { font-size: 2.4rem; }
-    [data-v="register"] .gazette { column-count: 1; }
+  /* ---- remix B · RAIL: command becomes structural, not inline ---- */
+  [data-v="rail"] .split { display: grid; grid-template-columns: 1fr 17rem; gap: 1.25rem; align-items: start; }
+  [data-v="rail"] .rail .lbl { display: block; margin-bottom: .3rem; }
+  @media (max-width: 820px) { [data-v="rail"] .split { grid-template-columns: 1fr; } }
+
+  /* ---- remix C · PLATE: agent gets the seed's annotation treatment ---- */
+  [data-v="plate"] { --agent: #2c5560; }
+  [data-v="plate"] .cmd {
+    background: rgba(44,85,96,.07); border: none; border-left: 3px solid var(--agent);
+  }
+  [data-v="plate"] .cmd-head {
+    font-family: var(--f-mono); font-size: .625rem; font-weight: 700; letter-spacing: .1em;
+    text-transform: uppercase; color: var(--agent); margin-bottom: .3rem;
   }
 </style>
 
 <header class="chrome-head">
-  <div class="eyebrow">Prototype · Phase 2 · Round 1</div>
-  <h1>standards.thefocus.ai — direction round</h1>
-  <p>Four contrasting answers to <b>“what kind of bureaucratic document is a standard?”</b>
-     All four run the <b>same four voices from the Walking Thoughts DESIGN.md</b> — Barlow
-     Condensed 600 display, Georgia italic as the one reserved voice, system sans body, mono for
-     measured facts. Type is inherited, not re-opened. What varies is <b>composition</b> — and one
-     question the transposition forces:</p>
-  <p><b>On the trail, Georgia italic means “the walker said this.” What does it mean here?</b>
-     Each direction gives a different answer, shown in the strip below. All are light; Forest Night
-     was for a phone at dawn. <b>Arrow keys</b> cycle.</p>
+  <div class="eyebrow">Prototype · Phase 2 · Round 2</div>
+  <h1>standards.thefocus.ai — Bulletin remixes</h1>
+  <p><b>Bulletin's visual language is now fixed</b> — cool near-white stock, level bands with
+     reversed tabs, tight masthead, square rules, no shadows. Each remix changes <b>exactly one
+     substantive thing</b>, so what you're comparing is one decision at a time, not four at once.
+     The blue rule at the top of each panel names the change. Round 1 is archived at
+     <a href="round-1.html">round-1.html</a>. <b>Arrow keys</b> cycle.</p>
 </header>
 
-<nav class="tabs" role="tablist" aria-label="Design directions" id="tabs"></nav>
+<nav class="tabs" role="tablist" aria-label="Bulletin remixes" id="tabs"></nav>
 
 <div class="stage-wrap">
   <div class="stage" id="stage">
@@ -347,36 +247,26 @@ const STD = {
     "Every repo in the fleet opens a reachable preview for every PR, and tears it down when the " +
     "branch dies. This standard names the mechanism per host and the secret path previews may use.",
   rules: [
-    {
-      n: "014.1", lvl: "MUST",
+    { n: "014.1", lvl: "MUST",
       norm: "Every pull request opens a preview deployment reachable from the PR check list.",
       note: "A PR with no preview is not reviewable. If the host cannot produce one, the repo is out of scope for this standard and must say so in its AGENTS.md.",
-      cmd: "vercel link --yes\nvercel git connect",
-    },
-    {
-      n: "014.2", lvl: "MUST",
+      cmd: "vercel link --yes\nvercel git connect" },
+    { n: "014.2", lvl: "MUST",
       norm: "The preview URL is published as a check, not a comment.",
       note: "Comments scroll away under review threads; checks stay pinned to the PR head. Agents read the check list, not the conversation.",
-      cmd: "gh api repos/:owner/:repo/statuses/$SHA \\\n  -f state=success -f context=preview",
-    },
-    {
-      n: "014.3", lvl: "SHOULD",
+      cmd: "gh api repos/:owner/:repo/statuses/$SHA \\\n  -f state=success -f context=preview" },
+    { n: "014.3", lvl: "SHOULD",
       norm: "Preview environments resolve secrets through fnox from the preview vault.",
       note: "Never the production vault. A preview is a public URL with a guessable name; treat every value it holds as disclosed.",
-      cmd: "fnox sync vercel --env preview",
-    },
-    {
-      n: "014.4", lvl: "SHOULD",
+      cmd: "fnox sync vercel --env preview" },
+    { n: "014.4", lvl: "SHOULD",
       norm: "Previews tear down on merge or close.",
       note: "A preview outliving its branch is a liability with a URL. Hosts that do not expire previews get a scheduled reaper.",
-      cmd: "mise run preview:reap",
-    },
-    {
-      n: "014.5", lvl: "DEPRECATED",
+      cmd: "mise run preview:reap" },
+    { n: "014.5", lvl: "DEPRECATED",
       norm: "Netlify Deploy Previews via the legacy build plugin.",
       note: "Superseded by the adapter named in R3. Three repos still run it; they are counted as drifted below.",
-      cmd: null,
-    },
+      cmd: null },
   ],
   register: [
     ["STD-002", "Tooling installs through mise", "All repos", "IN FORCE", 0],
@@ -387,78 +277,64 @@ const STD = {
   ],
 };
 
-const ROLES = [
+/* ============================ the four panels ============================ */
+const VARIANTS = [
+  {
+    id: "base", name: "Bulletin (control)",
+    delta: "No change — Bulletin exactly as it won round 1. Compare the others against this.",
+    italic: "retired", agentTreatment: "hatched fill, no hue", accents: 3,
+    question: "—",
+  },
+  {
+    id: "clause", name: "+ Clause voice",
+    delta: "The reserved Georgia italic returns, carrying the normative clause — and the clause number is promoted into the band as a condensed numeral, so the thing an agent cites is the thing you see first.",
+    italic: "the normative clause", agentTreatment: "hatched fill, no hue", accents: 3,
+    question: "Does the seed's deepest rule survive inside Bulletin's shell, or does italic read as soft where the band reads as issued?",
+  },
+  {
+    id: "rail", name: "+ Command rail",
+    delta: "The command that satisfies each clause moves out of the prose and into a fixed right rail. Actionable stops being a convention someone has to remember and becomes structural.",
+    italic: "retired", agentTreatment: "hatched fill, no hue", accents: 3,
+    question: "Does the rail earn its width, and what does a clause with no command look like when the rail is empty?",
+  },
+  {
+    id: "plate", name: "+ Agent accent",
+    delta: "The hatch is replaced by the seed's actual annotation treatment: a solid petrol left rule with a mono AGENT header. The role table grows from three accents to four.",
+    italic: "retired", agentTreatment: "petrol #2c5560 rule + mono header", accents: 4,
+    question: "Does machine-facing material need its own colour, or was the hatch already saying it?",
+  },
+];
+
+const ROLES_3 = [
   ["action", "The one primary act on the sheet. Never decorative.", "action"],
   ["in-force", "A standard that binds right now; adopted repos; active nav.", "in-force"],
   ["attention", "Drifted from the standard, or the clause is superseded. Warm, not an alarm.", "attention"],
-  ["agent", "Machine-facing material: commands, tokens, the markdown source.", "agent"],
 ];
+const AGENT_ROLE = ["agent", "Machine-facing material: commands, tokens, the markdown source.", "agent"];
 
-/* The four voices, straight from the seed. Shared by every direction. */
-const VOICES = [
-  ["display", "Barlow Condensed 600 · caps · +.03em · lh .95",
-   "Mastheads, section heads, clause numerals, button labels. The survey sheet's official lettering.",
-   "font-family:var(--f-disp);font-weight:var(--fw-disp);letter-spacing:var(--ls-disp);text-transform:uppercase;line-height:var(--lh-disp);font-size:2.1rem"],
-  ["reserved", "Georgia italic",
-   "One speaker per system, and nothing else may borrow it. Which speaker is the question this round asks.",
-   "font-family:var(--f-quote);font-style:italic;font-size:1.15rem"],
-  ["body", "system sans 400/700",
-   "UI prose, commentary, everything the machine says. Upright.",
-   "font-family:var(--f-body);font-size:1rem"],
-  ["mono", "ui-monospace 700 · caps · +.08–.1em",
-   "Every measured fact: refs, dates, counts, repo names, status labels. Tabular numerals.",
-   "font-family:var(--f-mono);font-weight:700;letter-spacing:.09em;text-transform:uppercase;font-size:.8rem"],
-];
-
-/* ============================ variants ============================ */
-const VARIANTS = [
-  {
-    id: "register", name: "Register", world: "Federal Register · the daily docket",
-    italic: "the normative clause", italicWhy:
-      "The rule is the one that speaks. Everything else — commentary, commands, metadata — annotates it upright, exactly as the machine annotates the walker.",
-    move: "The marginal docket numeral — a 4.2rem condensed clause number hanging in the left margin, tabular, with the clause set beside it.",
-    stock: "Buff #ede7d8 on manila #ded6c2", accent: "#7a1f2b", accents: 4,
-    note: "Densest of the four. Two-column gazette commentary; the register reads as a docket you scan, not a page you read.",
-  },
-  {
-    id: "bulletin", name: "Bulletin", world: "Bell Labs / NASA flight rules",
-    italic: "nothing — retired", italicWhy:
-      "Tests the seed's deepest rule by removing it. A standard is issued by an institution, not said by a person, so no voice is privileged and everything sets upright.",
-    move: "The level band — every clause opens with a ruled band whose left tab carries MUST / SHOULD / DEPRECATED in reversed condensed caps.",
-    stock: "Cool near-white #f1f3f0 on #e4e7e4", accent: "#1f5fa8", accents: 3,
-    note: "Also one accent short: agent material is hatched rather than hued. The austere option — if this wins, the transposition was mostly about colour, not voice.",
-  },
-  {
-    id: "decree", name: "Decree", world: "The issued order · stamped and countersigned",
-    italic: "the rationale", italicWhy:
-      "Inverts Register. The clause is stamped and impersonal; the reasoning behind it is the human part, and therefore the part that is 'said'. Closest to how the seed actually works — the machine states, the person reflects.",
-    move: "The stamp — a rotated outlined IN FORCE block on the sheet corner, with a countersignature rule at the foot.",
-    stock: "Paper #f6f4ee on #e9e6de", accent: "#8c1d2b", accents: 2,
-    note: "Near-monochrome: authority needs no colour, so the only chromatic ink is the stamp. Narrowest measure, most ceremonial.",
-  },
-  {
-    id: "fieldguide", name: "Field Guide", world: "Haynes manual · green-bar bench copy",
-    italic: "superseded practice", italicWhy:
-      "Italic marks what is quoted from the past — the retired clause, the thing you used to do. Live rules are upright because they are current; italic becomes a tense, not a speaker.",
-    move: "The command rail — every clause carries the command that satisfies it in a fixed right rail. Plus a condensed masthead cropped by the sheet edge.",
-    stock: "Warm #f4f2e9 with green-bar banding #e2ebdd", accent: "#b3400f", accents: 4,
-    note: "Widest and most practical. The rail makes the Actionable trait structural rather than a convention someone has to remember.",
-  },
-];
-
-/* ============================ shared blocks ============================ */
+/* ============================ blocks ============================ */
 const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;");
-const lvlClass = (l) => (l === "DEPRECATED" ? "is-attn" : l === "MUST" ? "is-force" : "");
+
+function displayFaceStatus() {
+  const c = document.createElement("canvas").getContext("2d");
+  const probe = "STANDARDS ISSUED NOT SUGGESTED";
+  const width = (stack) => { c.font = `600 40px ${stack}`; return c.measureText(probe).width; };
+  const generic = width("sans-serif");
+  const differs = (stack) => Math.abs(width(`"${stack}", sans-serif`) - generic) > 1;
+  if (differs("Barlow Condensed")) return { face: "Barlow Condensed", missing: false };
+  if (differs("Arial Narrow")) return { face: "Arial Narrow (spec fallback)", missing: false };
+  if (differs("Liberation Sans Narrow")) return { face: "Liberation Sans Narrow", missing: false };
+  return { face: "NO CONDENSED FACE ON THIS DEVICE — rendering un-condensed", missing: true };
+}
+const FACE = displayFaceStatus();
 
 function fleetStrip() {
-  const f = STD.fleet;
-  // A LAST AUDIT cell is deliberately absent — nothing has audited this
-  // standard, so the cell does not render. Never a placeholder.
+  // No LAST AUDIT cell: nothing has audited this standard, so it does not render.
   const cells = [
     ["Status", `<span class="pip is-force">In force</span>`],
     ["Issued", STD.issued],
     [`Revision · supersedes ${STD.supersedes}`, STD.revision],
-    ["Distribution", `${f.total} repos`],
+    ["Distribution", `${STD.fleet.total} repos`],
   ];
   return `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(9rem,1fr));border-top:2px solid var(--rs);border-bottom:1px solid var(--r);margin:1.1rem 0 0">
     ${cells.map(([k, val], i) => `<div style="padding:.7rem .8rem;display:flex;flex-direction:column;${i ? "border-left:1px solid var(--r)" : ""}">
@@ -468,65 +344,93 @@ function fleetStrip() {
   </div>`;
 }
 
-function fleetCounts() {
-  const f = STD.fleet;
-  return `<div class="btn-row" style="gap:1.4rem;margin:.9rem 0 0">
-    <span class="pip is-force lbl">${f.adopted} adopted</span>
-    <span class="pip is-attn lbl">${f.drifted} drifted</span>
-    <span class="pip muted lbl">${f.pending} pending</span>
+const fleetCounts = () => `<div class="btn-row" style="gap:1.4rem;margin:.9rem 0 0">
+  <span class="pip is-force lbl">${STD.fleet.adopted} adopted</span>
+  <span class="pip is-attn lbl">${STD.fleet.drifted} drifted</span>
+  <span class="pip muted lbl">${STD.fleet.pending} pending</span>
+</div>`;
+
+function cmdBlock(v, cmd) {
+  if (!cmd) return "";
+  const head = v.id === "plate" ? `<div class="cmd-head">Agent · satisfy with</div>` : "";
+  return `${head}<div class="cmd">${esc(cmd)}</div>`;
+}
+
+function ruleRow(v, r) {
+  const tab = r.lvl === "MUST" ? "must" : r.lvl === "SHOULD" ? "should" : "dep";
+  const bigref = v.id === "clause" ? `<div class="bigref">${r.n}</div>` : "";
+  const refMeta = v.id === "clause"
+    ? (r.lvl === "DEPRECATED" ? `<div class="ref">superseded by R3</div>` : "")
+    : `<div class="ref">${r.n}${r.lvl === "DEPRECATED" ? " · superseded by R3" : ""}</div>`;
+
+  const body = v.id === "rail"
+    ? `<div class="split">
+         <div>
+           <p class="norm">${r.norm}</p>
+           <p class="note muted" style="margin:0">${r.note}</p>
+         </div>
+         <div class="rail">
+           ${r.cmd
+             ? `<span class="lbl">Satisfy with</span>${cmdBlock(v, r.cmd)}`
+             : `<span class="lbl">No procedure — clause is retired</span>`}
+         </div>
+       </div>`
+    : `<p class="norm">${r.norm}</p>
+       <p class="note muted">${r.note}</p>
+       ${cmdBlock(v, r.cmd)}`;
+
+  return `<div class="rule-row">
+    <div class="band">
+      <div class="tab ${tab}">${r.lvl}</div>
+      ${bigref}${refMeta}
+    </div>
+    <div class="rule-body">${body}</div>
   </div>`;
 }
 
 function appendix(v) {
+  const roles = v.accents === 4 ? [...ROLES_3, AGENT_ROLE] : ROLES_3;
   return `
   <div class="appendix">
     <div class="lbl">Specimen appendix — not part of the page design</div>
 
     <h2>The four voices — inherited from the seed</h2>
-    <p class="muted" style="font-size:.82rem;max-width:62ch">Identical in all four directions.
-      Barlow Condensed is not embedded — font binaries stay out of the standards repo — so display
-      renders through the DESIGN.md's own fallback stack (<b>"Arial Narrow", system-ui</b>) with the
-      spec recipe applied. Georgia, system sans and mono render true.
+    <p class="muted" style="font-size:.82rem;max-width:62ch">Barlow Condensed is not embedded, so
+      display renders through the DESIGN.md's own fallback stack with the spec recipe applied.
       <b style="color:var(--attention)">On this device the display voice resolved to:
-      ${esc(FACE.face)}.</b>${FACE.missing ? " Judge the condensed silhouette on a machine that has Arial Narrow — the proportions here are wrong." : ""}</p>
-    ${VOICES.map(([n, spec, job, css]) => `<div class="voice-row${n === "reserved" ? " on" : ""}">
-      <div class="n lbl">${n}<br><span style="letter-spacing:0;text-transform:none">${spec}</span></div>
-      <div>
-        <div style="${css}">Standards are issued, not suggested</div>
-        <div class="muted" style="font-size:.78rem;margin-top:.25rem">${job}</div>
-      </div>
-    </div>`).join("")}
-    <p style="font-size:.85rem;margin-top:.8rem"><b>In this direction the reserved voice is
-      ${esc(v.italic)}.</b> <span class="muted">${esc(v.italicWhy)}</span></p>
+      ${esc(FACE.face)}.</b>${FACE.missing ? " Judge the condensed silhouette on a machine that has Arial Narrow." : ""}</p>
+    <div style="font-family:var(--f-disp);font-weight:var(--fw-disp);letter-spacing:var(--ls-disp);text-transform:uppercase;font-size:2rem;line-height:var(--lh-disp)">Standards are issued, not suggested</div>
+    <div style="font-family:var(--f-quote);font-style:italic;font-size:1.15rem;margin-top:.4rem">Standards are issued, not suggested
+      <span class="lbl" style="font-style:normal"> — reserved voice: ${esc(v.italic)}</span></div>
+    <div style="font-size:1rem;margin-top:.4rem">Standards are issued, not suggested <span class="lbl">— body</span></div>
+    <div style="font-family:var(--f-mono);font-weight:700;letter-spacing:.09em;text-transform:uppercase;font-size:.8rem;margin-top:.4rem">Standards are issued <span class="lbl">— mono</span></div>
 
     <h2>Colour roles — ${v.accents} accents, one job each</h2>
     <table class="roles">
       <tr><th></th><th>Token</th><th>Role — and nothing else</th></tr>
-      ${ROLES.map(([tok, role, cssvar]) => `<tr>
+      ${roles.map(([tok, role, cssvar]) => `<tr>
         <td><span class="chip" style="background:var(--${cssvar})"></span></td>
         <td><code>${tok}</code></td><td>${role}</td></tr>`).join("")}
     </table>
-    <p class="muted" style="font-size:.78rem;margin-top:.6rem">The seed's fifth accent
-      (<code>record</code>) retires — nothing on a standards site is ever recording, and an accent
-      with no job does not survive the transposition.</p>
+    <p class="muted" style="font-size:.78rem;margin-top:.6rem">Agent material here: ${esc(v.agentTreatment)}.
+      The seed's fifth accent (<code>record</code>) retires — nothing on a standards site is ever recording.</p>
 
     <h2>Would-be tokens</h2>
     <pre class="tokens">colors:
-  page:       ${cssOf(v.id, "--page")}
-  sheet:      ${cssOf(v.id, "--sheet")}
-  ink:        ${cssOf(v.id, "--ink")}
-  muted:      ${cssOf(v.id, "--muted")}
-  action:     ${cssOf(v.id, "--action")}
-  in-force:   ${cssOf(v.id, "--in-force")}
-  attention:  ${cssOf(v.id, "--attention")}
-  agent:      ${cssOf(v.id, "--agent")}
-typography:            # inherited from the Walking Thoughts DESIGN.md
+  page:       #e4e7e4
+  sheet:      #f1f3f0
+  ink:        #141a17
+  muted:      #5c6560
+  action:     #1f5fa8      # AA on sheet 5.77, page 5.17
+  in-force:   #1f6b44      # AA 5.80 / 5.19
+  attention:  #a8451c      # AA 5.33 / 4.77
+${v.accents === 4 ? "  agent:      #2c5560      # AA 7.31 / 6.54\n" : "  # agent: no hue — hatched fill\n"}typography:            # inherited, not re-opened
   display:    Barlow Condensed 600, caps, +.03em, lh .95
   reserved:   Georgia italic  ->  ${esc(v.italic)}
   body:       system-ui 400/700
   mono:       ui-monospace 700, caps, tabular
-rounded:      ${cssOf(v.id, "--rad")}
-signature:    ${esc(v.move.split(" — ")[0])}</pre>
+rounded:      3px
+signature:    the level band</pre>
 
     <h2>Starter prompt</h2>
     <div class="promptbox">
@@ -537,43 +441,44 @@ signature:    ${esc(v.move.split(" — ")[0])}</pre>
 }
 
 function promptFor(v) {
-  return `Build this surface for standards.thefocus.ai in the ${v.name} direction: ${v.world}. `
-    + `Light ${v.stock.toLowerCase()}; square corners; depth from rules and neatlines, never shadows. `
-    + `Signature move: ${v.move} `
-    + `Type is inherited from the Walking Thoughts DESIGN.md and is not re-opened — four voices, `
-    + `each with one job: Barlow Condensed 600 uppercase +.03em for display, Georgia italic as the `
-    + `ONE reserved voice, system sans upright for body and commentary, mono uppercase for every `
-    + `measured fact with tabular numerals. In this direction the reserved italic is ${v.italic} — `
-    + `nothing else may borrow it. `
-    + `Four traits govern: authoritative (no hedging), traceable (no undated or unattributed rule), `
-    + `actionable (every clause ships the command that satisfies it), dry (wit in the fixtures, never the copy). `
-    + `${v.accents} accents with non-transferable jobs — action, in-force, attention, agent; every status colour ships its text label. `
+  return `Build this surface for standards.thefocus.ai in the Bulletin language: a technical `
+    + `bulletin on cool near-white #f1f3f0 over #e4e7e4, square, flat, depth from rules only. `
+    + `Signature move: every clause opens with a level band whose left tab carries MUST / SHOULD / `
+    + `DEPRECATED in reversed condensed caps. `
+    + `Type is inherited from the Walking Thoughts DESIGN.md and is not re-opened — Barlow Condensed `
+    + `600 uppercase +.03em display, Georgia italic as the ONE reserved voice, system sans upright `
+    + `body, mono uppercase for every measured fact with tabular numerals. `
+    + `Reserved italic here: ${v.italic}. `
+    + `${v.accents} accents with non-transferable jobs (action #1f5fa8, in-force #1f6b44, `
+    + `attention #a8451c${v.accents === 4 ? ", agent #2c5560" : "; agent material is hatched, not hued"}); `
+    + `every status colour ships its text label. `
+    + `Four traits: authoritative (no hedging), traceable (no undated or unattributed rule), `
+    + `actionable (every clause ships the command that satisfies it${v.id === "rail" ? ", in a fixed right rail" : ""}), `
+    + `dry (wit in the fixtures, never the copy). `
     + `Never render a field with no data: omit the cell. 44px targets, 2px focus ring, contrast >= 4.5:1.`;
 }
 
-function cssOf(id, prop) {
-  const el = document.querySelector(`[data-v="${id}"]`);
-  return el ? getComputedStyle(el).getPropertyValue(prop).trim() : "";
-}
+const navBar = () => `<div class="btn-row lbl" style="gap:1.1rem;margin:.9rem 0 1.2rem">
+  <span>Register</span><span class="is-force pip">Standards</span><span>Fleet</span><span>Changes</span>
+</div>`;
 
-/* Honest instrument: report which display face actually resolved on THIS device.
-   A silent fallback is a wrong answer the reviewer can't see they're approving —
-   and a condensed face missing entirely changes the whole silhouette. */
-function displayFaceStatus() {
-  const c = document.createElement("canvas").getContext("2d");
-  const probe = "STANDARDS ISSUED NOT SUGGESTED";
-  const width = (stack) => { c.font = `600 40px ${stack}`; return c.measureText(probe).width; };
-  const generic = width("sans-serif");
-  const differs = (stack) => Math.abs(width(`"${stack}", sans-serif`) - generic) > 1;
-  if (differs("Barlow Condensed")) return { face: "Barlow Condensed", real: true };
-  if (differs("Arial Narrow")) return { face: "Arial Narrow (spec fallback)", real: false };
-  if (differs("Liberation Sans Narrow")) return { face: "Liberation Sans Narrow", real: false };
-  return { face: "NO CONDENSED FACE ON THIS DEVICE — rendering un-condensed", real: false, missing: true };
-}
-const FACE = displayFaceStatus();
+function renderDoc(v) {
+  return `<div class="doc"><div class="sheet">
+    <div class="delta"><p><b>Change from control:</b> ${esc(v.delta)}
+      ${v.question !== "—" ? `<br><span class="muted"><b>Asks:</b> ${esc(v.question)}</span>` : ""}</p></div>
+    <div class="masthead">
+      <div>
+        <div class="lbl">The Focus AI · Engineering Standards</div>
+        <div class="name">${STD.id} — ${STD.title}</div>
+      </div>
+      <div class="lbl" style="text-align:right;margin-left:auto">Issued ${STD.issued}<br>Revision ${STD.revision}</div>
+    </div>
+    ${navBar()}
+    <p class="prose">${STD.summary}</p>
+    ${fleetStrip()}${fleetCounts()}
+    <h2>Clauses</h2>
+    ${STD.rules.map((r) => ruleRow(v, r)).join("")}
 
-function commonTail(v) {
-  return `
     <h2>The register</h2>
     <div class="reg-scroll"><table class="reg">
       <tr><th>Ref</th><th>Standard</th><th>Applies to</th><th>State</th></tr>
@@ -602,131 +507,9 @@ function commonTail(v) {
       <button class="btn btn-quiet">View markdown source</button>
       <button class="btn btn-primary" disabled>Distributed</button>
     </div>
-    ${appendix(v)}`;
+    ${appendix(v)}
+  </div></div>`;
 }
-
-const navBar = (active) => `<div class="btn-row lbl" style="gap:1.1rem;margin:.9rem 0 1.2rem">
-  ${["Register", "Standards", "Fleet", "Changes"]
-    .map((n) => (n === active ? `<span class="is-force pip">${n}</span>` : `<span>${n}</span>`))
-    .join("")}
-</div>`;
-
-/* ============================ per-variant documents ============================ */
-const RENDER = {
-  register: (v) => `<div class="doc"><div class="sheet">
-    <div class="masthead">
-      <div class="name">The Focus AI Standards</div>
-      <div class="lbl" style="margin-top:.45rem">Issued daily · Vol. 2026 · Sheet 1 of 1 · Distribution: all repos</div>
-    </div>
-    ${navBar("Register")}
-    <div class="lbl">${STD.id} · Revision ${STD.revision}</div>
-    <h2 style="margin:.35rem 0 .6rem;font-size:1.8rem">${STD.title}</h2>
-    <p class="prose">${STD.summary}</p>
-    ${fleetStrip()}${fleetCounts()}
-    <h2>Clauses</h2>
-    ${STD.rules.map((r) => `<div class="rule-row${r.lvl === "DEPRECATED" ? " dep" : ""}">
-      <div class="docket">
-        <span class="num">${r.n.split(".")[1]}</span>
-        <span class="lbl lvl ${lvlClass(r.lvl)}">${r.lvl}</span>
-      </div>
-      <div>
-        <p class="norm">${r.norm}</p>
-        <p class="note muted" style="font-size:.875rem">${r.note}</p>
-        ${r.cmd ? `<div class="cmd">${esc(r.cmd)}</div>` : ""}
-      </div>
-    </div>`).join("")}
-    <h2>Commentary</h2>
-    <div class="gazette">
-      <p>The preview requirement began as local practice in two client repos and was written up
-         only after a release shipped from a branch nobody had opened. It is recorded here so the
-         next agent inherits the reason, not just the rule.</p>
-      <p>Hosts differ. Vercel and Netlify both expose previews natively; a Cloud Run service needs
-         a per-PR revision with tag-based routing. The mechanism is not the standard — the reachable
-         URL on the check list is.</p>
-    </div>
-    ${commonTail(v)}
-  </div></div>`,
-
-  bulletin: (v) => `<div class="doc"><div class="sheet">
-    <div class="masthead">
-      <div>
-        <div class="lbl">The Focus AI · Engineering Standards</div>
-        <div class="name">${STD.id} — ${STD.title}</div>
-      </div>
-      <div class="lbl" style="text-align:right">Issued ${STD.issued}<br>Revision ${STD.revision}</div>
-    </div>
-    ${navBar("Standards")}
-    <p class="prose">${STD.summary}</p>
-    ${fleetStrip()}${fleetCounts()}
-    <h2>Clauses</h2>
-    ${STD.rules.map((r) => `<div class="rule-row${r.lvl === "DEPRECATED" ? " dep" : ""}">
-      <div class="band">
-        <div class="tab ${r.lvl === "MUST" ? "must" : r.lvl === "SHOULD" ? "should" : "dep"}">${r.lvl}</div>
-        <div class="ref">${r.n}${r.lvl === "DEPRECATED" ? " · superseded by R3" : ""}</div>
-      </div>
-      <div class="rule-body">
-        <p class="norm">${r.norm}</p>
-        <p class="note muted" style="font-size:.875rem">${r.note}</p>
-        ${r.cmd ? `<div class="cmd">${esc(r.cmd)}</div>` : ""}
-      </div>
-    </div>`).join("")}
-    ${commonTail(v)}
-  </div></div>`,
-
-  decree: (v) => `<div class="doc"><div class="sheet">
-    <div class="stamp">In force<span class="d">${STD.issued}</span></div>
-    <div class="masthead">
-      <div class="name">The Focus AI · Standards</div>
-      <div class="title">${STD.title}</div>
-      <div class="lbl">${STD.id} · Revision ${STD.revision} · Supersedes ${STD.supersedes}</div>
-    </div>
-    <div style="display:flex;justify-content:center">${navBar("Standards")}</div>
-    <p class="prose">${STD.summary}</p>
-    ${fleetStrip()}${fleetCounts()}
-    <h2>It is hereby standard that —</h2>
-    ${STD.rules.map((r) => `<div class="rule-row${r.lvl === "DEPRECATED" ? " dep" : ""}">
-      <div class="head">
-        <span class="lbl">${r.n}</span>
-        <span class="lbl ${lvlClass(r.lvl)}">${r.lvl}</span>
-      </div>
-      <p class="norm">${r.norm}</p>
-      <p class="note muted">${r.note}</p>
-      ${r.cmd ? `<div class="cmd">${esc(r.cmd)}</div>` : ""}
-    </div>`).join("")}
-    <div class="countersign">
-      <div><div class="sig"></div><div class="lbl" style="margin-top:.35rem">Issuing authority</div></div>
-      <div><div class="sig"></div><div class="lbl" style="margin-top:.35rem">Effective ${STD.issued}</div></div>
-    </div>
-    ${commonTail(v)}
-  </div></div>`,
-
-  fieldguide: (v) => `<div class="doc"><div class="sheet">
-    <div class="masthead">
-      <div class="lbl">The Focus AI · Standards · ${STD.id} · Rev ${STD.revision}</div>
-      <div class="title">${STD.title}</div>
-    </div>
-    ${navBar("Standards")}
-    <p class="prose">${STD.summary}</p>
-    ${fleetStrip()}${fleetCounts()}
-    <h2>Procedure</h2>
-    ${STD.rules.map((r) => `<div class="rule-row${r.lvl === "DEPRECATED" ? " dep" : ""}">
-      <div>
-        <div class="btn-row" style="gap:.7rem;align-items:baseline">
-          <span class="ref">${r.n}</span>
-          <span class="lbl ${lvlClass(r.lvl)}">${r.lvl}</span>
-        </div>
-        <p class="norm">${r.norm}</p>
-        <p class="note muted" style="font-size:.875rem;max-width:52ch">${r.note}</p>
-      </div>
-      <div class="rail">
-        ${r.cmd
-          ? `<span class="lbl">Satisfy with</span><div class="cmd">${esc(r.cmd)}</div>`
-          : `<span class="lbl">No procedure — clause is retired</span>`}
-      </div>
-    </div>`).join("")}
-    ${commonTail(v)}
-  </div></div>`,
-};
 
 /* ============================ wiring ============================ */
 const tabs = document.getElementById("tabs");
@@ -739,7 +522,7 @@ VARIANTS.forEach((v) => {
   b.role = "tab";
   b.id = "tab-" + v.id;
   b.setAttribute("aria-selected", "false");
-  b.innerHTML = `<span class="sw" style="background:${v.accent}"></span>${v.name}`;
+  b.textContent = v.name;
   b.addEventListener("click", () => select(v.id, true));
   tabs.appendChild(b);
 
@@ -748,12 +531,8 @@ VARIANTS.forEach((v) => {
   p.id = "panel-" + v.id;
   p.dataset.v = v.id;
   p.setAttribute("role", "tabpanel");
+  p.innerHTML = renderDoc(v);
   panels.appendChild(p);
-});
-
-// second pass: renderers read computed custom properties, so panels must exist first
-VARIANTS.forEach((v) => {
-  document.getElementById("panel-" + v.id).innerHTML = RENDER[v.id](v);
 });
 
 function select(id, push) {
@@ -763,14 +542,12 @@ function select(id, push) {
     document.getElementById("panel-" + x.id).classList.toggle("active", x.id === v.id);
   });
   stage.dataset.v = v.id;
-  document.documentElement.style.setProperty("--c-accent", v.accent);
   meta.innerHTML = [
     `<span class="fam">${v.name}</span>`,
-    `<span>${v.world}</span>`,
-    `<span class="it">italic = ${v.italic}</span>`,
-    `<span${FACE.missing ? ' class="it"' : ""}>display voice: ${FACE.face}</span>`,
-    `<span>${v.stock}</span>`,
+    `<span class="it">reserved italic: ${v.italic}</span>`,
+    `<span>agent: ${v.agentTreatment}</span>`,
     `<span>${v.accents} accents</span>`,
+    `<span${FACE.missing ? ' class="it"' : ""}>display voice: ${FACE.face}</span>`,
   ].join("");
   if (push) {
     const u = new URL(location.href);
@@ -798,5 +575,5 @@ document.addEventListener("keydown", (e) => {
   select(VARIANTS[next].id, true);
 });
 
-select(new URLSearchParams(location.search).get("variant") || "bulletin", false);
+select(new URLSearchParams(location.search).get("variant") || "clause", false);
 </script>
