@@ -615,7 +615,7 @@ const navBar = (active) => `<div class="btn-row lbl" style="gap:1.1rem;margin:.9
 const RENDER = {
   register: (v) => `<div class="doc"><div class="sheet">
     <div class="masthead">
-      <div class="name">The Focus Standards</div>
+      <div class="name">The Focus AI Standards</div>
       <div class="lbl" style="margin-top:.45rem">Issued daily · Vol. 2026 · Sheet 1 of 1 · Distribution: all repos</div>
     </div>
     ${navBar("Register")}
@@ -650,7 +650,7 @@ const RENDER = {
   bulletin: (v) => `<div class="doc"><div class="sheet">
     <div class="masthead">
       <div>
-        <div class="lbl">The Focus · Engineering Standards</div>
+        <div class="lbl">The Focus AI · Engineering Standards</div>
         <div class="name">${STD.id} — ${STD.title}</div>
       </div>
       <div class="lbl" style="text-align:right">Issued ${STD.issued}<br>Revision ${STD.revision}</div>
@@ -676,7 +676,7 @@ const RENDER = {
   decree: (v) => `<div class="doc"><div class="sheet">
     <div class="stamp">In force<span class="d">${STD.issued}</span></div>
     <div class="masthead">
-      <div class="name">The Focus · Standards</div>
+      <div class="name">The Focus AI · Standards</div>
       <div class="title">${STD.title}</div>
       <div class="lbl">${STD.id} · Revision ${STD.revision} · Supersedes ${STD.supersedes}</div>
     </div>
@@ -702,7 +702,7 @@ const RENDER = {
 
   fieldguide: (v) => `<div class="doc"><div class="sheet">
     <div class="masthead">
-      <div class="lbl">The Focus · Standards · ${STD.id} · Rev ${STD.revision}</div>
+      <div class="lbl">The Focus AI · Standards · ${STD.id} · Rev ${STD.revision}</div>
       <div class="title">${STD.title}</div>
     </div>
     ${navBar("Standards")}
@@ -798,5 +798,5 @@ document.addEventListener("keydown", (e) => {
   select(VARIANTS[next].id, true);
 });
 
-select(new URLSearchParams(location.search).get("variant") || "register", false);
+select(new URLSearchParams(location.search).get("variant") || "bulletin", false);
 </script>
