@@ -35,18 +35,57 @@ everything else annotating it.
 | Atmosphere | Light, no dark mode. Square. Flat and ruled. Utilitarian. Density follows the job — dense register, airy clause. |
 | Open | Stock and accent — **this round decides it.** |
 
+## Type is inherited, not re-opened
+
+**All four directions run the same four voices, straight from the seed's
+DESIGN.md.** An earlier cut of this round anchored each variant in a different
+display face (Steps Mono / Clash Display / Zodiak / Le Murmure) per the Phase 2
+"different personality group" rule — that was wrong. That rule governs a *fresh*
+brand where typography is an open branch. Here it is **evidenced**: the seed
+already specifies four voices with fixed jobs and says the mix *is* the brand.
+
+| Voice | Spec | Job |
+| --- | --- | --- |
+| display | Barlow Condensed 600 · caps · +.03em · lh .95 | Mastheads, section heads, clause numerals, button labels, instrument values |
+| reserved | Georgia italic | One speaker per system. Nothing else may borrow it. |
+| body | system sans 400/700 | UI prose, commentary — everything upright |
+| mono | ui-monospace 700 · caps · +.08–.1em | Every measured fact, tabular numerals |
+
+Barlow Condensed is **not embedded** — font binaries stay out of the standards
+repo — so display renders through the DESIGN.md's own fallback stack
+(`"Arial Narrow", system-ui`) with the spec recipe applied. The specimen probes
+the device at load and prints which face actually resolved; on a machine with no
+condensed face at all it says so in the meta strip, because the un-condensed
+silhouette is a materially different design.
+
+## The typographic question this round asks
+
+On the trail, Georgia italic means **"the walker said this."** A standards site
+has no walker. So what earns the reserved voice? Each direction commits to a
+different answer, and that is the sharpest thing to judge them on:
+
+| Variant | Reserved italic is… | Argument |
+| --- | --- | --- |
+| `register` | the normative clause | The rule is what speaks; everything else annotates it upright |
+| `bulletin` | nothing — retired | A standard is issued by an institution, not said by a person |
+| `decree` | the rationale | Inverts Register: the clause is stamped and impersonal, the reasoning is human |
+| `fieldguide` | superseded practice | Italic marks what is quoted from the past — a tense, not a speaker |
+
+If `bulletin` wins, the transposition was mostly about colour and the seed's
+deepest rule does not survive contact with this subject. That is a real possible
+outcome and the round is built to surface it.
+
 ## The four directions
 
-Each answers "what kind of bureaucratic document is a standard?" differently,
-and each has its own stock, grid, display personality group, and signature move —
-not four fonts on one layout.
+Each answers "what kind of bureaucratic document is a standard?" through
+composition — grid, stock, density, and one signature move.
 
-| Variant | World | Display group | Signature move | Accents |
-| --- | --- | --- | --- | --- |
-| `register` | Federal Register · the daily docket | mono-led / stencil | The marginal docket numeral | 4 |
-| `bulletin` | Bell Labs / NASA flight rules | characterful grotesk | The level band (MUST/SHOULD tab) | 3 |
-| `decree` | The issued order, stamped | editorial drama | The stamp + countersignature block | 2 |
-| `fieldguide` | Haynes manual · green-bar bench copy | weird display | The command rail | 4 |
+| Variant | World | Signature move | Accents |
+| --- | --- | --- | --- |
+| `register` | Federal Register · the daily docket | The marginal docket numeral (4.2rem condensed, tabular) | 4 |
+| `bulletin` | Bell Labs / NASA flight rules | The level band (MUST / SHOULD tab, reversed) | 3 |
+| `decree` | The issued order, stamped | The stamp + countersignature rule | 2 |
+| `fieldguide` | Haynes manual · green-bar bench copy | The command rail + cropped masthead | 4 |
 
 `bulletin` deliberately runs one accent short — agent material is signalled with
 a hatched fill instead of a fourth hue, to test whether the role table needs
@@ -56,20 +95,6 @@ no colour, so only the stamp is chromatic.
 Quadrangle's fifth accent (`record`) retires in all four: nothing on a standards
 site is ever recording, and an accent with no job does not survive the
 transposition.
-
-## Faces
-
-Named but **not embedded** — font binaries stay out of the standards repo. Each
-variant's meta strip states its spec face and the fallback actually rendering,
-per the anti-silent-fallback rule and the mock recipes in
-`reports/2026-07-23-creative-typography.md`.
-
-| Variant | Spec face | License | Rendered as |
-| --- | --- | --- | --- |
-| `register` | Steps Mono (Velvetyne) | OFL | `ui-monospace` 700, tracked .14em |
-| `bulletin` | Clash Display (Fontshare) | ITF FFL | Helvetica Neue 700, −.03em, ≥40px |
-| `decree` | Zodiak (Fontshare) | ITF FFL | Didot / Bodoni MT 700, tight leading |
-| `fieldguide` | Le Murmure (Velvetyne) | OFL | Arial Narrow 700 caps, .02em, lh .88 |
 
 ## Content
 
@@ -105,6 +130,10 @@ Or open `index.html` directly. Left/right arrow keys cycle variants.
 Throwaway per the prototype skill — do not productionize. When a direction wins
 and its `DESIGN.md` is written, delete this directory.
 
-Round 1 open questions for the next grill: which stock, whether the stamp in
-`decree` reads as authority or as costume, and whether the command rail in
-`fieldguide` survives clauses that have no command.
+Round 1 open questions for the next grill: which stock; **what earns the reserved
+italic** (or whether it retires); whether the stamp in `decree` reads as authority
+or as costume; and whether the command rail in `fieldguide` survives clauses that
+have no command.
+
+Judge the display voice on a machine that has Arial Narrow. Where no condensed
+face is installed the proportions are wrong and the specimen says so.
