@@ -99,6 +99,13 @@ run = '''
 echo "==> Deploy: Standards are reference-only, nothing to deploy."
 '''
 
+[tasks."prototype:standards-site"]
+description = "Serve the standards.thefocus.ai direction round (throwaway prototype)"
+run = '''
+echo "==> http://localhost:8899/?variant=register|bulletin|decree|fieldguide"
+python3 -m http.server -d prototypes/standards-site-directions 8899
+'''
+
 [tasks."generate:dockerfile"]
 description = "Run pi in batch mode with the generate-dockerfile prompt"
 run = '''
