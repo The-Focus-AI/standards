@@ -78,6 +78,9 @@ echo "  ✓ fnox secrets OK"
 echo ""
 echo "==> Validating DESIGN.md..."
 node scripts/validate-design.mjs
+echo ""
+echo "==> Checking standards conform to STD-001..."
+node scripts/render-standard.mjs
 '''
 
 [tasks."lint:fix"]
@@ -100,6 +103,19 @@ echo "==> Integration tests (docker build + smoke)..."
 description = "Deploy standards"
 run = '''
 echo "==> Deploy: Standards are reference-only, nothing to deploy."
+'''
+
+[tasks."standard:render"]
+description = "Render every standard in standards/ to out/standards/ and check STD-001 conformance"
+run = "node scripts/render-standard.mjs"
+
+[tasks."standard:preview"]
+description = "Render the standards and serve them for preview"
+run = '''
+set -euo pipefail
+node scripts/render-standard.mjs
+echo "==> http://localhost:8900/"
+python3 -m http.server -d out/standards 8900
 '''
 
 [tasks."design:validate"]

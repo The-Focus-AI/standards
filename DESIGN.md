@@ -62,6 +62,7 @@ components:
     letterSpacing: "0"
     borderBottom: "2px solid {colors.ink}"
     columns: "identity | attribution"
+    fields: "standard, obsoletes, category, status, applies-to | author, org, issued, revision"
   rfc-title:
     typography: "{typography.display}"
     fontSize: "{typography.sizes.title}"
@@ -335,8 +336,12 @@ extension to this file.
 ## Components
 
 - **Header block** — mono, natural case, two columns, closed by a 2px `ink` rule. Left: organisation
-  name in bold, `Standard:`, `Obsoletes:`, `Category:`, `Applies to:`. Right: author, organisation,
-  date, revision. A field with no value is **omitted**, not shown empty.
+  name in bold, `Standard:`, `Obsoletes:`, `Category:`, `Status:`, `Applies to:`. Right: author,
+  organisation, date, revision. A field with no value is **omitted**, not shown empty.
+  **`Category` and `Status` are separate axes** and must never be collapsed into one line: category
+  is the document's class (Practice, Process, Guide), status is whether it is Draft, In force, or
+  Obsoleted. A Guide can be in force; a Practice can be a draft. The first cut of this file
+  conflated them; `STD-001 §3.3` is the authority.
 - **Title** — display, centred, `text-wrap: balance`, below the header block. One per document.
 - **Status memo** — a bordered block on a 3% ink tint, headed `STATUS OF THIS STANDARD` in mono
   micro. States what the document specifies, that it requests comment, that it expects revision, and

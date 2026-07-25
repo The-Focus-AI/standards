@@ -27,6 +27,10 @@ Start with these files, depending on the work being requested:
 - `prompts/standardize-project.md` — inspect-first prompt for auditing an existing project against these markdown standards, proposing a diff, and migrating to mise/fnox/1Password safely.
 - `prompts/generate-dockerfile.md` — prompt for regenerating the standards container Dockerfile.
 - `prompts/develop-design-md.md` — prompt for developing a project's brand/`DESIGN.md` via the `grill-me` and `prototype` skills.
+- `standards/` — the numbered standards corpus. `STD-001` defines how a standard is written:
+  frontmatter fields, categories, clause numbering, requirement levels. Read it before writing or
+  migrating any standard. `mise run standard:render` renders them and refuses to emit a page for a
+  document that does not conform, so rendering *is* the conformance check.
 - `DESIGN.md` — the brand and design system for standards.thefocus.ai: tokens, colour roles, the
   three type voices, RFC structure, print rules, the voice rulebook, and agent prompt snippets.
   Read it before building or changing any surface of the standards site. Validate edits with
