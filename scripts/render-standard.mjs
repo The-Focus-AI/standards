@@ -217,6 +217,11 @@ pre.code {
   background: rgba(20,26,23,.05); border: 1px solid var(--color-line);
   padding: .6rem .75rem; overflow-x: auto;
 }
+pre.mermaid {
+  font-family: var(--font-mono); font-size: var(--size-mono-block); line-height: 1.7;
+  background: var(--color-sheet); border: 1px solid var(--color-line-strong);
+  padding: 1rem; overflow-x: auto; text-align: center;
+}
 .table-scroll { overflow-x: auto; }
 table { width: 100%; min-width: 30rem; border-collapse: collapse; font-size: .8125rem; margin-bottom: 1.1rem; }
 th {

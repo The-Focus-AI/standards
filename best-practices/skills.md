@@ -72,8 +72,10 @@ too large or foggy for one agent session. Use `ask-matt` when unsure which skill
 fits. Run `setup-matt-pocock-skills` once per repo before first use of the
 tracker-backed skills.
 
-Projects using this workflow must document tracker behavior, label vocabulary,
-local fallbacks, and Wayfinder operations in `docs/agents/issue-workflow.md`.
+Issue states, the label vocabulary, claiming, and Wayfinder operations are
+specified by `STD-002`, which binds every repository worked by an agent. A
+project records only its own tracker configuration — which tracker, and the
+local fallback path — in its `AGENTS.md`.
 
 #### Setup and routing
 

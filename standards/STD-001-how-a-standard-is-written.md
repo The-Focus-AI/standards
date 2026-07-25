@@ -158,12 +158,15 @@ convention and SHOULD be replaced during migration.
 
 ### 3.11
 
-A revision MUST NOT change what an existing clause number means.
+A revision of a standard that is `In force` MUST NOT change what an existing
+clause number means.
 
 A revision may freely change wording, add clauses, or deprecate clauses — what it
 may not do is renumber, because that breaks every citation written against the
 old revision. A requirement whose meaning changes gets a new number, and the old
-one is marked DEPRECATED with a pointer to its replacement.
+one is marked DEPRECATED with a pointer to its replacement. A `Draft` is exempt:
+nothing has cited it yet, and forcing a draft to accumulate deprecated clauses
+before it is first issued would make its first revision unreadable.
 
 ### 3.12
 
@@ -172,6 +175,24 @@ A demonstration MUST carry the text an agent receives from raw source.
 Standards are authored as markdown and may be rendered as MDX with live
 components. A demonstration that only works rendered is invisible to the primary
 reader, which is the agent.
+
+### 3.13
+
+A diagram MUST be expressed as Mermaid in a fenced `mermaid` block.
+
+ASCII art cannot be edited without redrawing it, misaligns wherever the font is
+not monospaced, and is opaque to anything that reads the document as data.
+Mermaid source stays readable raw — which satisfies 3.12 without a separate
+fallback — and renders as a figure for the person. A standard MUST NOT contain a
+box-drawing diagram.
+
+````markdown
+```mermaid
+stateDiagram-v2
+    [*] --> ready: accepted
+    ready --> active: claimed
+```
+````
 
 ## 4. File layout
 

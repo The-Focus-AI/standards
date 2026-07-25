@@ -8,7 +8,7 @@ When starting work, inspect these files in order:
 
 1. `AGENTS.md` — this project-specific guide.
 2. `README.md` — product and developer overview, if present.
-3. `docs/agents/issue-workflow.md` — how planning work maps to GitHub Issues, specs, tickets, and wayfinder maps.
+3. `STD-002` in The-Focus-AI/standards — issue states, the frontier, claiming, and what an agent comments. Binding; not copied into this repo.
 4. `docs/adr/` — architecture decisions, if present.
 5. `CONTEXT.md` — domain language and project context, if present.
 6. `mise.toml` — tools, environment loading, and required tasks.
@@ -51,7 +51,7 @@ Default planning flow:
 1. Use `wayfinder` first when the work is too large, cross-cutting, or foggy for one agent session.
 2. Use `grill-me`, `grilling`, or `grill-with-docs` to clarify goals, constraints, terminology, risks, and non-goals.
 3. Use `to-spec` to produce a spec when the work is multi-step or ambiguous.
-4. Publish or reference the spec through the configured issue tracker in `docs/agents/issue-workflow.md`.
+4. Publish or reference the spec through the issue tracker, per `STD-002 §3.15`.
 5. Use `to-tickets` to split the spec into vertical tracer-bullet tickets with explicit blocking edges; use `triage` for inbound issues/PRs.
 6. Use `prototype` before implementation when the design has high UX, architecture, or state-model uncertainty.
 7. Use `implement` for one ticket at a time, then `code-review` before declaring the ticket complete.
@@ -60,7 +60,7 @@ Default planning flow:
 ## GitHub Issues / tracker expectations
 
 - Prefer GitHub Issues when this repo has a GitHub remote and `gh` is authenticated.
-- If GitHub Issues are unavailable, use local markdown under `docs/issues/` and document that choice in `docs/agents/issue-workflow.md`.
+- If GitHub Issues are unavailable, use local markdown under `docs/issues/` and record that choice here — tracker configuration is per-repo, the workflow rules are not.
 - Issues should be small enough for an agent to complete independently.
 - Each implementation ticket should include context, acceptance criteria, test expectations, blocking edges, and links to the spec or parent issue.
 - Before creating issues, check existing open issues to avoid duplicates.

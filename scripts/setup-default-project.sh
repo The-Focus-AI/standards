@@ -13,7 +13,6 @@ Creates/updates:
   .pi/settings.json
   skills-lock.json
   AGENTS.md
-  docs/agents/issue-workflow.md
 
 By default, existing files are left untouched. Use --force to overwrite.
 Then the script runs:
@@ -85,9 +84,8 @@ copy_file "$TEMPLATE_DIR/mise.toml" "$TARGET_DIR/mise.toml"
 copy_file "$TEMPLATE_DIR/.pi/settings.json" "$TARGET_DIR/.pi/settings.json"
 copy_file "$TEMPLATE_DIR/skills-lock.json" "$TARGET_DIR/skills-lock.json"
 copy_file "$TEMPLATE_DIR/AGENTS.md" "$TARGET_DIR/AGENTS.md"
-copy_file "$TEMPLATE_DIR/docs/agents/issue-workflow.md" "$TARGET_DIR/docs/agents/issue-workflow.md"
 
-mkdir -p "$TARGET_DIR/.pi/sessions" "$TARGET_DIR/docs/agents"
+mkdir -p "$TARGET_DIR/.pi/sessions"
 
 if [[ "$DO_INSTALL" == "1" ]]; then
 	echo "==> Running mise bootstrap"
@@ -121,5 +119,6 @@ Next checks:
   mise tasks
   npx skills list || true
 
-Review docs/agents/issue-workflow.md if this project does not use GitHub Issues.
+Issue tracker rules come from STD-002, not from a per-project file. Record only
+this repo's tracker configuration in AGENTS.md if it is not GitHub Issues.
 EOF

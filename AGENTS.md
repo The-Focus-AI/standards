@@ -21,7 +21,7 @@ Start with these files, depending on the work being requested:
 - `skills-lock.json` — locked, reproducible list of installed/approved skills and hashes.
 - `mise.toml` — this standards repo's tool/task declaration; use as a reference for project bootstrapping.
 - `.pi/settings.json` — project-local pi configuration example.
-- `scripts/setup-default-project.sh` — quick bootstrap script for new/empty projects; copies default `mise.toml`, `.pi/settings.json`, `skills-lock.json`, `AGENTS.md`, and issue-workflow docs, then runs `mise trust`, `mise install`, setup, and locked skill installation.
+- `scripts/setup-default-project.sh` — quick bootstrap script for new/empty projects; copies default `mise.toml`, `.pi/settings.json`, `skills-lock.json`, and `AGENTS.md`, then runs `mise trust`, `mise install`, setup, and locked skill installation.
 - `templates/default-project/` — source templates used by the bootstrap script and by prompts as examples for missing files.
 - `prompts/setup-project.md` — prompt for applying these standards to a new project.
 - `prompts/standardize-project.md` — inspect-first prompt for auditing an existing project against these markdown standards, proposing a diff, and migrating to mise/fnox/1Password safely.

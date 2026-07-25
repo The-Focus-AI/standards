@@ -124,7 +124,7 @@ Planning workflow skills that must be available and referenced in project instru
 - `domain-modeling`, `codebase-design`, `improve-codebase-architecture`
 - `diagnosing-bugs`, `resolving-merge-conflicts`, `handoff`, `teach`, `writing-great-skills`
 
-Remove deprecated `to-prd` and `to-issues` installs and lock entries when migrating existing projects. Drop title-case lock keys in favor of kebab-case names. Use GitHub Issues via `gh` when the repo has a GitHub remote and auth is available. Otherwise document the fallback in `docs/agents/issue-workflow.md`. The workflow doc should describe specs, blocked tickets, triage labels, and Wayfinder operations.
+Remove deprecated `to-prd` and `to-issues` installs and lock entries when migrating existing projects. Drop title-case lock keys in favor of kebab-case names. Use GitHub Issues via `gh` when the repo has a GitHub remote and auth is available. Otherwise record the fallback in the project's `AGENTS.md`. The issue states, label vocabulary, claiming rules, and Wayfinder operations come from `STD-002` and are not copied into the project.
 
 ### pi
 

@@ -17,11 +17,12 @@ specified, what is being worked, and what is stuck. This standard fixes the
 state vocabulary, who may move an issue between states, and what an agent says
 when it does.
 
-It replaces the per-project `docs/agents/issue-workflow.md` template as the
-source of the rules. That file remains, but only for configuration a repository
-genuinely varies: which tracker it uses and where its local fallback lives. It
-no longer restates the vocabulary, because twenty editable copies of a rule are
-twenty rules.
+It replaces the per-project `docs/agents/issue-workflow.md` template, which is
+deleted. Twenty editable copies of a rule are twenty rules, and a bootstrap
+script that seeded a fresh copy into every new repository guaranteed the drift.
+Configuration a repository genuinely varies — which tracker it uses, where its
+local fallback lives — belongs in that repository's `AGENTS.md`, as
+configuration rather than as a restatement of the vocabulary.
 
 **Out of scope.** Pull requests, branch naming, and review are `STD-003`. This
 standard does not cover which planning skills produce a ticket, nor the contents
@@ -38,24 +39,32 @@ repositories still running it can find out what replaced it.
 
 ### 3.1
 
-Every open issue MUST carry exactly one state label from `backlog`, `ready`,
-`active`, `blocked`, `wontfix`.
+An open issue MUST carry at most one state label from `ready`, `active`,
+`blocked`, `wontfix`.
 
-Exactly one, always. An issue with no state label is invisible to the frontier
-and to every board built on it; an issue with two states is a question nobody
-can answer. State is a single axis, and a tracker where that is not enforced
-stops being a source of truth within a week.
+At most one, never two. An issue holding two states is a question nobody can
+answer. State is a single axis, and a tracker where that is not enforced stops
+being a source of truth within a week.
 
 ### 3.2
 
-A newly created issue MUST enter `backlog`.
+An issue with no state label MUST be treated as backlog.
 
-`backlog` means captured but not yet specified or accepted — it absorbs what the
-previous vocabulary called `needs-triage`. Nothing is skipped straight to
-`ready` on creation, including by an agent filing follow-up work it discovered
-while doing something else.
+Backlog is the absence of a state, not a label. A newly filed issue is in the
+backlog because nobody has said otherwise, which means filing costs one action
+instead of two and nothing has to be labelled to be captured. Demoting an issue
+is removing its label, not swapping one.
 
 ### 3.3
+
+A `backlog` label MUST NOT be applied.
+
+Two representations of one state is the same defect as two components reporting
+one truth. If the label existed, an unlabelled issue and a `backlog`-labelled
+issue would be indistinguishable in meaning and distinguishable on a board,
+which is how a tracker starts lying.
+
+### 3.4
 
 An issue MUST NOT be labelled `ready` unless it states a goal, background links,
 acceptance criteria, a verification plan, and what is out of scope.
@@ -64,7 +73,7 @@ acceptance criteria, a verification plan, and what is out of scope.
 anything. Those five sections are what make that promise checkable. An issue
 missing any of them is `backlog`, however obvious the work seems.
 
-### 3.4
+### 3.5
 
 An agent MUST NOT move an issue into `ready`.
 
@@ -74,7 +83,7 @@ and then pick it up, which converts a planning failure into merged code. An
 agent that believes an issue is ready says so in a comment and leaves the label
 alone.
 
-### 3.5
+### 3.6
 
 An agent MUST assign itself to an issue before labelling it `active`.
 
@@ -82,16 +91,45 @@ An agent MUST assign itself to an issue before labelling it `active`.
 needed when several sessions share a frontier, and an `active` issue with no
 assignee is indistinguishable from an abandoned one.
 
-### 3.6
+### 3.7
+
+An agent MUST re-read an issue immediately before claiming it, and MUST
+abandon the claim if the issue is no longer on the frontier.
+
+Several agents read the same frontier at the same time. Whatever an agent
+learned when it listed the frontier is already stale by the time it acts, so the
+check happens against the tracker at the moment of claiming — not against the
+listing. If the issue has gained an assignee, changed state, or closed, the
+agent takes the next item instead. Two agents on one ticket is two branches, two
+pull requests, and a merge conflict nobody planned.
+
+```sh
+gh issue view "$N" --json assignees,state,labels \
+  | jq -e '.assignees == [] and .state == "OPEN"' || exit 0
+gh issue edit "$N" --add-assignee "@me" --add-label active
+gh issue view "$N" --json assignees \
+  | jq -e '[.assignees[].login] == ["'"$AGENT"'"]' || exit 0
+```
+
+### 3.8
+
+An agent MUST verify it holds the claim after making it, and MUST yield if it
+does not.
+
+Assignment is not atomic on any tracker this fleet uses. Read back after
+writing: if the agent is not the sole assignee, another session won the race and
+this one stops, without commenting and without unassigning the winner.
+
+### 3.9
 
 `blocked` MUST mean the issue is waiting on a person.
 
 A question, a decision, an access grant, an external dependency. It is a human
 queue, and it is meant to be worked. Blocking on *another issue* is not this —
-see 3.7. Conflating the two is why boards stop being trusted: a `blocked` column
+see 3.10. Conflating the two is why boards stop being trusted: a `blocked` column
 full of items that will unblock themselves teaches everyone to ignore it.
 
-### 3.7
+### 3.10
 
 A dependency between issues MUST be recorded as a blocking relationship, never
 as a label.
@@ -101,7 +139,7 @@ Use the tracker's native blocked-by relationship where it exists, and a
 dependency then resolves itself when the blocker closes, with nobody
 relabelling anything.
 
-### 3.8
+### 3.11
 
 An agent MUST take work only from the frontier.
 
@@ -110,7 +148,7 @@ blocking relationship. An agent that reaches outside it is either working
 something a person has not accepted, something already claimed, or something
 whose prerequisites do not exist yet.
 
-### 3.9
+### 3.12
 
 An agent MUST comment on the issue whenever it changes that issue's state.
 
@@ -118,7 +156,7 @@ The label says what the state is; the comment says why it changed. A state
 change with no comment leaves the next reader — usually another agent —
 guessing at intent from a timestamp.
 
-### 3.10
+### 3.13
 
 A state-change comment MUST state what happened and what happens next.
 
@@ -127,7 +165,7 @@ One or two sentences. No preamble, no apology, no restating the ticket title.
 operator to create it, then this returns to `ready`." Voice follows `DESIGN.md`
 — factual, no enthusiasm, no emoji.
 
-### 3.11
+### 3.14
 
 An issue labelled `wontfix` MUST carry the reason in a comment before it is
 closed.
@@ -135,17 +173,17 @@ closed.
 `wontfix` is a decision, and a decision with no recorded reason gets relitigated
 every quarter. Name what was decided and what would change the answer.
 
-### 3.12
+### 3.15
 
 A spec or PRD MUST exist as its own tracker item, and every ticket derived from
 it MUST link back to that item.
 
 Specs live where the work lives, so an agent reading a ticket can reach the
 reasoning behind it in one hop. The spec item carries a type label and moves
-through the same states; it is excluded from the frontier by 3.13 rather than by
+through the same states; it is excluded from the frontier by 3.16 rather than by
 being kept somewhere else.
 
-### 3.13
+### 3.16
 
 An issue that is not directly workable MUST carry a type label, and an agent
 MUST NOT take type-labelled planning items as work.
@@ -154,7 +192,26 @@ Type is a second axis, independent of state: `type:spec`, `type:epic`, and the
 existing `wayfinder:map` are containers, not tickets. They may be `ready` —
 meaning ready to be broken down — without being something to implement.
 
-### 3.14
+### 3.17
+
+Work on an `active` issue MUST be delivered as a branch and a pull request that
+reference the issue.
+
+The chain is issue → branch → pull request → merge, and every link names the one
+before it. An issue whose work landed without a pull request has no reviewable
+record of what changed; a branch that names no issue cannot be traced back to
+the requirement it satisfies. Naming and the shape of the pull request are
+`STD-003`.
+
+### 3.18
+
+An issue MUST NOT be closed by an agent before its pull request merges.
+
+Merging closes the issue, and nothing else does. An agent that closes on
+"finished writing the code" closes work that has not shipped, which is the one
+tracker lie that costs a release.
+
+### 3.19
 
 An issue SHOULD NOT be created for work already described by an open issue.
 
@@ -164,35 +221,36 @@ close it referencing the original rather than merging the two descriptions.
 
 ## 4. The state machine
 
-```text
-    (created)
-        │
-        ▼
-   ┌─────────┐   specified + accepted    ┌───────┐
-   │ backlog │ ───────────────────────►  │ ready │ ◄──────────┐
-   └─────────┘   (human only — 3.4)      └───┬───┘            │
-        ▲                                    │ agent claims   │ person
-        │                                    │ + assigns      │ answers
-        │                                    ▼                │
-        │                               ┌────────┐      ┌─────┴─────┐
-        │                               │ active │ ───► │  blocked  │
-        │                               └────┬───┘      └───────────┘
-        │                                    │ work merged
-        │                                    ▼
-        │                                (closed)
-        │
-        └──── any state ────► wontfix ────► (closed)
+```mermaid
+stateDiagram-v2
+    [*] --> backlog: filed
+    backlog --> ready: specified and accepted, person only (3.5)
+    ready --> active: claim, verify, assign (3.6 to 3.8)
+    active --> blocked: needs a person
+    blocked --> ready: person answers
+    active --> [*]: branch, pull request, merge (3.17)
+    backlog --> wontfix
+    ready --> wontfix
+    active --> wontfix
+    blocked --> wontfix
+    wontfix --> [*]: closed with a recorded reason (3.14)
+
+    note right of backlog
+        Not a label. Backlog is the
+        absence of one (3.2, 3.3).
+    end note
 ```
 
-Closing is not a label. An issue that is done is closed with its state label
-left as it was; `wontfix` is the only state that describes *why* something
-closed.
+Backlog is drawn dashed because it is not a label — it is what an issue is when
+no state label is present (3.2). Closing is not a label either: an issue that is
+done is closed by its pull request merging, with its state label left as it was.
+`wontfix` is the only state that describes *why* something closed.
 
 ## 5. Label reference
 
 | Label | Axis | Meaning | Who sets it |
 | --- | --- | --- | --- |
-| `backlog` | state | Captured, not yet specified or accepted | Anyone |
+| *(none)* | state | Backlog — captured, not yet specified or accepted | Default |
 | `ready` | state | Fully specified; an agent can finish it unaided | Person only |
 | `active` | state | An agent is working it; assignee names which | Agent |
 | `blocked` | state | Waiting on a person | Agent or person |
@@ -202,7 +260,8 @@ closed.
 | `wayfinder:*` | type | Wayfinder map and child-ticket kinds | Wayfinder |
 
 Migrating from the previous vocabulary: `ready-for-agent` becomes `ready`,
-`needs-triage` becomes `backlog`, and `needs-info` becomes `blocked`.
+`needs-triage` is deleted (an unlabelled issue is already backlog), and
+`needs-info` becomes `blocked`.
 
 ## 6. References
 
