@@ -52,7 +52,7 @@ set -euo pipefail
 if [ -f package.json ] && pnpm run | grep -q "^[[:space:]]*lint"; then
   pnpm run lint
 elif command -v markdownlint-cli2 >/dev/null 2>&1; then
-  markdownlint-cli2 "**/*.md" "#node_modules" "#.pi" "#.agents" || true
+  markdownlint-cli2 "**/*.md" "#node_modules" "#.pi" "#.agents"
 else
   echo "No linter configured yet"
 fi
