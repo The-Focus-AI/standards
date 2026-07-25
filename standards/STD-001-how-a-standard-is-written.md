@@ -194,6 +194,37 @@ stateDiagram-v2
 ```
 ````
 
+### 3.14
+
+A standard MUST NOT be moved from `Draft` to `In force` by an agent.
+
+Ratification is the act of a person deciding the fleet will be bound by
+something. An agent that promotes its own draft binds every repository to rules
+nobody accepted, which is the same failure as `STD-002 §3.5` one level up. An
+agent that believes a draft is ready says so and leaves the field alone.
+
+### 3.15
+
+A standard MUST render without error before it is moved to `In force`.
+
+Rendering is the conformance check, so a standard that will not render is a
+standard whose own format is broken. This is mechanical and belongs in the same
+change as the status edit.
+
+```sh
+mise run standard:render
+```
+
+### 3.16
+
+A standard that obsoletes another MUST set that standard's status to
+`Obsoleted` in the same change that puts the new one `In force`.
+
+The `obsoletes` field points forward; the status of the old document is what a
+reader lands on. Leaving a superseded standard reading `In force` is the
+undated-rule failure this whole corpus exists to prevent, and it is worst
+exactly when someone is following the old one.
+
 ## 4. File layout
 
 Standards live in `standards/`, one file per document, named
