@@ -1,4 +1,17 @@
-# Prompt: Develop a DESIGN.md (Brand + Design System) for a Project
+---
+name: develop-design-md
+description: >
+  Take a project from "no visual identity" to a committed, validated DESIGN.md — brand
+  interview, contrasting rendered prototypes, distilled tokens plus a voice rulebook,
+  then a fresh-agent validation pass. Produces the file plus a decision log and a list
+  of product tickets the prototypes surfaced.
+  Use when a project needs a brand, a design system, a visual direction, or a DESIGN.md.
+  Triggers on: "design system", "DESIGN.md", "brand this", "visual identity",
+  "what should this look like", "pick a look", "style guide", "design tokens",
+  "voice and tone".
+---
+
+# Develop a DESIGN.md
 
 Use this prompt to take a project from "we have no visual identity" (or "our
 identity lives in someone's head") to a committed `DESIGN.md` that any coding
@@ -129,11 +142,11 @@ Rules for the variants:
   four times, and the user will (rightly) reject the whole round. A
   typeface only reads as a direction when the composition around it
   changes too.
-- Draw faces and moves from `reports/2026-07-23-creative-typography.md`:
+- Draw faces and moves from `references/creative-typography.md`:
   anchor each variant in a different personality group (editorial drama,
   characterful grotesk, weird display, mono-led), never a system-stack or
   AI-default face as display, and give every variant a named signature
-  move. The note's "checkable anti-boring rules" belong in the final
+  move. The reference's "checkable anti-boring rules" belong in the final
   DESIGN.md's typography section.
 - **Specimens mock faces from descriptions, and say so.** Early rounds
   don't need font files: use the approximation recipes in the typography

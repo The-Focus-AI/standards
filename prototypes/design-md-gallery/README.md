@@ -30,7 +30,7 @@ Each variant shows the same content — hero, type scale, color roles,
 components with states, and a voice rulebook (numbered Orwell-style rules in
 character, a before/after rewrite, banned words) — plus its would-be
 DESIGN.md YAML tokens and a copyable **starter prompt** that kicks off the
-grill-me → prototype → DESIGN.md flow in `prompts/develop-design-md.md`.
+grill-me → prototype → DESIGN.md flow in the `develop-design-md` skill.
 
 ## Run
 

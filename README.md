@@ -18,7 +18,7 @@ Inside the container, install tools and run the project setup prompt:
 ```bash
 cd /standards
 mise install
-pi -p prompts/setup-project.md
+pi -p skills/setup-project/SKILL.md
 ```
 
 The `~/.pi` mount gives the container's pi access to your host's LLM API keys.
@@ -33,9 +33,9 @@ Sessions are ephemeral — lost when the container exits. Mount a volume to
 | `mise.toml`         | Tool declarations (mise is the only dependency — everything else flows from here)                            |
 | `Dockerfile`        | Minimal container: `debian:stable-slim`, mise, bash, tmux, git, gh. `/app` is left empty for your project.   |
 | `skills-lock.json`  | Company-approved skills (locked hashes for reproducibility)                                                  |
-| `skills/`           | Skills authored here — `activity-report` (live prod usage + git history → client-ready report)               |
+| `skills/`           | Every skill we own — brand, research, reporting, docs/decks, project setup. See `skills/VENDORED.md`         |
 | `best-practices/`   | Deployment, Vercel, GCP, GCE Gaia, Clerk, security, skills, pi extensions, project organization             |
-| `prompts/`          | Pi prompts — `setup-project.md` scaffolds new projects, `generate-dockerfile.md` regenerates this Dockerfile |
+| `prompts/`          | Pi prompts — `generate-dockerfile.md` regenerates this Dockerfile (the rest became skills)                   |
 | `reports/`          | Technical research (fnox secrets reference, skills CLI guide, electron shell)                               |
 | `tests/`            | Dockerfile integration tests — `mise test` validates the image                                               |
 | `architecture/`     | Design documents — PRDs and decision records                                                                 |
@@ -48,10 +48,11 @@ Sessions are ephemeral — lost when the container exits. Mount a volume to
 mise install           # Install all tools (one-time, or after mise.toml changes)
 mise lint              # Run linters (markdownlint, mise doctor, fnox check)
 mise test              # Build and validate the Docker image
+mise run skills:check  # Validate every skill in skills/
 mise dev               # Run lint + test
 mise run generate:dockerfile   # Regenerate the Dockerfile via pi
 ./scripts/setup-default-project.sh ../my-project   # New/empty project bootstrap
-pi @prompts/standardize-project.md "Target project: ../qbsync"   # Audit another project and propose a standards migration
+pi @skills/standardize-project/SKILL.md "Target project: ../qbsync"   # Audit a project against these standards
 ```
 
 ## Design Philosophy

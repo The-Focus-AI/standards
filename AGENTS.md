@@ -19,16 +19,15 @@ Start with these files, depending on the work being requested:
 - `best-practices/pi-extensions.md` — pi installation and required pi extensions.
 - `best-practices/organization.md` — organization-level structure guidance. Review when setting up or auditing repo layout.
 - `skills-lock.json` — locked, reproducible list of installed/approved skills and hashes.
-- `skills/` — skills authored and hosted by this repository, one folder per skill
-  (`skills/<name>/SKILL.md`), installable with `skills add The-Focus-AI/standards --skill <name>`.
+- `skills/` — every skill TheFocus.AI owns, one folder per skill (`skills/<name>/SKILL.md`), installable with
+  `skills add The-Focus-AI/standards --skill <name>`. `skills/VENDORED.md` records provenance;
+  `mise run skills:check` validates them.
 - `mise.toml` — this standards repo's tool/task declaration; use as a reference for project bootstrapping.
 - `.pi/settings.json` — project-local pi configuration example.
 - `scripts/setup-default-project.sh` — quick bootstrap script for new/empty projects; copies default `mise.toml`, `.pi/settings.json`, `skills-lock.json`, `AGENTS.md`, and issue-workflow docs, then runs `mise trust`, `mise install`, setup, and locked skill installation.
 - `templates/default-project/` — source templates used by the bootstrap script and by prompts as examples for missing files.
-- `prompts/setup-project.md` — prompt for applying these standards to a new project.
-- `prompts/standardize-project.md` — inspect-first prompt for auditing an existing project against these markdown standards, proposing a diff, and migrating to mise/fnox/1Password safely.
-- `prompts/generate-dockerfile.md` — prompt for regenerating the standards container Dockerfile.
-- `prompts/develop-design-md.md` — prompt for developing a project's brand/`DESIGN.md` via the `grill-me` and `prototype` skills.
+- `prompts/generate-dockerfile.md` — prompt for regenerating the standards container Dockerfile. The other
+  prompts became skills: `setup-project`, `standardize-project`, and `develop-design-md` now live in `skills/`.
 - `architecture/` — design notes and decisions for this standards repo itself.
 - `reports/` — longer research/reference material, including fnox secrets, the skills CLI, and creative typography for DESIGN.md work.
 - `tests/` — validation scripts for this standards repo.
