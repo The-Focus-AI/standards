@@ -180,13 +180,13 @@ Conventions:
 3. Deploy scripts always pass `--project` / `--region`.
 4. Prefer **service account impersonation** over SA key files:
 
-```bash
-gcloud run deploy my-service \
-  --source . \
-  --project "$GOOGLE_CLOUD_PROJECT" \
-  --region "$GOOGLE_CLOUD_REGION" \
-  --impersonate-service-account=deploy-sa@PROJECT.iam.gserviceaccount.com
-```
+   ```bash
+   gcloud run deploy my-service \
+     --source . \
+     --project "$GOOGLE_CLOUD_PROJECT" \
+     --region "$GOOGLE_CLOUD_REGION" \
+     --impersonate-service-account=deploy-sa@PROJECT.iam.gserviceaccount.com
+   ```
 
 5. CI: GitHub Actions + **Workload Identity Federation** (no keys). See the
    multi-project report references.

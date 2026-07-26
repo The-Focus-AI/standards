@@ -59,26 +59,31 @@ Then `mise install`.
 > **Important — shell activation.** mise's per-directory env (`_.file = ".fnox/env"`)
 > only fires when `mise activate` is loaded in your **interactive** shell rc.
 > Make sure `~/.zshrc` (NOT just `~/.zprofile`) has:
+>
 > ```bash
 > eval "$(mise activate zsh)"
 > # fnox: auto-injects every declared secret on `cd` into a fnox.toml dir,
 > # unsets them on leave (chpwd hook). Replaces `fnox exec --` wrapping.
 > command -v fnox >/dev/null 2>&1 && eval "$(fnox activate zsh)"
 > ```
+>
 > Without `mise activate`, new terminal tabs won't have `OP_SERVICE_ACCOUNT_TOKEN`
 > in env, and the `op` CLI will fall back to the desktop app's Touch ID prompt
 > for every command. Without `fnox activate`, you'll have to wrap every command
 > in `fnox exec --` to see secrets. Check with:
+>
 > ```bash
 > echo "${OP_SERVICE_ACCOUNT_TOKEN:0:8}..."   # should be ops_...
 > echo "${DATABASE_URL:0:20}..."              # should be your DB URL
 > ```
+>
 > in a fresh tab inside the project directory.
 
 > **Why `fnox activate` is the smart default.** It registers a `chpwd` hook
 > that walks up looking for `fnox.toml`; when it finds one, every declared
 > secret is exported into your shell. When you leave that directory tree, the
 > vars are unset. This means:
+>
 > - `pnpm dev`, `pnpm build`, `tsx scripts/foo.ts` all "just work" without a
 >   `fnox exec --` prefix — the secrets are already in env.
 > - Each project gets its own scoped secret env, no cross-contamination.
@@ -295,7 +300,7 @@ Now `pnpm dev` boots with secrets pulled from 1Password at process start, and
 ## Daily operations
 
 | Task | Command |
-|---|---|
+| --- | --- |
 | Run app with secrets injected | `pnpm dev` (auto-injected via `fnox activate` in `~/.zshrc`); or `fnox exec -- <cmd>` if activation isn't loaded |
 | List all configured secrets | `mise run secrets:list` |
 | Verify everything resolves | `mise run secrets:check` |
@@ -351,7 +356,7 @@ CI/Vercel sets only the `_PROD` token; local devs have only the `_DEV` token. Co
 There are two patterns; pick based on platform constraints:
 
 | Pattern | When to use | How it works |
-|---|---|---|
+| --- | --- | --- |
 | **A. Sync** (recommended for Vercel/Next.js) | Platform has native env vars and you can run `fnox` locally to push them | `mise run <platform>:sync` resolves fnox → platform env vars; deploys read natively |
 | **B. Bootstrap token** (recommended for GCP Cloud Run, Fly.io, K8s) | Platform can run a wrapper command at container start | One bootstrap secret (`OP_SERVICE_ACCOUNT_TOKEN`) in the platform; container ENTRYPOINT runs `fnox exec -- <app>` |
 
@@ -453,7 +458,7 @@ reads from that vault.
 #### Gotchas we hit
 
 | Symptom | Cause | Fix |
-|---|---|---|
+| --- | --- | --- |
 | `Error: No Next.js version detected` | Vercel scanning root `package.json` (no `next` there) | Set **Root Directory = `web`** in dashboard |
 | `Database connection string is not valid URL` | `vercel env add` from stdin silently stored empty strings | Use `--value <VALUE> --yes` flags, not stdin |
 | `vercel env pull` shows `KEY=""` for production secrets | Production env vars default to **sensitive** (write-only) | Not a bug — secrets are stored fine, just unreadable on pull |
@@ -482,6 +487,7 @@ Two viable patterns — pick based on whether you want fnox in the runtime image
 The container has `fnox` installed; entrypoint is `fnox exec -- <your app>`. The bootstrap token comes from **Google Secret Manager**.
 
 **Dockerfile:**
+
 ```dockerfile
 FROM node:22-slim
 RUN apt-get update && apt-get install -y curl ca-certificates && \
@@ -497,12 +503,14 @@ CMD ["pnpm", "start"]
 ```
 
 **Store the bootstrap token in Secret Manager:**
+
 ```bash
 echo -n "ops_..." | gcloud secrets create op-service-account-token \
   --data-file=- --replication-policy=automatic
 ```
 
 **Cloud Run deploy:**
+
 ```bash
 gcloud run deploy my-app \
   --image=gcr.io/PROJECT/my-app \
@@ -534,7 +542,7 @@ Trade-off: production reads from GSM (faster, no external dependency, IAM-contro
 #### Pattern A vs Pattern B
 
 | | Pattern A (fnox in runtime) | Pattern B (sync to GSM) |
-|---|---|---|
+| --- | --- | --- |
 | Source of truth | 1Password | 1Password (GSM is a mirror) |
 | Cold-start latency | +50-200ms (1P API call) | None |
 | External dependency | 1Password.com must be up | Just GCP |
@@ -604,7 +612,7 @@ The `[secrets]` table is shared — same set of env vars for every environment. 
 #### Switching profiles
 
 | Where | How profile is selected |
-|---|---|
+| --- | --- |
 | Local dev | default (no env var) → dev vault |
 | Local "what would prod look like?" | `FNOX_PROFILE=prod fnox exec -- pnpm build` (with prod token in `.fnox/token-prod`) |
 | Vercel Production | env var `FNOX_PROFILE=prod` + `OP_SERVICE_ACCOUNT_TOKEN=ops_prod_...` |
@@ -700,20 +708,25 @@ Fails the build if either vault is missing a declared secret — catches drift b
 ## Onboarding a teammate
 
 1. They install the prerequisites:
+
    ```bash
    brew install --cask 1password-cli   # op (with desktop app integration)
    curl https://mise.run | sh           # mise
    ```
+
 2. Make sure mise + fnox activate in their interactive shell — append to `~/.zshrc`:
+
    ```bash
    eval "$(mise activate zsh)"
    command -v fnox >/dev/null 2>&1 && eval "$(fnox activate zsh)"
    ```
+
    The fnox line installs a `chpwd` hook so secrets are auto-loaded into the
    shell when entering any directory containing `fnox.toml`, and unset on exit.
 3. Grant them access in 1Password to the **token backup vault** (e.g. `thefocus`)
    so they can read `op://thefocus/<project> service account token/credential`.
 4. They run:
+
    ```bash
    git clone <repo>
    cd <repo>
@@ -761,6 +774,7 @@ fnox list 2>/dev/null | awk 'NR>1 {
 ```
 
 Output:
+
 ```
 ANTHROPIC_API_KEY    Anthropic — https://console.anthropic.com/settings/billing
 DATABASE_URL         Neon Postgres — https://console.neon.tech
@@ -774,6 +788,7 @@ CLERK_SECRET_KEY     Clerk backend — https://dashboard.clerk.com
 Each provider exposes its own usage API. Wrap them in `scripts/check-balances.ts` (or .sh) and run via fnox so the right keys are present:
 
 #### Anthropic
+
 Requires a separate **Admin API key** (`ANTHROPIC_ADMIN_KEY`, prefix `sk-ant-admin-...`), stored in fnox alongside the regular key:
 
 ```bash
@@ -787,11 +802,14 @@ fnox exec -- bash -c '
 ```
 
 Endpoints:
+
 - `GET /v1/organizations/usage_report/messages` — token counts per model
 - `GET /v1/organizations/cost_report` — dollar amounts
 
 #### OpenAI
+
 Requires an Admin key (`sk-admin-...`):
+
 ```bash
 curl https://api.openai.com/v1/organization/costs \
   -H "Authorization: Bearer $OPENAI_ADMIN_KEY"

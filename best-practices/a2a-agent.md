@@ -39,7 +39,7 @@ The agent is **session-tracked**: every conversation, user message, assistant me
 Lock these unless you have a specific reason to swap one out:
 
 | Layer | Choice | Why |
-|---|---|---|
+| --- | --- | --- |
 | Framework | Next.js 15 App Router | Vercel-native; one project hosts both A2A endpoint and any web UI |
 | Runtime | `nodejs` (Vercel Fluid Compute) | Edge can't import the MCP SDK; persistent state survives invocation reuse |
 | LLM | Vercel AI Gateway via `ai` SDK v6 | Plain `"provider/model"` strings, no provider-specific packages |
@@ -420,6 +420,7 @@ const card: AgentCard = {
 ```
 
 **Two custom extensions every Focus agent declares:**
+
 - `urn:{project}:refusals/v1` — what we won't compute (mirrors `REFUSAL_REASONS`).
 - `urn:{project}:data-source/v1` — identity of the underlying dataset.
 
@@ -432,7 +433,7 @@ const card: AgentCard = {
 **Discovery public, invocation authenticated.** The callers + auth matrix:
 
 | Caller | Hits | Auth |
-|---|---|---|
+| --- | --- | --- |
 | Anyone | `/.well-known/agent-card.json`, `/api/health` | None — these advertise the agent |
 | Browser user | `/chat`, internal pages, `/api/chat` | Clerk session cookie |
 | External A2A agent | `/api/a2a/jsonrpc` | Clerk M2M JWT (Bearer) |
@@ -542,7 +543,7 @@ Source of truth: `fnox.toml` mapping env vars to 1Password items in a per-projec
 **Required:**
 
 | Var | Where | Notes |
-|---|---|---|
+| --- | --- | --- |
 | `DATABASE_URL` | 1P, Vercel | Neon Postgres connection string |
 | `AI_GATEWAY_API_KEY` | 1P, Vercel | Vercel AI Gateway key |
 | `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` | 1P, Vercel | `pk_test_...` / `pk_live_...`. `NEXT_PUBLIC_` prefix bundles for the browser |
@@ -551,7 +552,7 @@ Source of truth: `fnox.toml` mapping env vars to 1Password items in a per-projec
 **Optional:**
 
 | Var | Default | Notes |
-|---|---|---|
+| --- | --- | --- |
 | `AGENT_MODEL` | `anthropic/claude-opus-4-7` | Override to swap models without code change |
 | `A2A_BASE_URL` | `https://{project}.thefocus.ai` | Baked into AgentCard `url` |
 | `CLERK_DOMAIN` | `https://clerk.{project}.thefocus.ai` | For M2M token URL in AgentCard |
@@ -616,6 +617,7 @@ export const config: VercelConfig = {
 **Env var sync:** add all four required vars in Vercel dashboard (Production + Preview). Or wire `mise run sync-vercel-env` task that walks fnox and `vercel env add` each.
 
 **First-deploy checklist:**
+
 1. `pnpm --filter app build` locally — confirm green.
 2. `curl https://{project}.vercel.app/api/health` → `200`.
 3. `curl https://{project}.vercel.app/.well-known/agent-card.json` → AgentCard JSON.
@@ -628,6 +630,7 @@ export const config: VercelConfig = {
 ## 11. Testing & probing
 
 **Unit tests** (`vitest`):
+
 - One `tools-shape.test.ts` asserting every tool in the catalog conforms to `ToolSpec` or `DiscoveryToolSpec`.
 - One `system-prompt.test.ts` enforcing `.md` ↔ `.ts` lockstep.
 - One `chat-log.test.ts` covering the four writers.
@@ -636,6 +639,7 @@ export const config: VercelConfig = {
 - Per-tool tests for any non-trivial logic in `run()`.
 
 **End-to-end probing:** use [`focus/a2a-probe`](#) (TODO — separate repo). The probe is a CLI/TUI that:
+
 - Fetches an AgentCard from any URL.
 - Authenticates via Clerk M2M (client_credentials grant) or session cookie.
 - Lists discovered skills.
