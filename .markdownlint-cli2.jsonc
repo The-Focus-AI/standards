@@ -15,7 +15,23 @@
     "node_modules/**",
     ".pi/**",
     ".agents/skills/**",
+    "out/**",
     "reports/**",
-    "architecture/**"
+    "architecture/**",
+
+    // Vendored skills — copied in from other repositories, listed under
+    // "Vendored" in skills/VENDORED.md. They are validated by
+    // `mise run skills:check` on the axes that matter for a skill (frontmatter,
+    // kebab-case name, reference paths that resolve). Holding someone else's
+    // prose to this repo's line-length rule produces noise, and a permanently
+    // red gate is one everybody learns to skip.
+    //
+    // This list MUST match the Vendored table in skills/VENDORED.md.
+    // `mise run skills:check` fails if the two drift apart.
+    "skills/research-methodology/**",
+    "skills/browser-automation/**",
+    "skills/nano-banana-imagegen/**",
+    "skills/nano-banana-videogen/**",
+    "skills/focus-ai-brand/**"
   ]
 }
