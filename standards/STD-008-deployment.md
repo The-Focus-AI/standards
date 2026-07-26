@@ -117,6 +117,54 @@ One line in `AGENTS.md` naming the platform and the guide. An agent asked to
 deploy should not have to infer the platform from which config files happen to
 exist.
 
+### 3.10
+
+An artefact deployed to production MUST be built by CI.
+
+Not built on a workstation and pushed. A locally built image embeds whatever was
+on that machine — uncommitted changes, a different toolchain version, a stale
+dependency — and nothing records what actually went out.
+
+### 3.11
+
+A service that controls deployment or agent execution MUST NOT be reachable
+without authentication.
+
+Put it behind a proxy with a key. A control plane exposed on a raw port is
+administrative access to the fleet, offered to whoever finds the port.
+
+### 3.12
+
+Each deploy loop MUST be documented separately, and a change to one MUST NOT be
+assumed to reach another.
+
+A repository with more than one deployment path — a SaaS surface, an agent
+fleet, a scheduled job — has that many loops. Changing an environment variable
+in one and assuming the others rebuilt is the most common way a deploy appears
+to have worked.
+
+### 3.13
+
+A deploy workflow MUST be path-filtered.
+
+Without a filter, a documentation change cycles the fleet. On a self-hosted
+runner that is ten minutes of production churn for a typo fix, and it trains
+everyone to ignore deploy notifications.
+
+### 3.14
+
+A repository MUST expose the platform tasks its deployment requires as mise
+tasks.
+
+`STD-004 §3.3` fixes the universal four; a platform adds its own. Whatever the
+platform needs — authenticating, checking which target is active, syncing
+secrets, tailing logs — is a named task rather than a command someone remembers.
+
+```sh
+mise run auth-status     # which project am I pointed at
+mise run vercel:sync -- --env preview
+```
+
 ## 4. References
 
 [1] Bradner, S., *Key words for use in RFCs to Indicate Requirement Levels*,

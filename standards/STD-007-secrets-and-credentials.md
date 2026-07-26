@@ -113,6 +113,46 @@ Client secrets on OAuth applications expire silently, and the failure is a login
 outage discovered by a customer. Whoever creates one records when it dies and
 who renews it.
 
+### 3.10
+
+A long-lived service account key file MUST NOT be used where impersonation or
+workload identity is available.
+
+A key file on a laptop or in a repository is a credential with no expiry and no
+audit trail, and it survives the departure of whoever created it. Impersonation
+and workload identity federation issue short-lived credentials tied to an
+identity that can be revoked in one place.
+
+### 3.11
+
+A control-plane credential MUST NOT be distributed to a client of that control
+plane.
+
+A master API key handed to the application it administers turns any compromise
+of that application into compromise of the fleet it manages. Issue the client a
+credential scoped to what the client actually does.
+
+### 3.12
+
+A secret store MUST receive only the secrets its target needs.
+
+Syncing an entire vault into a project that needs three values gives that
+project — and anyone who can read its environment — everything else in the
+vault. Review what landed after any sync.
+
+```sh
+vercel env ls
+```
+
+### 3.13
+
+A store holding live credentials MUST be identified as such before it is
+destroyed.
+
+Rotated OAuth tokens and session state accumulate in volumes and data
+directories that look disposable. Deleting one to reclaim space is how a fleet
+loses credentials it cannot re-issue without the customer's involvement.
+
 ## 4. References
 
 [1] Bradner, S., *Key words for use in RFCs to Indicate Requirement Levels*,
