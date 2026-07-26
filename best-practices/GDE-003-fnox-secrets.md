@@ -1,4 +1,5 @@
 ---
+number: "003"
 title: "Project secrets with fnox and 1Password"
 kind: guide
 issued: "2026-07-25"

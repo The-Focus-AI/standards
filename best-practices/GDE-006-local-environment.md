@@ -1,4 +1,5 @@
 ---
+number: "006"
 title: "Local development environment"
 kind: guide
 issued: "2026-07-25"
@@ -116,7 +117,7 @@ This writes to `.pi/settings.json` and installs to `.pi/git/`. Teammates who
 clone the repo and run pi will have packages auto-installed on startup.
 
 Everything in `.pi/` is pinned per project rather than globally, which is
-`STD-004 §3.1` applied to pi. The current package set is in `pi-extensions.md`.
+`STD-004 §3.1` applied to pi. The current package set is in `best-practices/GDE-007-pi-extensions.md`.
 
 # tmux setup
 

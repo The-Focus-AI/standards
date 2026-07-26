@@ -1,4 +1,5 @@
 ---
+number: "003"
 title: "standards.thefocus.ai design decision log"
 kind: decision
 issued: "2026-07-25"

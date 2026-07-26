@@ -1,4 +1,5 @@
 ---
+number: "002"
 title: "Clerk authentication setup"
 kind: guide
 issued: "2026-07-25"
@@ -11,7 +12,7 @@ verified: "2026-07-25"
 
 # Clerk authentication
 
-Clerk is the default auth layer (see @AGENTS.md). These rules cover how to set
+Clerk is the default auth layer (see `best-practices/GDE-009-technology-defaults.md`). These rules cover how to set
 it up across multiple client projects that live on subdomains of one root
 domain (e.g. `thp.thefocus.ai`, `habitats.thefocus.ai`).
 

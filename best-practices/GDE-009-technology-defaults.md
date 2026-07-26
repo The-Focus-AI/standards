@@ -1,4 +1,5 @@
 ---
+number: "009"
 title: "Technology defaults"
 kind: guide
 issued: "2026-07-25"
@@ -23,11 +24,11 @@ Unless a project states otherwise:
   unless a client has already standardised on something else — document the
   exception in the project's `AGENTS.md`.
 - **Clerk** for authentication. The rules are `STD-009`; the setup walkthrough
-  is `clerk.md`.
+  is `best-practices/GDE-002-clerk.md`.
 
 ## Not yet decided
 
-These are named in the gap register (`reports/2026-07-25-standards-gap-register.md`)
+These are named in the gap register (`reports/NOTE-005-2026-07-25-standards-gap-register.md`)
 as needing a decision before they can be written as standards:
 
 - Module layout and error-handling conventions for TypeScript projects.

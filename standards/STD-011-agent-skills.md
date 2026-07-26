@@ -19,7 +19,7 @@ someone remembering which ones a project needs.
 
 This standard covers how skills are installed and kept current. Which skills
 belong to the standard set is an inventory that changes on its own schedule and
-lives in `best-practices/skills.md`, not here — a list of names is data, and
+lives in `best-practices/GDE-008-skills.md`, not here — a list of names is data, and
 putting data in a standard means revising the standard whenever the data moves.
 
 **Out of scope.** The standard skill set itself. How to write a skill. What each
@@ -101,4 +101,4 @@ BCP 14, RFC 2119, March 1997.
 
 [2] The Focus AI, `STD-004` — Repository tooling and tasks. Draft.
 
-[3] The Focus AI, `best-practices/skills.md` — the standard skill set inventory.
+[3] The Focus AI, `best-practices/GDE-008-skills.md` — the standard skill set inventory.

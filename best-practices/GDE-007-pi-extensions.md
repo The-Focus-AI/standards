@@ -1,4 +1,5 @@
 ---
+number: "007"
 title: "pi extensions"
 kind: guide
 issued: "2026-07-25"

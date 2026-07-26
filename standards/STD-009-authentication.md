@@ -22,7 +22,7 @@ recorded as requirements because each one has already cost somebody an outage or
 a leak.
 
 **Out of scope.** The per-provider OAuth setup walkthroughs, which stay in
-`best-practices/clerk.md`. Secret storage, which is `STD-007`. Authorisation
+`best-practices/GDE-002-clerk.md`. Secret storage, which is `STD-007`. Authorisation
 inside an application.
 
 ## 2. Requirements language
@@ -120,4 +120,4 @@ BCP 14, RFC 2119, March 1997.
 
 [2] The Focus AI, `STD-007` — Secrets and credentials. Draft.
 
-[3] The Focus AI, `best-practices/clerk.md` — per-provider setup walkthroughs.
+[3] The Focus AI, `best-practices/GDE-002-clerk.md` — per-provider setup walkthroughs.

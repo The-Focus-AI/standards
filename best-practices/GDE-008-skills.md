@@ -1,4 +1,5 @@
 ---
+number: "008"
 title: "Standard skill set"
 kind: guide
 issued: "2026-07-25"

@@ -1,4 +1,5 @@
 ---
+number: "002"
 title: "skills CLI: Technical Implementation Guide for Agent Skill Management"
 date: 2026-06-25
 updated_from: "2026-05-10 (v1.5.6)"
@@ -19,7 +20,7 @@ project_context:
   relevant_dependencies:
     - pi coding agent (primary agent in use)
     - skills npm package (~14.2M weekly downloads, MIT license)
-  our_convention: "Pinned in mise.toml as `\"npm:skills\" = \"1.5.13\"` and invoked as `skills ...` (not `npx skills`). See best-practices/skills.md."
+  our_convention: "Pinned in mise.toml as `\"npm:skills\" = \"1.5.13\"` and invoked as `skills ...` (not `npx skills`). See best-practices/GDE-008-skills.md."
 kind: note
 author: W. Schenk
 status: Current

@@ -1,4 +1,5 @@
 ---
+number: "002"
 title: "Wrapping a habitat in an Electron app"
 kind: decision
 issued: "2026-07-25"

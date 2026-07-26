@@ -1,4 +1,5 @@
 ---
+number: "004"
 title: "GCE Gaia runtime"
 kind: guide
 issued: "2026-07-25"
@@ -17,8 +18,8 @@ containers. Reference: **umwelten** (`deploy/gaia/`, `.github/workflows/deploy-g
 and ops notes in `umwelten/docs/guide/operating-production.md`.
 
 This is **not** the Cloud Run / App Engine standard. For those see
-@gcp-deployment.md. For the habitats SaaS control plane (previews, env sync)
-see @vercel-deployment.md.
+`best-practices/GDE-005-gcp-deployment.md`. For the habitats SaaS control plane (previews, env sync)
+see `best-practices/GDE-010-vercel-deployment.md`.
 
 ## When to use this pattern
 
@@ -31,8 +32,8 @@ Use GCE + Gaia when the workload needs:
 
 Do **not** use this for:
 
-- Stateless HTTP APIs → Cloud Run (@gcp-deployment.md)
-- Next.js SaaS with PR previews → Vercel (@vercel-deployment.md)
+- Stateless HTTP APIs → Cloud Run (`best-practices/GDE-005-gcp-deployment.md`)
+- Next.js SaaS with PR previews → Vercel (`best-practices/GDE-010-vercel-deployment.md`)
 - Gaia itself on Cloud Run — rejected today (needs Docker socket, volumes, sibling networking)
 
 ## Three deploy loops (do not mix them)
@@ -180,8 +181,8 @@ focused on the live GCE + self-hosted runner pattern.
 
 | Doc | Role |
 | --- | --- |
-| @gcp-deployment.md | Cloud Run / App Engine / gcloud configs |
-| @vercel-deployment.md | habitats SaaS previews and fnox→Vercel sync |
+| `best-practices/GDE-005-gcp-deployment.md` | Cloud Run / App Engine / gcloud configs |
+| `best-practices/GDE-010-vercel-deployment.md` | habitats SaaS previews and fnox→Vercel sync |
 | umwelten `deploy/gaia/README.md` | Host runbook |
 | umwelten `docs/guide/operating-production.md` | Day-to-day fleet ops |
 | umwelten `reports/2026-07-10-gaia-on-gcp-deployment-strategy.md` | Why not Cloud Run |

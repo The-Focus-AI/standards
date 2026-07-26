@@ -5,7 +5,7 @@ title: Documents and provenance
 category: Process
 status: Draft
 issued: "2026-07-25"
-revision: R1
+revision: R2
 applies-to: Every document in this repository
 author: W. Schenk
 ---
@@ -87,12 +87,15 @@ the first.
 
 ### 3.4
 
-A research note filename MUST begin with its issue date in `YYYY-MM-DD` form.
+A research note filename MUST carry its issue date in `YYYY-MM-DD` form after its
+number.
 
-`2026-06-25-skills-cli-technical-guide.md`. The directory then sorts into a
-timeline, and staleness is visible from `ls` without opening anything. Two of the
-five notes in this repository already do this; the convention is being recorded,
-not invented.
+`NOTE-002-2026-06-25-skills-cli-technical-guide.md`. A note is a capture of a
+moment: what was true, when it was checked. The date belongs in the name because
+staleness is the first thing a reader needs and `ls` should show it without
+opening anything. A guide or a decision record carries no date in its name — it
+is a topic that gets revised in place, and a date on it would only record when
+somebody last thought about it.
 
 ### 3.5
 
@@ -146,26 +149,76 @@ the new one before deleting anything.
 git show HEAD:path/to/old.md > /tmp/old.md && diff /tmp/old.md path/to/new.md
 ```
 
+### 3.10
+
+Every durable document MUST carry a `number` field and MUST lead its filename
+with its class prefix and that number.
+
+`GDE-002`, `NOTE-005`, `ADR-001`, `PRM-001` — the prefixes are fixed by section
+4. A number is an address that survives a retitling, which a slug does not: a
+guide renamed from `deployment` to `local-environment` is the same document, and
+a citation written against it should not die of that. The prefix is part of the
+address because `GDE-002` and `STD-002` are different documents, and a bare `002`
+in a sentence tells a reader nothing. A standard carries its number in the
+`standard` field instead, per `STD-001 §3.18` — the same fact under the name it
+was given first.
+
+The design document is the one exception: it is a singleton at a fixed path,
+cited everywhere as `DESIGN.md`, and a number on a class with one member
+addresses nothing that the path does not already address.
+
+### 3.11
+
+A number MUST NOT be reassigned once issued.
+
+Numbers are identity, not order. A retired document keeps its number and its
+status says it is retired; the next document takes the next free number. Reusing
+one makes every citation written before the reuse resolve to the wrong document,
+silently, which is worse than a citation that resolves to nothing.
+
+### 3.12
+
+Every skill under `skills/` MUST be registered in `skills/VENDORED.md` with a
+unique `SKL` number.
+
+The number cannot live in `SKILL.md`: the skills CLI owns that frontmatter, and a
+second schema in it would break installation. So the register is a separate file,
+and a register nothing checks is a register that drifts — `mise run skills:check`
+fails when a skill on disk is unregistered, registered twice, or shares a number.
+A skill is still installed and cited by name; the number is what the published
+site addresses it by.
+
+```sh
+mise run skills:check
+```
+
 ## 4. Document classes
 
 | Kind | Lives in | Filename | Status values |
 | --- | --- | --- | --- |
-| `note` | `reports/` | `YYYY-MM-DD-slug.md` | `Current`, `Superseded` |
-| `decision` | `architecture/` | `slug.md` | `Proposed`, `Accepted`, `Superseded` |
-| `guide` | `best-practices/` | `slug.md` | `Current`, `Superseded` |
 | `standard` | `standards/` | `STD-nnn-slug.md` | `Draft`, `In force`, `Obsoleted` |
-| `prompt` | `prompts/` | `slug.md` | `Current`, `Superseded` |
+| `guide` | `best-practices/` | `GDE-nnn-slug.md` | `Current`, `Superseded` |
+| `note` | `reports/` | `NOTE-nnn-YYYY-MM-DD-slug.md` | `Current`, `Superseded` |
+| `decision` | `architecture/` | `ADR-nnn-slug.md` | `Proposed`, `Accepted`, `Superseded` |
+| `prompt` | `prompts/` | `PRM-nnn-slug.md` | `Current`, `Superseded` |
+| `skill` | `skills/<name>/` | `SKILL.md`, numbered `SKL-nnn` in the register | — |
 | `design` | repository root | `DESIGN.md` | `Current`, `Superseded` |
 
 A standard carries four more fields on top of these — `standard`, `category`,
 `revision`, `applies-to` — specified by `STD-001 §3.18`. Everything else in the
-table needs only the five.
+table needs only the five plus `number`.
 
-**Outside this axis.** `skills/<name>/SKILL.md` carries the frontmatter the
-skills CLI requires (`name`, `description`) and is validated by
-`mise run skills:check`; imposing a second schema on it would break
-installation. `AGENTS.md` and `README.md` are navigation read by external
-tooling. Neither is a defect — both are formats this repository does not own.
+**Skills are numbered but not on the frontmatter axis.** `skills/<name>/SKILL.md`
+carries the frontmatter the skills CLI requires (`name`, `description`), and
+imposing a second schema on it would break installation. Their numbers and
+provenance therefore live in `skills/VENDORED.md`, which is the skill register
+(3.12). The directory name stays the skill's installable identity — `skills add`
+takes a name, not a number.
+
+**Outside this axis entirely.** `AGENTS.md` and `README.md` are navigation read
+by external tooling, and `skills/VENDORED.md` is the register rather than a
+document in the corpus. Neither is a defect — they are formats this repository
+does not own, and an index of a class cannot be a member of it.
 
 A **guide** is long-form explanation with no binding clauses: a walkthrough, a
 reference implementation, an inventory. `STD-001 §3.2` originally listed Guide
@@ -173,9 +226,9 @@ as a category of standard; that was obsoleted in R2, because a guide is a
 different kind of document rather than a weaker standard. A guide that contains
 rules has a standard trapped inside it.
 
-A decision record is not date-prefixed because it is cited by name and its date
-is in its frontmatter; a note is, because notes are read as a timeline and
-decisions are not.
+A decision record carries no date in its filename because it is cited by number
+and its date is in its frontmatter; a note does, because notes are read as a
+timeline and decisions are not.
 
 ## 5. References
 

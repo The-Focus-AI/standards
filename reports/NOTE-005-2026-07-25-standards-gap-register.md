@@ -1,4 +1,5 @@
 ---
+number: "005"
 title: "Standards gap register: what is practised but not written"
 kind: note
 issued: "2026-07-25"
@@ -51,7 +52,7 @@ prompts into skills, which resolves two category A rows and changes a third:
 | Repository naming | Client repos prefix by client (`upperhand-ae`, `upperhand-cp`, `upperhand-versant`, `upperhand-landing`); experiments prefix `weekend-`; event repos lead with the date (`2026-04-20-ai-engineering-miami`). A real convention, followed, unwritten. |
 | Commit messages | Agents author nearly all of them. A consistent shape is in use — imperative subject, body explaining why rather than restating the diff, trailers — but nothing specifies it. `git log` is the only record of intent that outlives a tracker. |
 | Prompt files | **Largely resolved.** Three of four became skills under `skills/`, validated by `mise run skills:check`; the remainder carries `kind: prompt`. What a *skill* must contain is now the open question. |
-| pi extension set | `.pi/settings.json` pins five packages. `best-practices/pi-extensions.md` is 260 bytes and does not list them. Belongs in `STD-005`. |
+| pi extension set | `.pi/settings.json` pins five packages. `best-practices/GDE-007-pi-extensions.md` is 260 bytes and does not list them. Belongs in `STD-005`. |
 | Test entry point | `mise test` is required by `STD-004`; `tests/test-dockerfile.sh` is the only implementation. Where tests live and what they must cover is unstated. |
 | Lint configuration | `.markdownlint-cli2.jsonc` pins line length 120, disables MD025 and MD033. Covered by `STD-004 §3.9`; no separate standard needed. |
 
@@ -61,10 +62,10 @@ prompts into skills, which resolves two category A rows and changes a third:
 | --- | --- |
 | Repository layout | The zero-byte `organization.md` was deleted rather than written, so the question it stood for is still open: what layout is actually required of a repository? |
 | "Verification plan" | `STD-002 §3.4` requires a `ready` issue to carry one, and the term is defined nowhere. `STD-003 §3.7` separately requires checkable success criteria. These are probably one concept with two names across two standards — **an outright defect in shipped text**, and the first thing to fix. |
-| TypeScript and pnpm | `best-practices/AGENTS.md` gives it two lines: use TypeScript and pnpm, avoid a build step where possible. Module layout, error handling, and what "avoid a build step" means in practice are unstated. |
+| TypeScript and pnpm | `best-practices/GDE-009-technology-defaults.md` gives it two lines: use TypeScript and pnpm, avoid a build step where possible. Module layout, error handling, and what "avoid a build step" means in practice are unstated. |
 | Database | "Use neon/postgres" is one line. Migrations, schema conventions, connection handling, and what happens in preview environments are unstated — and `STD-003 §3.9` already leans on preview-scoped credentials that no standard defines. |
 | Code review | A `code-review` skill exists and `STD-003` requires human approval, but what a reviewer must check is unwritten. Without it, "approved" means whatever the reviewer felt like that day. |
-| Skill authoring | `best-practices/skills.md` covers installing skills. Nothing covers writing one, though `skill-creator` is installed. |
+| Skill authoring | `best-practices/GDE-008-skills.md` covers installing skills. Nothing covers writing one, though `skill-creator` is installed. |
 | Model selection | `.pi/extensions/gengen.ts`, `pi-local-models`, and the gateway model IDs in `DESIGN.md` all imply a policy. None is written. |
 | Secrets policy | **Resolved.** `STD-007` now covers vaults, service-account scoping, preview isolation, and rotation; `security.md` was absorbed and deleted. |
 

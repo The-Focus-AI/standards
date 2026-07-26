@@ -1,4 +1,5 @@
 ---
+number: "003"
 title: "Creative typography: research notes for DESIGN.md work"
 kind: note
 issued: "2026-07-23"

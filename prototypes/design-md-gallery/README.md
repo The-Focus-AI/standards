@@ -24,7 +24,7 @@ repo copy renders labeled system fallbacks; the published artifact version
 has the real faces injected as woff2 data URIs at publish time. Every
 variant's meta strip states its face and whether it's real, authentic to
 genre, or an approximation, per the anti-silent-fallback rule and mock
-recipes in `reports/2026-07-23-creative-typography.md`.
+recipes in `reports/NOTE-003-2026-07-23-creative-typography.md`.
 
 Each variant shows the same content — hero, type scale, color roles,
 components with states, and a voice rulebook (numbered Orwell-style rules in

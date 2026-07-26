@@ -1,4 +1,5 @@
 ---
+number: "006"
 title: "Migration coverage map: every source rule to its clause"
 kind: note
 issued: "2026-07-26"
@@ -65,7 +66,7 @@ Complete. The publishable-key decode check moved into `§3.3` as its command.
 | One Neon database shared by Preview and Production | `STD-007 §3.5` |
 | Syncing a whole vault into a project needing a subset | `STD-007 §3.12` **(added on audit)** |
 | Changing `NEXT_PUBLIC_*` without redeploying | `STD-008 §3.5` |
-| Supabase-as-default for new projects | `best-practices/AGENTS.md` — a preference, not a rule |
+| Supabase-as-default for new projects | `best-practices/GDE-009-technology-defaults.md` — a preference, not a rule |
 | Required tasks: `vercel:sync`, `vercel:deploy`, `secrets:*` | `STD-008 §3.14` **(added on audit)** |
 | Environment matrix (local / preview / production) | `STD-008 §3.4` requires the mapping; the table itself stays in the guide |
 | `fnox exec` as the Vercel build command | **stays in the guide** — platform mechanism |
@@ -105,7 +106,7 @@ Complete, one to one. Everything else in the 694-line document — stack,
 directory layout, AgentCard, auth, MCP route, env vars, local dev, deployment,
 testing — stays in the guide.
 
-## skills.md → STD-011
+## GDE-008-skills.md → STD-011
 
 | Source | Clause |
 | --- | --- |
@@ -118,7 +119,7 @@ testing — stays in the guide.
 | Do not install a whole upstream collection | `§3.7` |
 | The standard skill set tables | Stay in the guide — data, not rules |
 
-## best-practices/AGENTS.md → STD-004, STD-011
+## best-practices/GDE-009-technology-defaults.md → STD-004, STD-011
 
 | Source | Clause |
 | --- | --- |
@@ -137,10 +138,10 @@ testing — stays in the guide.
 | --- | --- |
 | Own 1Password vault per project | `STD-007 §3.1` |
 | fnox + mise activation on `cd` | `STD-004 §3.7` |
-| Must work in bash and zsh | `best-practices/local-environment.md` |
+| Must work in bash and zsh | `best-practices/GDE-006-local-environment.md` |
 | Defers to the fnox playbook | `STD-007` reference [3] |
 
-## deployment.md → local-environment.md
+## deployment.md → GDE-006-local-environment.md
 
 Audited separately and **failed**: 15 of 15 procedural details were lost when it
 was replaced with a hand-written summary, and were restored from the original.
@@ -157,7 +158,7 @@ be carried over rather than summarised.
 | gce-gaia | 12 | 12 | 0 |
 | a2a §4 | 7 | 7 | 0 |
 | skills | 8 | 7 | 1 (the inventory) |
-| AGENTS.md | 8 | 8 | 0 |
+| GDE-009-technology-defaults.md | 8 | 8 | 0 |
 | security | 4 | 4 | 0 |
 
 Nothing normative remains unclaimed. The three left in guides are a tool fact,

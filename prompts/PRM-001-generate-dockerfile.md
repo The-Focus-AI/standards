@@ -1,4 +1,5 @@
 ---
+number: "001"
 title: "Generate the standards Dockerfile"
 kind: prompt
 issued: "2026-07-25"

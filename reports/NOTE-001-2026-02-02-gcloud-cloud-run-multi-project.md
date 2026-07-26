@@ -1,10 +1,11 @@
 ---
+number: "001"
 title: "gcloud Cloud Run Deployments: Multi-Project Configuration Guide"
 date: 2026-02-02
 topic: gcloud-multi-project
 recommendation: gcloud configurations with direnv
 version_researched: gcloud CLI 500+
-canonical_standard: best-practices/gcp-deployment.md
+canonical_standard: best-practices/GDE-005-gcp-deployment.md
 source_repo: foundtain-creek
 use_when:
   - Working with multiple GCP projects from a single development machine
@@ -25,7 +26,7 @@ issued: "2026-02-02"
 verified: "2026-02-02"
 ---
 
-> **Canonical standard:** Prefer `best-practices/gcp-deployment.md`. That doc
+> **Canonical standard:** Prefer `best-practices/GDE-005-gcp-deployment.md`. That doc
 > adapts this research to TheFocus.AI conventions (mise `[env]` instead of
 > direnv; Fountain Creek Cloud Run + qbsync App Engine as references).
 > This file remains the longer background report.

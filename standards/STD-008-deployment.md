@@ -23,8 +23,8 @@ the walkthroughs, the reference implementations, and the checklists.
 
 **Out of scope.** Vault layout and credential handling, which is `STD-007`. What
 the four required tasks do, which is `STD-004`. Platform-specific mechanics,
-which stay in `best-practices/vercel-deployment.md`,
-`best-practices/gcp-deployment.md`, and `best-practices/gce-gaia-runtime.md`.
+which stay in `best-practices/GDE-010-vercel-deployment.md`,
+`best-practices/GDE-005-gcp-deployment.md`, and `best-practices/GDE-004-gce-gaia-runtime.md`.
 
 ## 2. Requirements language
 

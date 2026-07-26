@@ -1,4 +1,5 @@
 ---
+number: "010"
 title: "Vercel deployment"
 kind: guide
 issued: "2026-07-25"
@@ -15,9 +16,9 @@ Canonical pattern for Next.js apps on Vercel with GitHub previews, fnox-backed
 secrets, Neon, Vercel Blob, and Clerk. Reference implementation: the **habitats**
 repo (`mise.toml` `vercel:sync`, `fnox.toml`, Neon + Blob + Clerk).
 
-For remote-server / pi / tmux setup see `local-environment.md`. For Clerk domain and
-OAuth rules see @clerk.md. For the full fnox playbook see
-`best-practices/fnox-secrets.md`.
+For remote-server / pi / tmux setup see `best-practices/GDE-006-local-environment.md`. For Clerk domain and
+OAuth rules see `best-practices/GDE-002-clerk.md`. For the full fnox playbook see
+`best-practices/GDE-003-fnox-secrets.md`.
 
 ## Defaults
 
@@ -62,7 +63,7 @@ Add `crons` only when the app needs them. Cron handlers must verify
 ### 3. Required mise tools and tasks
 
 Pin Vercel CLI via mise. Copy the habitats-style tasks (see
-`best-practices/fnox-secrets.md` for the full sync script):
+`best-practices/GDE-003-fnox-secrets.md` for the full sync script):
 
 | Task | Purpose |
 | --- | --- |
@@ -125,7 +126,7 @@ Vercel has three scopes. Map them deliberately:
 **Blast radius:** Prefer separate 1Password vaults (and Neon branches) for
 Preview vs Production so a leaked preview token cannot read prod. Use fnox
 profiles (`FNOX_PROFILE=preview` / `prod`) locally when syncing; see
-`best-practices/fnox-secrets.md` § Staging vs production isolation. Habitats currently
+`best-practices/GDE-003-fnox-secrets.md` § Staging vs production isolation. Habitats currently
 runs a single vault with profiles commented out — fine for dogfood, not the
 long-term default for client work.
 
@@ -170,13 +171,13 @@ DATABASE_URL="$(fnox get DATABASE_URL_UNPOOLED)" pnpm db:migrate
 
 ## Clerk: production vs staging / preview
 
-Full rules: @clerk.md. On Vercel specifically:
+Full rules: `best-practices/GDE-002-clerk.md`. On Vercel specifically:
 
 | | Preview + local | Production |
 | --- | --- | --- |
 | Clerk instance | **Development** (`*.clerk.accounts.dev`) | **Production** instance on the client custom domain |
 | Keys | `pk_test_…` / `sk_test_…` in Development + Preview scopes | `pk_live_…` / `sk_live_…` in Production scope **only** |
-| Social OAuth | Clerk shared dev credentials | Your Google/Microsoft apps (see clerk.md) |
+| Social OAuth | Clerk shared dev credentials | Your Google/Microsoft apps (see `best-practices/GDE-002-clerk.md`) |
 | Domains | Add needed `*.vercel.app` / localhost in the **dev** Clerk instance | Custom domain + Clerk CNAMEs (DNS-only / grey cloud on Cloudflare) |
 | `authorizedParties` | Usually omit (preview URLs vary) or list a stable branch alias | Lock to `https://<prod-host>` |
 | Webhooks | Optional; point at a stable preview URL or disable | Prod URL + `CLERK_WEBHOOK_SECRET` in Production scope |
@@ -255,4 +256,4 @@ curl -sS "https://<host>/api/health"
 - [ ] Clerk: separate prod instance; test keys only in Preview/Development
 - [ ] `.env.example` matches fnox keys; health endpoint exists
 - [ ] `mise run vercel:sync` + smoke deploy; `vercel env ls` reviewed
-- [ ] Custom domain + Clerk DNS per @clerk.md when going live
+- [ ] Custom domain + Clerk DNS per `best-practices/GDE-002-clerk.md` when going live

@@ -27,20 +27,20 @@ Sessions are ephemeral — lost when the container exits. Mount a volume to
 
 ## What's Inside
 
-| Path                | Purpose                                                                                                      |
-| ------------------- | ------------------------------------------------------------------------------------------------------------ |
-| `AGENTS.md`         | Mandatory tools, constraints, task structure for pi agents                                                   |
-| `mise.toml`         | Tool declarations (mise is the only dependency — everything else flows from here)                            |
-| `Dockerfile`        | Minimal container: `debian:stable-slim`, mise, bash, tmux, git, gh. `/app` is left empty for your project.   |
-| `skills-lock.json`  | Company-approved skills (locked hashes for reproducibility)                                                  |
-| `skills/`           | Every skill we own — brand, research, reporting, docs/decks, project setup. See `skills/VENDORED.md`         |
-| `best-practices/`   | Deployment, Vercel, GCP, GCE Gaia, Clerk, security, skills, pi extensions, project organization              |
-| `prompts/`          | Pi prompts — `generate-dockerfile.md` regenerates this Dockerfile (the rest became skills)                   |
-| `reports/`          | Technical research (fnox secrets reference, skills CLI guide, electron shell)                                |
-| `tests/`            | Dockerfile integration tests — `mise test` validates the image                                               |
-| `architecture/`     | Design documents — PRDs and decision records                                                                 |
-| `.pi/settings.json` | Project-local pi config (npmCommand routes through mise, sessionDir keeps sessions local)                    |
-| `.agents/skills/`   | Installed skill files (managed by `skills experimental_install`)                                             |
+| Path                | Purpose                                                                                                                |
+| ------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `AGENTS.md`         | Mandatory tools, constraints, task structure for pi agents                                                             |
+| `mise.toml`         | Tool declarations (mise is the only dependency — everything else flows from here)                                      |
+| `Dockerfile`        | Minimal container: `debian:stable-slim`, mise, bash, tmux, git, gh. `/app` is left empty for your project.             |
+| `skills-lock.json`  | Company-approved skills (locked hashes for reproducibility)                                                            |
+| `skills/`           | Every skill we own, numbered `SKL-nnn` in `skills/VENDORED.md` — brand, research, reporting, docs/decks, project setup |
+| `best-practices/`   | Guides `GDE-001`–`GDE-010` — deployment, Vercel, GCP, GCE Gaia, Clerk, secrets, skills, pi extensions                  |
+| `prompts/`          | Pi prompts — `PRM-001` regenerates this Dockerfile (the rest became skills)                                            |
+| `reports/`          | Research notes `NOTE-001`–`NOTE-006` — fnox secrets, the skills CLI guide, the standards gap register                  |
+| `tests/`            | Dockerfile integration tests — `mise test` validates the image                                                         |
+| `architecture/`     | Decision records `ADR-001`–`ADR-003` — PRDs and settled questions                                                      |
+| `.pi/settings.json` | Project-local pi config (npmCommand routes through mise, sessionDir keeps sessions local)                              |
+| `.agents/skills/`   | Installed skill files (managed by `skills experimental_install`)                                                       |
 
 ## Tasks
 

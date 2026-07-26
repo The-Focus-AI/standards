@@ -1,4 +1,5 @@
 ---
+number: "001"
 title: "Building an A2A agent"
 kind: guide
 issued: "2026-07-25"
@@ -757,10 +758,10 @@ Items not yet in the template but planned:
 
 ## See also
 
-- `STD-008` — deployment rules; `best-practices/vercel-deployment.md` for Vercel specifics.
+- `STD-008` — deployment rules; `best-practices/GDE-010-vercel-deployment.md` for Vercel specifics.
 - Repository layout conventions are not yet written; see the gap register in `reports/`.
 - `STD-007` — secrets and credentials. It absorbed `security.md`, which is gone.
-- `STD-009` — authentication; [`clerk.md`](./clerk.md) for the Clerk walkthrough.
-- [`AGENTS.md`](./AGENTS.md) — the technology defaults for Focus repos.
+- `STD-009` — authentication; [`GDE-002-clerk.md`](./GDE-002-clerk.md) for the Clerk walkthrough.
+- [`GDE-009-technology-defaults.md`](./GDE-009-technology-defaults.md) — the technology defaults for Focus repos.
 - Reference implementation: ask in `#engineering` for the current pointer — read its `app/` and the
   workspace-package directory.

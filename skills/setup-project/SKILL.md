@@ -19,8 +19,8 @@ configuration, and tooling only — **do not write application source code**.
 
 The normative rules are in the standards repository, `The-Focus-AI/standards`:
 `best-practices/deployment.md` (mise + fnox + pi), `best-practices/security.md`
-(secrets), `best-practices/skills.md` (the locked skill set),
-`best-practices/pi-extensions.md`, and `reports/fnox-secrets.md` for the full secrets
+(secrets), `best-practices/GDE-008-skills.md` (the locked skill set),
+`best-practices/GDE-007-pi-extensions.md`, and `best-practices/GDE-003-fnox-secrets.md` for the full secrets
 reference. If you are running inside that repo, read them directly. If not, and you
 have `gh` access, fetch them. If neither, the sequence below is the minimum bar — say
 in your summary that you worked without the full standards.
@@ -49,7 +49,7 @@ Write `.pi/settings.json` with `npmCommand: ["mise", "exec", "node", "--", "npm"
 
 ### 4. Install pi extensions
 
-Always `-l` for project-local. The required set is in `best-practices/pi-extensions.md`.
+Always `-l` for project-local. The required set is in `best-practices/GDE-007-pi-extensions.md`.
 
 ### 5. Write mise.toml tasks
 

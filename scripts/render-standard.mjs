@@ -4,17 +4,19 @@
 //   mise run standard:render                 # everything
 //   node scripts/render-standard.mjs FILE    # one file
 //
-// Two document classes reach the site. **Standards** (`standards/`) carry
-// numbered clauses and requirement levels; rendering them is also the
-// conformance check, because the renderer refuses to emit a page for a document
-// that does not satisfy STD-001. **Guides** (`best-practices/`) carry
-// explanation and no clauses at all, and are rendered subordinate to the
-// standards they belong to — visibly non-normative, per STD-001 §4.
+// The whole corpus reaches the site, in six classes. **Standards**
+// (`standards/`) carry numbered clauses and requirement levels; rendering them
+// is also the conformance check, because the renderer refuses to emit a page for
+// a document that does not satisfy STD-001. **Guides**, **notes**, **decision
+// records** and **prompts** carry prose and no clauses, and are rendered
+// visibly subordinate to the standards they name, per STD-001 §4. **Skills**
+// come from `skills/<name>/SKILL.md`, numbered by the register in
+// `skills/VENDORED.md` because the skills CLI owns their frontmatter.
 //
-// A guide that fails STD-006 does not render either. Same rule, different
+// A document that fails STD-006 does not render either. Same rule, different
 // checklist: if it appears on the site, it conforms.
 
-import { readFileSync, writeFileSync, mkdirSync, readdirSync, existsSync } from "node:fs";
+import { readFileSync, writeFileSync, mkdirSync, readdirSync, existsSync, rmSync } from "node:fs";
 import { join, basename } from "node:path";
 import { splitFrontmatter, parseYaml } from "./lib/yaml.mjs";
 import { tokensToCss, ROOT } from "./lib/design-tokens.mjs";
@@ -22,16 +24,64 @@ import { pageCss } from "./lib/page-css.mjs";
 import { blocks, renderBlock, inline, esc } from "./lib/markdown.mjs";
 
 const STD_DIR = join(ROOT, "standards");
-const GUIDE_DIR = join(ROOT, "best-practices");
+const SKILLS_DIR = join(ROOT, "skills");
 const OUT_DIR = join(ROOT, "out", "standards");
+
+// Everything that is not a standard and not a skill. One shape, four classes:
+// prose with provenance, no clauses, numbered by STD-006 §3.10. `memo` is the
+// sentence the reader gets before the first line of content — what this class of
+// document is, and what it does not do.
+const PROSE_CLASSES = [
+  {
+    kind: "guide", prefix: "GDE", dir: "best-practices", label: "Guide",
+    plural: "Guides", stamp: "Guide · not normative",
+    statuses: ["Current", "Superseded"],
+    blurb: "Guides carry explanation, walkthroughs and reference implementations.",
+    memo: "This is a <b>guide</b>: explanation, walkthrough and reference implementation. " +
+          "It contains <b>no clauses and binds nothing</b> (<code>STD-001 §4</code>).",
+    tail: "When a guide turns out to contain a rule, the rule moves to a standard " +
+          "where it can be cited and checked, and the guide keeps the explanation.",
+  },
+  {
+    kind: "note", prefix: "NOTE", dir: "reports", label: "Research note",
+    plural: "Research notes", stamp: "Note · a capture in time",
+    statuses: ["Current", "Superseded"],
+    blurb: "Notes record what was true when somebody checked, against sources they cite.",
+    memo: "This is a <b>research note</b>: what was found, when it was checked, and " +
+          "against what. It binds nothing and is <b>not maintained</b> " +
+          "(<code>STD-006 §3.2</code>).",
+    tail: "Read the <code>verified</code> date before acting on it. A note that has not " +
+          "been rechecked is evidence about the past, not a claim about now.",
+  },
+  {
+    kind: "decision", prefix: "ADR", dir: "architecture", label: "Decision record",
+    plural: "Decision records", stamp: "Decision · not a rule",
+    statuses: ["Proposed", "Accepted", "Superseded"],
+    blurb: "Decision records settle a question for this repository and say what would reopen it.",
+    memo: "This is a <b>decision record</b>: what was decided, what else was considered, " +
+          "and what would change the answer. It binds nothing outside this repository " +
+          "(<code>STD-006 §3.5</code>).",
+    tail: "A decision is never edited to reverse itself. It is superseded by a new record " +
+          "that names it, so the change of mind stays visible.",
+  },
+  {
+    kind: "prompt", prefix: "PRM", dir: "prompts", label: "Prompt",
+    plural: "Prompts", stamp: "Prompt · executed, not read",
+    statuses: ["Current", "Superseded"],
+    blurb: "Prompts are instructions an agent runs. They are input to a tool, not guidance for a person.",
+    memo: "This is a <b>prompt</b>: text an agent executes to produce something. " +
+          "It binds nothing and is read by a machine first.",
+    tail: "",
+  },
+];
+const CLASS_BY_KIND = new Map(PROSE_CLASSES.map((c) => [c.kind, c]));
 
 const REQUIRED = ["standard", "title", "category", "status", "issued", "revision", "applies-to", "author"];
 // Guide was removed as a category in STD-001 R2 — a guide is a document
 // kind under STD-006, not a weaker standard. (STD-001 §3.17)
 const CATEGORIES = ["Practice", "Process"];
 const STATUSES = ["Draft", "In force", "Obsoleted"];
-const GUIDE_REQUIRED = ["title", "kind", "issued", "author", "status"];
-const GUIDE_STATUSES = ["Current", "Superseded"];
+const PROSE_REQUIRED = ["number", "title", "kind", "issued", "author", "status"];
 const SHELL_LANGS = new Set(["sh", "bash", "zsh", "shell", "console"]);
 const LEVELS = [
   ["MUST NOT", "must"], ["MUST", "must"],
@@ -136,39 +186,46 @@ export function parseStandard(src, file) {
   return { meta, nodes, clauses, errors };
 }
 
-/* ---------------- parse a guide ---------------- */
-// A guide has no clauses, so there is nothing to intercept: the whole body is
-// prose. What is checked is that it declares itself under STD-006, and that it
-// does not smuggle in normative language — a sentence with MUST in it belongs
-// in a standard where it can be cited, not in a walkthrough where it cannot.
-export function parseGuide(src, file) {
+/* ---------------- parse a prose document ---------------- */
+// Guides, notes, decision records and prompts have no clauses, so there is
+// nothing to intercept: the whole body is prose. What is checked is that the
+// document declares itself under STD-006 and sits in the directory its kind
+// belongs to.
+export function parseProse(src, file, cls) {
   const errors = [];
   let yaml, body;
   try {
     ({ yaml, body } = splitFrontmatter(src, file));
   } catch {
-    return { meta: {}, nodes: [], errors: [`no frontmatter. STD-006 §3.1 requires title, kind, issued, author, status.`] };
+    return { meta: {}, nodes: [], relates: [], errors: ["no frontmatter. STD-006 §3.1 requires title, kind, issued, author, status."] };
   }
   const meta = parseYaml(yaml);
 
-  for (const k of GUIDE_REQUIRED) {
-    if (meta[k] === undefined || meta[k] === null || meta[k] === "") errors.push(`missing frontmatter: ${k} (STD-006 §3.1)`);
+  for (const k of PROSE_REQUIRED) {
+    if (meta[k] === undefined || meta[k] === null || meta[k] === "") {
+      errors.push(`missing frontmatter: ${k} (STD-006 §3.1, §3.10)`);
+    }
   }
-  if (meta.kind && meta.kind !== "guide") {
-    errors.push(`kind is "${meta.kind}" but best-practices/ holds guides (STD-006 §4)`);
+  if (meta.kind && meta.kind !== cls.kind) {
+    errors.push(`kind is "${meta.kind}" but ${cls.dir}/ holds ${cls.kind} documents (STD-006 §4)`);
   }
-  if (meta.status && !GUIDE_STATUSES.includes(meta.status)) {
-    errors.push(`unknown status "${meta.status}" (expected ${GUIDE_STATUSES.join(" | ")})`);
+  if (meta.status && !cls.statuses.includes(meta.status)) {
+    errors.push(`unknown status "${meta.status}" (expected ${cls.statuses.join(" | ")})`);
+  }
+  const named = file.match(new RegExp(`^${cls.prefix}-(\\d{3})-`));
+  if (!named) errors.push(`filename must start ${cls.prefix}-nnn- (STD-006 §3.10)`);
+  else if (meta.number && named[1] !== String(meta.number)) {
+    errors.push(`filename says ${cls.prefix}-${named[1]} but number is "${meta.number}" (STD-006 §3.10)`);
   }
 
   const toks = blocks(body);
   const nodes = [];
   let droppedTitle = false;
-  // Most guides open with a blockquote saying where their rules went. That is
-  // the guide's standing, not its content, so it is lifted into the status memo
-  // instead of being printed just below a memo that says the same thing. The
-  // source keeps it — read as raw markdown, which is how agents read these,
-  // there is no memo to carry it.
+  // Most of these open with a blockquote saying where they stand — where their
+  // rules went, what they were before. That is standing, not content, so it is
+  // lifted into the status memo instead of being printed just below a memo that
+  // says the same thing. The source keeps it: read as raw markdown, which is how
+  // agents read these, there is no memo to carry it.
   const provenance = toks[0]?.type === "quote" ? toks.shift() : null;
   for (const t of toks) {
     if (t.type === "code" && t.unterminated) {
@@ -185,12 +242,55 @@ export function parseGuide(src, file) {
     nodes.push(t);
   }
 
-  // Which standards this guide sits under. Read from the prose rather than
-  // declared in frontmatter: a guide that stops mentioning a standard has
+  // Which standards this document sits under. Read from the prose rather than
+  // declared in frontmatter: a document that stops mentioning a standard has
   // stopped being about it, and the site should say so without being told.
   const relates = [...new Set((body.match(/\bSTD-\d{3}\b/g) || []))].sort();
 
   return { meta, nodes, relates, provenance, errors };
+}
+
+/* ---------------- parse a skill ---------------- */
+// A skill's frontmatter belongs to the skills CLI — `name` and `description`,
+// nothing else — so its number and provenance are read from the register in
+// skills/VENDORED.md instead. STD-006 §3.12.
+export function parseSkillRegister(src) {
+  const section = (h) => src.split(new RegExp(`^## ${h}\\s*$`, "m"))[1]?.split(/^## /m)[0] ?? "";
+  const rows = (text, provenance) =>
+    [...text.matchAll(/^\|\s*SKL-(\d{3})\s*\|\s*`([a-z0-9-]+)`\s*\|/gm)]
+      .map((m) => ({ number: m[1], name: m[2], provenance }));
+  return [...rows(section("Authored here"), "Authored here"), ...rows(section("Vendored"), "Vendored")];
+}
+
+export function parseSkill(src, entry) {
+  const errors = [];
+  let yaml, body;
+  try {
+    ({ yaml, body } = splitFrontmatter(src, `skills/${entry.name}/SKILL.md`));
+  } catch {
+    return { meta: {}, nodes: [], relates: [], errors: ["SKILL.md has no frontmatter"] };
+  }
+  const meta = parseYaml(yaml);
+  if (!meta.name) errors.push("frontmatter is missing `name`");
+  if (!meta.description) errors.push("frontmatter is missing `description`");
+  if (meta.name && meta.name !== entry.name) {
+    errors.push(`frontmatter name "${meta.name}" does not match directory ${entry.name}`);
+  }
+
+  const toks = blocks(body);
+  const nodes = [];
+  let droppedTitle = false;
+  for (const t of toks) {
+    if (t.type === "code" && t.unterminated) errors.push("unterminated code fence");
+    if (t.type === "heading" && t.level === 1) {
+      if (!droppedTitle) { droppedTitle = true; continue; }
+      nodes.push({ ...t, level: 2 });
+      continue;
+    }
+    nodes.push(t);
+  }
+  const relates = [...new Set((body.match(/\bSTD-\d{3}\b/g) || []))].sort();
+  return { meta, nodes, relates, errors };
 }
 
 /* ---------------- render: shared pieces ---------------- */
@@ -263,28 +363,26 @@ function headerBlock(meta) {
 </div>`;
 }
 
-export function renderStandard(parsed, cssVars, guides = []) {
+export function renderStandard(parsed, cssVars, related = []) {
   const { meta, nodes } = parsed;
   const bodyHtml = nodes
     .map((n) => (n.type === "clause" ? renderClause(n.clause) : renderBlock(n.block)))
     .join("\n");
-  const related = relatedBlock(
-    "Guides under this standard",
-    guides.map((g) => ({ mark: "Guide", href: g.file, text: g.title }))
-  );
 
   return page({
     title: `${esc(String(meta.standard))} — ${esc(meta.title)}`,
     cssVars,
-    bodyHtml: `${headerBlock(meta)}\n<h1>${esc(meta.title)}</h1>\n${bodyHtml}\n${related}`,
+    bodyHtml: `${headerBlock(meta)}\n<h1>${esc(meta.title)}</h1>\n${bodyHtml}\n` +
+      relatedBlock("Documents under this standard",
+        related.map((d) => ({ mark: d.cls.label, href: d.file, text: `${d.id} — ${d.title}` }))),
   });
 }
 
-/* ---------------- render a guide ---------------- */
-function guideHeaderBlock(meta, relates) {
+/* ---------------- render a prose document ---------------- */
+function proseHeaderBlock(meta, relates, cls, id) {
   const left = [
     `<b>The Focus AI Standards</b>`,
-    `Guide: ${meta.title}`,
+    `${cls.label}: ${id}`,
     `Status: ${meta.status}`,
     relates.length ? `Relates to: ${relates.join(", ")}` : null,
   ].filter(Boolean);
@@ -292,115 +390,163 @@ function guideHeaderBlock(meta, relates) {
     meta.author, "The Focus AI", meta.issued,
     meta.verified ? `Verified ${meta.verified}` : null,
   ].filter(Boolean);
-  return `<div class="stamp">Guide · not normative</div>
+  return `<div class="stamp">${esc(cls.stamp)}</div>
 <div class="rfc-head guide-head">
   <div>${left.join("<br>")}</div>
   <div class="right">${right.join("<br>")}</div>
 </div>`;
 }
 
-// Generated, not written. Every guide gets the same sentence about what a guide
-// is, in the same place, so a reader who lands on one from a search result
-// learns its standing before reading a word of it.
-function guideMemo(relates, provenance) {
+// Generated, not written. Every document of a class gets the same sentence about
+// what that class is, in the same place, so a reader who lands on one from a
+// search result learns its standing before reading a word of it.
+function proseMemo(relates, provenance, cls) {
   const cite = relates.length
     ? `The rules in this area are <b>${relates.join("</b>, <b>")}</b>; where this
        document and a standard disagree, the standard is the authority.`
     : `No standard has been written for this area yet, so nothing here binds
        anything.`;
-  const own = provenance
-    ? blocks(provenance.text).map(renderBlock).join("\n")
-    : "";
+  const own = provenance ? blocks(provenance.text).map(renderBlock).join("\n") : "";
   return `<div class="status-memo">
-  <span class="lbl">Status of this guide</span>
-  <p>This is a <b>guide</b>: explanation, walkthrough and reference
-     implementation. It contains <b>no clauses and binds nothing</b>
-     (<code>STD-001 §4</code>). ${cite}</p>
-  <p>When a guide turns out to contain a rule, the rule moves to a standard
-     where it can be cited and checked, and the guide keeps the explanation.</p>
+  <span class="lbl">Status of this ${esc(cls.label.toLowerCase())}</span>
+  <p>${cls.memo} ${cite}</p>
+  ${cls.tail ? `<p>${cls.tail}</p>` : ""}
   ${own}
 </div>`;
 }
 
-export function renderGuide(parsed, cssVars, standards = []) {
+export function renderProse(parsed, cssVars, cls, id, standards = []) {
   const { meta, nodes, relates, provenance } = parsed;
   const bodyHtml = nodes.map(renderBlock).join("\n");
-  const related = relatedBlock(
-    "Standards this guide sits under",
-    standards.map((s) => ({ mark: s.category, href: s.file, text: `${s.id} — ${s.title}` }))
-  );
 
   return page({
-    title: `Guide — ${esc(meta.title)}`,
+    title: `${esc(id)} — ${esc(meta.title)}`,
     cssVars,
-    bodyHtml: `${guideHeaderBlock(meta, relates)}
+    bodyHtml: `${proseHeaderBlock(meta, relates, cls, id)}
 <h1>${esc(meta.title)}</h1>
-${guideMemo(relates, provenance)}
+${proseMemo(relates, provenance, cls)}
 ${bodyHtml}
-${related}`,
+` + relatedBlock(`Standards this ${cls.label.toLowerCase()} sits under`,
+      standards.map((s) => ({ mark: s.category, href: s.file, text: `${s.id} — ${s.title}` }))),
   });
+}
+
+/* ---------------- render a skill ---------------- */
+export function renderSkill(parsed, cssVars, entry, standards = []) {
+  const { meta, nodes, relates } = parsed;
+  const bodyHtml = nodes.map(renderBlock).join("\n");
+  const left = [
+    `<b>The Focus AI Standards</b>`,
+    `Skill: SKL-${entry.number}`,
+    `Install: ${entry.name}`,
+    `Provenance: ${entry.provenance}`,
+    relates.length ? `Relates to: ${relates.join(", ")}` : null,
+  ].filter(Boolean);
+  return `${page({
+    title: `SKL-${entry.number} — ${esc(entry.name)}`,
+    cssVars,
+    bodyHtml: `<div class="stamp">Skill · loaded on demand</div>
+<div class="rfc-head guide-head">
+  <div>${left.join("<br>")}</div>
+  <div class="right">The Focus AI<br>standards.thefocus.ai</div>
+</div>
+<h1>${esc(entry.name)}</h1>
+<div class="status-memo">
+  <span class="lbl">Status of this skill</span>
+  <p>This is a <b>skill</b>: a capability an agent loads when its triggers match.
+     It binds nothing — it is something an agent <i>can</i> do, not something any
+     repository <i>must</i> do (<code>STD-011</code>).</p>
+  <p>${esc(meta.description || "")}</p>
+  <div class="agent-head">Agent · install with</div>
+  <pre class="cmd"><code>skills add The-Focus-AI/standards --skill ${esc(entry.name)}</code></pre>
+</div>
+${bodyHtml}
+` + relatedBlock("Standards this skill sits under",
+      standards.map((s) => ({ mark: s.category, href: s.file, text: `${s.id} — ${s.title}` }))),
+  })}`;
 }
 
 /* ---------------- the register ---------------- */
 // The index DESIGN.md describes: every standard, its category, status and what
-// it binds, in one page — and beneath it, the guides, visibly subordinate.
-// A field with no value is omitted, never placeholdered.
-function renderRegister(entries, guides, cssVars) {
-  const row = (e) => {
-    const cls = e.status === "Obsoleted" ? "is-attn" : e.status === "Draft" ? "is-muted" : "is-force";
-    return `<tr>
+// it binds — and beneath it, every other class, visibly subordinate. A field
+// with no value is omitted, never placeholdered.
+const pipClass = (status) =>
+  status === "Obsoleted" || status === "Superseded" ? "is-attn"
+  : status === "Draft" || status === "Proposed" ? "is-muted"
+  : status === "In force" ? "is-force"
+  : "is-agent";
+
+const regTable = (heads, rows) => `<div class="table-scroll"><table class="reg">
+  <thead><tr>${heads.map((h) => `<th>${h}</th>`).join("")}</tr></thead>
+  <tbody>${rows.join("")}</tbody>
+</table></div>`;
+
+function renderRegister(standards, docs, skills, cssVars) {
+  const stdRows = standards.map((e) => `<tr>
       <td><a href="${esc(e.file)}">${esc(e.id)}</a></td>
       <td>${esc(e.title)}</td>
       <td>${esc(e.category)}</td>
       <td>${esc(e.applies)}</td>
-      <td><span class="pip ${cls}">${esc(e.status)}</span></td>
+      <td><span class="pip ${pipClass(e.status)}">${esc(e.status)}</span></td>
       <td class="num">${e.clauses || "—"}</td>
-    </tr>`;
-  };
-  const guideRow = (g) => `<tr>
-      <td><a href="${esc(g.file)}">${esc(g.slug)}</a></td>
-      <td>${esc(g.title)}</td>
-      <td>${g.relates.length ? g.relates.map(esc).join(", ") : "—"}</td>
-      <td><span class="pip ${g.status === "Superseded" ? "is-attn" : "is-agent"}">${esc(g.status)}</span></td>
-    </tr>`;
+    </tr>`);
 
-  const inForce = entries.filter((e) => e.status === "In force").length;
-  const drafts = entries.filter((e) => e.status === "Draft").length;
+  const sections = PROSE_CLASSES.map((cls) => {
+    const mine = docs.filter((d) => d.cls.kind === cls.kind);
+    if (!mine.length) return "";
+    const dated = cls.kind === "note";
+    const heads = ["Ref", "Title", "Relates to", ...(dated ? ["Verified"] : []), "Status"];
+    const rows = mine.map((d) => `<tr>
+      <td><a href="${esc(d.file)}">${esc(d.id)}</a></td>
+      <td>${esc(d.title)}</td>
+      <td>${d.relates.length ? d.relates.map(esc).join(", ") : "—"}</td>
+      ${dated ? `<td>${esc(d.verified || d.issued || "—")}</td>` : ""}
+      <td><span class="pip ${pipClass(d.status)}">${esc(d.status)}</span></td>
+    </tr>`);
+    return `<h2>${esc(cls.plural)}</h2>\n<p>${cls.blurb} They are <b>not standards</b> and bind nothing (<code>STD-001 §4</code>).</p>\n${regTable(heads, rows)}`;
+  }).join("\n");
 
-  const guideSection = guides.length ? `<h2>Guides</h2>
-<p>Guides carry explanation, walkthroughs and reference implementations. They
-   are <b>not standards</b> and bind nothing (<code>STD-001 §4</code>). Where a
-   guide turns out to contain a rule, the rule moves to a standard and the guide
-   keeps the explanation.</p>
-<div class="table-scroll"><table class="reg">
-  <thead><tr><th>Guide</th><th>Title</th><th>Relates to</th><th>Status</th></tr></thead>
-  <tbody>${guides.map(guideRow).join("")}</tbody>
-</table></div>` : "";
+  const skillSection = skills.length ? `<h2>Skills</h2>
+<p>Capabilities an agent loads when its triggers match, installable with
+   <code>skills add</code>. A skill is cited by name and numbered here;
+   <code>STD-011</code> governs how one is installed and pinned.</p>
+${regTable(["Ref", "Skill", "Provenance", "Relates to"], skills.map((k) => `<tr>
+      <td><a href="${esc(k.file)}">${esc(k.id)}</a></td>
+      <td>${esc(k.name)}</td>
+      <td><span class="pip ${k.provenance === "Vendored" ? "is-muted" : "is-agent"}">${esc(k.provenance)}</span></td>
+      <td>${k.relates.length ? k.relates.map(esc).join(", ") : "—"}</td>
+    </tr>`))}` : "";
+
+  const inForce = standards.filter((e) => e.status === "In force").length;
+  const drafts = standards.filter((e) => e.status === "Draft").length;
+  const counts = PROSE_CLASSES
+    .map((c) => [c.plural, docs.filter((d) => d.cls.kind === c.kind).length])
+    .filter(([, n]) => n)
+    .map(([label, n]) => `${label}: ${n}`);
 
   return page({
     title: "The Focus AI Standards — the register",
     cssVars,
     bodyHtml: `<div class="rfc-head">
-  <div><b>The Focus AI Standards</b><br>The register<br>Standards: ${entries.length}<br>In force: ${inForce}<br>Draft: ${drafts}<br>Guides: ${guides.length}</div>
-  <div class="right">The Focus AI<br>standards.thefocus.ai</div>
+  <div><b>The Focus AI Standards</b><br>The register<br>Standards: ${standards.length}<br>In force: ${inForce}<br>Draft: ${drafts}</div>
+  <div class="right">The Focus AI<br>standards.thefocus.ai<br>${counts.join("<br>")}${skills.length ? `<br>Skills: ${skills.length}` : ""}</div>
 </div>
 <h1>The register</h1>
 <div class="status-memo">
   <span class="lbl">Status of this register</span>
-  <p>Every standard The Focus AI has issued, with what it binds and whether it is
+  <p>Every document The Focus AI has issued, with what it binds and whether it is
      in force. A standard in <b>Draft</b> binds nothing: it reflects current
      understanding and is awaiting ratification, which only a person can give
-     (<code>STD-001 §3.14</code>).</p>
+     (<code>STD-001 §3.14</code>). Nothing below the standards binds anything at
+     all.</p>
   <p>This page is generated from the documents themselves. A standard that does
-     not conform to <code>STD-001</code>, or a guide that does not conform to
+     not conform to <code>STD-001</code>, or a document that does not conform to
      <code>STD-006</code>, does not render, and so does not appear here.</p>
 </div>
 <h2>Standards</h2>
-<div class="table-scroll"><table class="reg">
-  <thead><tr><th>Ref</th><th>Title</th><th>Category</th><th>Applies to</th><th>Status</th><th>Clauses</th></tr></thead>
-  <tbody>${entries.map(row).join("")}</tbody>
-</table></div>
-${guideSection}`,
+${regTable(["Ref", "Title", "Category", "Applies to", "Status", "Clauses"], stdRows)}
+${sections}
+${skillSection}`,
   });
 }
 
@@ -409,15 +555,21 @@ ${guideSection}`,
 // standard, every guide, and hash routing between them. For sharing and preview
 // where two dozen separate files cannot travel together. `standard:render`
 // still emits the real multi-page site alongside it.
-function renderBundle(entries, guides, cssVars, registerHtml) {
-  const all = [...entries, ...guides];
-  const nav = entries.map((e) =>
+function renderBundle(standards, docs, skills, cssVars, registerHtml) {
+  const all = [...standards, ...docs, ...skills];
+  const nav = standards.map((e) =>
     `<a class="reg-link" href="#${e.anchor}" data-doc="${e.anchor}">${e.id}</a>`).join("");
-  const guideNav = guides.length
-    ? `<div class="railbar rail-guides"><span class="raillbl">Guides</span>${
-        guides.map((g) => `<a class="reg-link" href="#${g.anchor}" data-doc="${g.anchor}">${esc(g.slug)}</a>`).join("")
+  // One rail per class. The number is the label, not the slug — a rail of
+  // twenty slugs is a wall of words, and the number is the address anyway.
+  const railFor = (label, items) => items.length
+    ? `<div class="railbar rail-sub"><span class="raillbl">${esc(label)}</span>${
+        items.map((d) => `<a class="reg-link" href="#${d.anchor}" data-doc="${d.anchor}" title="${esc(d.title)}">${esc(d.id)}</a>`).join("")
       }</div>`
     : "";
+  const subNav = [
+    ...PROSE_CLASSES.map((c) => railFor(c.plural, docs.filter((d) => d.cls.kind === c.kind))),
+    railFor("Skills", skills),
+  ].join("\n");
 
   // Inside one page every document is a fragment, so links to another
   // document's file become hash links. The anchor is looked up rather than
@@ -441,7 +593,8 @@ body { padding: 0 1rem 3rem; }
 .sheet { border-radius: 0; }
 .railbar { max-width:58rem; margin:0 auto; padding:1rem 0 .9rem;
   display:flex; flex-wrap:wrap; gap:.4rem .55rem; align-items:baseline; }
-.railbar.rail-guides { padding:0 0 1rem; }
+.railbar.rail-sub { padding:0 0 .55rem; }
+.railbar.rail-sub:last-of-type { padding-bottom:1rem; }
 .railbar .home { font-family:var(--font-display); font-weight:var(--fw-display);
   letter-spacing:var(--ls-display); text-transform:uppercase; font-size:1rem;
   color:var(--color-ink); text-decoration:none; margin-right:.5rem; }
@@ -466,7 +619,7 @@ ${pageCss(cssVars, extraCss)}
 </style>
 </head><body>
 <nav class="railbar"><a class="home" href="#register">The Focus AI Standards</a>${nav}</nav>
-${guideNav}
+${subNav}
 <main class="sheet">
 <div class="panel" id="register">${registerBody}</div>
 ${panels}
@@ -489,14 +642,16 @@ show();
 }
 
 /* ---------------- links between documents ---------------- */
-// The documents link to each other the way they sit on disk — `./clerk.md`,
-// `best-practices/skills.md`. On the site those paths do not exist, so they are
-// rewritten to the page that was actually emitted. A link that resolves to no
-// rendered document is left alone rather than guessed at.
-function linkMap(standards, guides) {
+// The documents link to each other the way they sit on disk —
+// `./GDE-002-clerk.md`, `best-practices/GDE-008-skills.md`. On the site those
+// paths do not exist, so they are rewritten to the page that was actually
+// emitted. A link that resolves to no rendered document is left alone rather
+// than guessed at.
+const DIR_PREFIX = /^(best-practices|standards|reports|architecture|prompts)\//;
+
+function linkMap(all) {
   const m = new Map();
-  for (const g of guides) m.set(`${g.slug}.md`, g.file);
-  for (const s of standards) m.set(s.file.replace(/\.html$/, ".md"), s.file);
+  for (const d of all) if (d.source) m.set(basename(d.source), d.file);
   return m;
 }
 
@@ -504,32 +659,41 @@ function rewriteLinks(html, map) {
   return html.replace(/href="([^"]+)"/g, (full, href) => {
     if (/^([a-z]+:|#)/i.test(href)) return full;
     const [path, frag] = href.split("#");
-    const base = path.replace(/^\.\//, "").replace(/^(best-practices|standards)\//, "");
-    const hit = map.get(base);
+    const hit = map.get(path.replace(/^\.\//, "").replace(DIR_PREFIX, ""));
     return hit ? `href="${hit}${frag ? "#" + frag : ""}"` : full;
   });
 }
 
 // These documents cite each other in running prose as code spans — `STD-007`,
-// `vercel-deployment.md` — because that is how they read as markdown. On the
-// site those are the navigation, so they become links. Fenced blocks are left
-// alone: a filename inside a command is an argument, not a reference.
-function crossLinkSpans(html, map, stds, self) {
+// `best-practices/GDE-010-vercel-deployment.md` — because that is how they read
+// as markdown. On the site those are the navigation, so they become links.
+function crossLinkSpans(html, map, ids, self) {
   // Fenced blocks and existing links are held out: a filename inside a command
-  // is an argument, and an anchor inside an anchor is not HTML.
+  // is an argument, and an anchor inside an anchor is not HTML. Each code span
+  // is considered exactly once — `NOTE-002-2026-06-25-slug.md` is both a
+  // reference and a filename, and matching it twice wrapped it twice.
   const parts = html.split(/(<pre[\s\S]*?<\/pre>|<a\b[\s\S]*?<\/a>)/);
   return parts.map((part, i) => {
     if (i % 2) return part;
-    return part
-      .replace(/<code>(STD-\d{3})([^<]*)<\/code>/g, (full, id, rest) => {
-        const file = stds.get(id);
-        return !file || file === self ? full : `<a href="${file}"><code>${id}${rest}</code></a>`;
-      })
-      .replace(/<code>([\w./-]+\.md)<\/code>/g, (full, name) => {
-        const file = map.get(name.replace(/^(best-practices|standards)\//, ""));
-        return !file || file === self ? full : `<a href="${file}"><code>${name}</code></a>`;
-      });
+    return part.replace(/<code>([^<]+)<\/code>/g, (full, text) => {
+      const byId = text.match(/^((?:STD|GDE|NOTE|ADR|PRM|SKL)-\d{3})/);
+      const file = byId
+        ? ids.get(byId[1])
+        : (/\.md$/.test(text) ? map.get(text.replace(DIR_PREFIX, "")) : null);
+      return !file || file === self ? full : `<a href="${file}">${full}</a>`;
+    });
   }).join("");
+}
+
+// A relative link that names no emitted page would 404 on the site. The text is
+// still worth reading — `examples/cinematic-shots.md` tells you what to look for
+// in the repository — so the anchor is dropped and the words are kept. A dead
+// link is worse than no link: it invites a click that goes nowhere.
+function deadenLinks(html, emitted) {
+  return html.replace(/<a href="([^"]+)">([\s\S]*?)<\/a>/g, (full, href, text) => {
+    if (/^([a-z]+:|#)/i.test(href)) return full;
+    return emitted.has(href.split("#")[0]) ? full : text;
+  });
 }
 
 /* ---------------- cli ---------------- */
@@ -540,67 +704,98 @@ const listMd = (dir) => {
 
 function main() {
   const args = process.argv.slice(2);
-  const stdFiles = args.length
-    ? args.filter((f) => !f.includes("best-practices"))
-    : listMd(STD_DIR);
-  const guideFiles = args.length
-    ? args.filter((f) => f.includes("best-practices"))
-    : (existsSync(GUIDE_DIR) ? listMd(GUIDE_DIR) : []);
-
-  if (!stdFiles.length && !guideFiles.length) {
-    console.error("no documents found to render");
-    process.exit(1);
-  }
+  const pick = (dir) => (args.length ? args.filter((f) => f.includes(`${dir}/`)) : listMd(join(ROOT, dir)));
+  const stdFiles = args.length ? args.filter((f) => f.includes("standards/")) : listMd(STD_DIR);
 
   const cssVars = tokensToCss();
+  // Rendering a renumbered corpus into a directory that still holds the old
+  // filenames leaves pages nothing links to any more — stale, unreachable, and
+  // indistinguishable from current. Clear it.
+  if (!args.length && existsSync(OUT_DIR)) rmSync(OUT_DIR, { recursive: true });
   mkdirSync(OUT_DIR, { recursive: true });
 
   let failed = 0;
+  const report = (path, why, errors) => {
+    failed++;
+    console.log(`\n  x ${path} — ${why}`);
+    for (const e of errors) console.log(`      ${e}`);
+  };
 
-  // Guides first: a standard's page lists the guides that sit under it, so the
+  // Prose first: a standard's page lists the documents that sit under it, so the
   // relationships have to be known before either side is rendered.
-  const guides = [];
-  for (const f of guideFiles) {
-    const slug = basename(f).replace(/\.md$/, "");
-    const parsed = parseGuide(readFileSync(f, "utf8"), basename(f));
-    if (parsed.errors.length) {
-      failed++;
-      console.log(`\n  x best-practices/${basename(f)} — does not conform to STD-006`);
-      for (const e of parsed.errors) console.log(`      ${e}`);
-      continue;
+  const docs = [];
+  for (const cls of PROSE_CLASSES) {
+    for (const f of pick(cls.dir)) {
+      const file = basename(f);
+      const parsed = parseProse(readFileSync(f, "utf8"), file, cls);
+      if (parsed.errors.length) { report(`${cls.dir}/${file}`, "does not conform to STD-006", parsed.errors); continue; }
+      const id = `${cls.prefix}-${parsed.meta.number}`;
+      docs.push({
+        parsed, cls, id, source: f,
+        title: parsed.meta.title, status: parsed.meta.status,
+        issued: parsed.meta.issued, verified: parsed.meta.verified,
+        relates: parsed.relates,
+        file: `${id.toLowerCase()}.html`, anchor: id,
+      });
     }
-    guides.push({
-      parsed, slug, title: parsed.meta.title, status: parsed.meta.status,
-      relates: parsed.relates, file: `guide-${slug}.html`, anchor: `guide-${slug}`,
-    });
+  }
+
+  // Skills: numbered by the register rather than by their own frontmatter.
+  const skills = [];
+  if (!args.length && existsSync(join(SKILLS_DIR, "VENDORED.md"))) {
+    const register = parseSkillRegister(readFileSync(join(SKILLS_DIR, "VENDORED.md"), "utf8"));
+    for (const entry of register) {
+      const md = join(SKILLS_DIR, entry.name, "SKILL.md");
+      if (!existsSync(md)) { report(`skills/${entry.name}`, "registered but has no SKILL.md", ["STD-006 §3.12"]); continue; }
+      const parsed = parseSkill(readFileSync(md, "utf8"), entry);
+      if (parsed.errors.length) { report(`skills/${entry.name}/SKILL.md`, "is not a valid skill", parsed.errors); continue; }
+      const id = `SKL-${entry.number}`;
+      skills.push({
+        parsed, entry, id, name: entry.name, provenance: entry.provenance,
+        title: entry.name, relates: parsed.relates,
+        file: `${id.toLowerCase()}.html`, anchor: id,
+      });
+    }
   }
 
   const standards = [];
   for (const f of stdFiles) {
     const parsed = parseStandard(readFileSync(f, "utf8"), basename(f));
-    const name = basename(f).replace(/\.md$/, ".html");
-    if (parsed.errors.length) {
-      failed++;
-      console.log(`\n  x ${basename(f)} — does not conform to STD-001`);
-      for (const e of parsed.errors) console.log(`      ${e}`);
-      continue;
-    }
+    if (parsed.errors.length) { report(basename(f), "does not conform to STD-001", parsed.errors); continue; }
     const id = `STD-${parsed.meta.standard}`;
     standards.push({
-      parsed, id, title: parsed.meta.title,
+      parsed, id, source: f, title: parsed.meta.title,
       category: parsed.meta.category, status: parsed.meta.status,
       applies: parsed.meta["applies-to"], clauses: parsed.clauses.length,
-      file: name, anchor: id,
+      file: basename(f).replace(/\.md$/, ".html"), anchor: id,
     });
   }
 
-  // now that both sides are known, render each with its cross-references
-  const links = linkMap(standards, guides);
-  const stdLinks = new Map(standards.map((s) => [s.id, s.file]));
-  const wire = (html, self) => crossLinkSpans(rewriteLinks(html, links), links, stdLinks, self);
+  if (!standards.length && !docs.length && !skills.length) {
+    console.error("no documents found to render");
+    process.exit(1);
+  }
+
+  docs.sort((a, b) => a.id.localeCompare(b.id));
+  skills.sort((a, b) => a.id.localeCompare(b.id));
+  standards.sort((a, b) => a.id.localeCompare(b.id));
+
+  // now that every side is known, render each with its cross-references
+  const links = linkMap([...standards, ...docs]);
+  const ids = new Map([...standards, ...docs, ...skills].map((d) => [d.id, d.file]));
+  const emitted = new Set([...standards, ...docs, ...skills].map((d) => d.file).concat("index.html"));
+  const wire = (html, self) =>
+    deadenLinks(crossLinkSpans(rewriteLinks(html, links), links, ids, self), emitted);
+
+  // A document that names four or five standards is surveying the corpus rather
+  // than sitting under any one of them; listing it beneath each would put the
+  // same row on every page and tell the reader nothing.
+  const SURVEY = 3;
   for (const s of standards) {
-    const mine = guides.filter((g) => g.relates.includes(s.id));
-    s.html = wire(renderStandard(s.parsed, cssVars, mine), s.file);
+    const mine = [...docs, ...skills].filter((d) => d.relates.includes(s.id) && d.relates.length <= SURVEY);
+    s.html = wire(renderStandard(s.parsed, cssVars, mine.map((d) => ({
+      ...d, cls: d.cls ?? { label: "Skill" },
+    }))), s.file);
     writeFileSync(join(OUT_DIR, s.file), s.html);
     const levels = s.parsed.clauses.reduce((a, c) => {
       const k = c.deprecated ? "DEPRECATED" : c.keyword;
@@ -608,24 +803,28 @@ function main() {
       return a;
     }, {});
     const summary = Object.entries(levels).map(([k, n]) => `${n} ${k}`).join(", ") || "no clauses";
-    console.log(`  ok ${s.file.replace(/\.html$/, ".md").padEnd(42)} ${String(s.category).padEnd(9)} ${summary}`);
+    console.log(`  ok ${s.id}  ${String(s.category).padEnd(9)} ${summary}`);
   }
-  for (const g of guides) {
-    const mine = standards.filter((s) => g.relates.includes(s.id));
-    g.html = wire(renderGuide(g.parsed, cssVars, mine), g.file);
-    writeFileSync(join(OUT_DIR, g.file), g.html);
-    console.log(`  ok ${(g.slug + ".md").padEnd(42)} ${"Guide".padEnd(9)} ${
+  for (const d of docs) {
+    const mine = standards.filter((s) => d.relates.includes(s.id));
+    d.html = wire(renderProse(d.parsed, cssVars, d.cls, d.id, mine), d.file);
+    writeFileSync(join(OUT_DIR, d.file), d.html);
+    console.log(`  ok ${d.id} ${d.cls.label.padEnd(16)} ${
       mine.length ? `under ${mine.map((s) => s.id).join(", ")}` : "under no standard"}`);
   }
+  for (const k of skills) {
+    const mine = standards.filter((s) => k.relates.includes(s.id));
+    k.html = wire(renderSkill(k.parsed, cssVars, k.entry, mine), k.file);
+    writeFileSync(join(OUT_DIR, k.file), k.html);
+    console.log(`  ok ${k.id}  Skill            ${k.name}`);
+  }
 
-  standards.sort((a, b) => a.id.localeCompare(b.id));
-  guides.sort((a, b) => a.slug.localeCompare(b.slug));
-  const registerHtml = wire(renderRegister(standards, guides, cssVars), "index.html");
+  const registerHtml = wire(renderRegister(standards, docs, skills, cssVars), "index.html");
   writeFileSync(join(OUT_DIR, "index.html"), registerHtml);
-  writeFileSync(join(OUT_DIR, "standards.html"), renderBundle(standards, guides, cssVars, registerHtml));
+  writeFileSync(join(OUT_DIR, "standards.html"), renderBundle(standards, docs, skills, cssVars, registerHtml));
   console.log(
-    `\n  rendered to out/standards/ — index.html lists ${standards.length} standard(s) ` +
-    `and ${guides.length} guide(s), standards.html bundles them`
+    `\n  rendered to out/standards/ — index.html lists ${standards.length} standard(s), ` +
+    `${docs.length} document(s) and ${skills.length} skill(s); standards.html bundles them`
   );
   if (failed) {
     console.log(`  ${failed} document(s) did not conform.`);

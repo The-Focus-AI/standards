@@ -1,4 +1,5 @@
 ---
+number: "001"
 title: "Standards Dockerfile redesign"
 kind: decision
 issued: "2026-07-23"
@@ -117,7 +118,7 @@ inside `/standards`, and they're ready to scaffold.
     tmux, ca-certificates, unzip) to be installed in an early layer that caches
     well, so that iterative Dockerfile changes don't re-download system packages.
 
-20. As a developer, I want the `generate-dockerfile.md` prompt to produce a
+20. As a developer, I want the `prompts/PRM-001-generate-dockerfile.md` prompt to produce a
     Dockerfile consistent with all these decisions, so that the generated artifact
     matches the documented design.
 
@@ -226,7 +227,7 @@ to maximize Docker build cache reuse:
 Working directory is the filesystem root; the user navigates to `/standards`
 or `/app` as needed.
 
-### generate-dockerfile.md prompt
+### PRM-001-generate-dockerfile.md prompt
 
 The prompt that guides pi to produce this Dockerfile enumerates every
 constraint explicitly. Pi does not need to discover them by reading the
@@ -293,13 +294,13 @@ updated to reflect these new expectations.
 
 ## Further Notes
 
-The `generate-dockerfile.md` prompt and the Dockerfile have a producer/consumer
+The `prompts/PRM-001-generate-dockerfile.md` prompt and the Dockerfile have a producer/consumer
 relationship: the prompt is the specification, the Dockerfile is the generated
 output. When standards evolve (new tools, new best-practices, new extensions),
 the prompt should be updated first, then the Dockerfile regenerated.
 
 The two prompts in this repo serve different audiences:
-- `generate-dockerfile.md` — consumed by pi to produce the standards
+- `prompts/PRM-001-generate-dockerfile.md` — consumed by pi to produce the standards
   container image
 - `setup-project.md` — consumed by pi at runtime inside the container to
   scaffold the user's actual project into `/app`

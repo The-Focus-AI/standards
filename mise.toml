@@ -154,7 +154,7 @@ set -euo pipefail
 echo "==> Generating Dockerfile (streaming progress)..."
 echo ""
 
-pi --mode json -p "$(cat prompts/generate-dockerfile.md)" 2>/dev/null | jq -R -r '
+pi --mode json -p "$(cat prompts/PRM-001-generate-dockerfile.md)" 2>/dev/null | jq -R -r '
   fromjson? |
   if .type == "tool_execution_start" then
     if .toolName == "read" then

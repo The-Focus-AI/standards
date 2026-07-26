@@ -36,7 +36,7 @@ If this repository also links to TheFocus.AI standards repository, read its `AGE
 ## Planning and issue workflow
 
 This project uses the Matt Pocock skill set recorded in `skills-lock.json`
-(see `best-practices/skills.md` in the standards repo for the full table).
+(see `best-practices/GDE-008-skills.md` in the standards repo for the full table).
 Run `setup-matt-pocock-skills` once if tracker/label/domain layout is not set up.
 Use `ask-matt` when unsure which skill fits.
 

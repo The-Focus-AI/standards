@@ -129,16 +129,21 @@ components:
     borderColor: "{colors.line-strong}"
     captionTypography: "{typography.mono}"
     fallbackRequired: true
-  guide-stamp:
+  subordinate-stamp:
     backgroundColor: "{colors.agent}"
     color: "{colors.sheet}"
     typography: "{typography.display}"
-  guide-head:
+  subordinate-head:
     borderBottom: "2px solid {colors.agent}"
-    fields: "guide, status, relates-to | author, org, issued, verified"
+    fields: "class-and-number, status, relates-to | author, org, issued, verified"
   related-kindmark:
     typography: "{typography.mono}"
     color: "{colors.muted}"
+  state-pip:
+    inForce: "{colors.in-force}"
+    draft: "{colors.muted}"
+    retired: "{colors.attention}"
+    subordinate: "{colors.agent}"
   register-table:
     headTypography: "{typography.mono}"
     rowBorder: "1px solid {colors.line}"
@@ -378,21 +383,31 @@ extension to this file.
   it demonstrates, the live component, and — **mandatory** — a `<details>` carrying the text an
   agent receives from raw source. A demonstration that only works rendered is invisible to the
   primary reader and is a defect.
-- **Guide header** — the header block a guide gets instead of a standard's. A `GUIDE · NOT
-  NORMATIVE` stamp in reversed `agent` sits above it, and the 2px rule that closes it is `agent`
-  rather than `ink`. Left: organisation, `Guide:`, `Status:`, `Relates to:`. Right: author,
-  organisation, date, `Verified`. The palette does the work — a reader who has seen one standard
-  knows at a glance that this document is not one.
-- **Guide memo** — headed `STATUS OF THIS GUIDE`, in the status memo's shell. Generated, not
-  written: every guide gets the same sentence about binding nothing, then the standards it sits
-  under, then the guide's own provenance note lifted out of the body. A guide under no standard
-  says so, which is how an undecided area stays visible.
-- **Related block** — the cross-reference between a standard and its guides, set below a hairline
-  as chrome rather than as a numbered section, because it is generated. Mono micro label, mono
-  `GUIDE` / `PRACTICE` / `PROCESS` kindmark in `muted`, then the link.
+- **Subordinate header** — the header block every non-standard document gets. A stamp in reversed
+  `agent` sits above it — `GUIDE · NOT NORMATIVE`, `NOTE · A CAPTURE IN TIME`, `DECISION · NOT A
+  RULE`, `PROMPT · EXECUTED, NOT READ`, `SKILL · LOADED ON DEMAND` — and the 2px rule that closes
+  it is `agent` rather than `ink`. Left: organisation, the class and its number, `Status:`,
+  `Relates to:`. Right: author, organisation, date, `Verified`. **Ink is authority; teal is
+  everything else.** A reader who has seen one standard knows at a glance that this document is
+  not one, before reading a word of it.
+- **Subordinate memo** — headed `STATUS OF THIS <CLASS>`, in the status memo's shell. Generated,
+  not written: every document of a class gets the same sentence about what that class is and what
+  it does not do, then the standards it sits under, then the document's own provenance note lifted
+  out of the body. A document under no standard says so, which is how an undecided area stays
+  visible rather than quiet.
+- **Related block** — the cross-reference between a standard and the documents beneath it, set
+  below a hairline as chrome rather than as a numbered section, because it is generated. Mono micro
+  label, mono kindmark in `muted` (`GUIDE`, `RESEARCH NOTE`, `PRACTICE`, `PROCESS`), then the link.
+  A document that names more than three standards is surveying the corpus rather than sitting under
+  any one of them, and is left out — a row that appears on every page says nothing.
 - **Register table** — mono uppercase heads, hairline rows, ref column mono and non-wrapping,
   state column carrying a labelled pip. Obsoleted rows drop to `muted`. Wraps in an
-  `overflow-x: auto` container; the page body never scrolls sideways.
+  `overflow-x: auto` container; the page body never scrolls sideways. One table per class,
+  standards first, everything else beneath in the order it binds nothing: guides, notes, decision
+  records, prompts, skills.
+- **State pip** — `in-force` green for a standard in force, `muted` for a draft or a proposal,
+  `attention` for anything obsoleted or superseded, `agent` for the current state of a document
+  that binds nothing. Green is reserved for the one thing that is actually in force.
 - **Empty state** — dashed border, states plainly what is absent and why, and offers the act that
   would fix it. Never a placeholder, never an apology, never a spinner.
 - **References** — numbered mono markers with the citation in body. Standards cite other standards

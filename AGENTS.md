@@ -9,10 +9,15 @@ them, then either make the needed changes or provide an itemized implementation 
 
 ## Where the standards live
 
-The corpus has two halves. **Standards** in `standards/` are numbered, binding,
-and written as citable clauses. **Guides** in `best-practices/` are explanation:
-walkthroughs, reference implementations, and inventories with no binding
-clauses. When a guide turns out to contain rules, the rules move to a standard.
+Every document is numbered, and the prefix says what kind it is: `STD` for a
+standard, `GDE` for a guide, `NOTE` for a research note, `ADR` for a decision
+record, `PRM` for a prompt, `SKL` for a skill. Cite by number — `STD-008`,
+`GDE-010` — because a number survives a retitling and a slug does not
+(`STD-006 §3.10`).
+
+**Standards** in `standards/` are the only documents that bind anything. Everything
+else is explanation, evidence, or capability. When a guide turns out to contain
+rules, the rules move to a standard and the guide keeps the explanation.
 
 ### Standards — binding
 
@@ -38,21 +43,31 @@ shareable file.
 
 ### Guides — explanation
 
-- `best-practices/AGENTS.md` — default technology choices, and what is still undecided.
-- `best-practices/local-environment.md` — shell activation, remote servers, pi, tmux.
-- `best-practices/skills.md` — the standard skill set inventory.
-- `best-practices/pi-extensions.md` — the pinned pi package list.
-- `best-practices/clerk.md` — per-provider OAuth setup walkthroughs.
-- `best-practices/vercel-deployment.md`, `gcp-deployment.md`, `gce-gaia-runtime.md` — platform walkthroughs.
-- `best-practices/a2a-agent.md` — the A2A agent reference implementation.
+Guides live in `best-practices/`, named `GDE-nnn-slug.md`.
+
+| Ref | Covers |
+| --- | --- |
+| `GDE-001` | The A2A agent reference implementation. |
+| `GDE-002` | Per-provider OAuth setup walkthroughs for Clerk. |
+| `GDE-003` | The fnox and 1Password playbook. |
+| `GDE-004` | The GCE Gaia self-hosted runtime. |
+| `GDE-005` | GCP deployment — Cloud Run, App Engine, gcloud configs. |
+| `GDE-006` | Local environment: shell activation, remote servers, pi, tmux. |
+| `GDE-007` | The pinned pi package list. |
+| `GDE-008` | The standard skill set inventory. |
+| `GDE-009` | Default technology choices, and what is still undecided. |
+| `GDE-010` | Vercel deployment — previews, env sync, Neon, Blob. |
 
 ### Skills — capabilities
 
 `skills/` holds every skill The Focus AI owns, one folder per skill
 (`skills/<name>/SKILL.md`), installable with
-`skills add The-Focus-AI/standards --skill <name>`. `skills/VENDORED.md` records
-provenance and `mise run skills:check` validates them. `STD-011` governs how
-skills are installed and pinned in consuming repositories.
+`skills add The-Focus-AI/standards --skill <name>`. A skill is installed and
+cited by **name**; `SKL-nnn` is its number on the site. Both the number and the
+provenance live in `skills/VENDORED.md`, the skill register, because the skills
+CLI owns `SKILL.md`'s frontmatter (`STD-006 §3.12`). `mise run skills:check`
+fails if a skill is unregistered, registered twice, or shares a number.
+`STD-011` governs how skills are installed and pinned in consuming repositories.
 
 Three former prompts are now skills: `setup-project`, `standardize-project`, and
 `develop-design-md`.
@@ -65,26 +80,31 @@ all of them.
 
 | `kind` | Lives in | Is |
 | --- | --- | --- |
-| `standard` | `standards/` | binding clauses, numbered and citable |
-| `guide` | `best-practices/` | explanation and walkthroughs, no clauses |
-| `note` | `reports/` | research at a point in time, cited and dated |
-| `decision` | `architecture/` | a settled question and its alternatives |
-| `prompt` | `prompts/` | instructions an agent executes |
+| `standard` | `standards/STD-nnn-slug.md` | binding clauses, numbered and citable |
+| `guide` | `best-practices/GDE-nnn-slug.md` | explanation and walkthroughs, no clauses |
+| `note` | `reports/NOTE-nnn-YYYY-MM-DD-slug.md` | research at a point in time, cited and dated |
+| `decision` | `architecture/ADR-nnn-slug.md` | a settled question and its alternatives |
+| `prompt` | `prompts/PRM-nnn-slug.md` | instructions an agent executes |
+| `skill` | `skills/<name>/SKILL.md` | a capability, numbered `SKL-nnn` in the register |
 | `design` | `DESIGN.md` | the design system and its tokens |
 
-Skills are outside the axis on purpose: `skills/<name>/SKILL.md` carries the
-frontmatter the skills CLI requires, checked by `mise run skills:check`. So are
-`AGENTS.md` and `README.md`, which external tooling reads.
+A note keeps its date in the filename because it is a capture of a moment and
+staleness is the first thing a reader needs. A guide or a decision record does
+not: it is a topic that gets revised in place.
+
+`AGENTS.md`, `README.md` and `skills/VENDORED.md` are outside the axis — the
+first two are navigation external tooling reads, and the third is the register
+of a class rather than a member of it.
 
 ### Everything else
 
 - `DESIGN.md` — the design system for standards.thefocus.ai. Validate edits with `mise run design:validate`.
-- `architecture/` — decision records for this repository.
-- `reports/` — research notes, including the standards gap register and the `best-practices/` inventory.
+- `architecture/` — decision records (`ADR-001`–`ADR-003`).
+- `reports/` — research notes (`NOTE-001`–`NOTE-006`), including the standards gap register and the `best-practices/` inventory.
 - `skills-lock.json`, `mise.toml`, `.pi/settings.json` — the repo's own configuration.
 - `scripts/` — the bootstrap script, the standards renderer, and the design, document, and skill validators.
 - `templates/default-project/` — source templates used by the bootstrap script.
-- `prompts/` — `generate-dockerfile.md` only; the rest became skills.
+- `prompts/` — `PRM-001` (`prompts/PRM-001-generate-dockerfile.md`) only; the rest became skills.
 - `tests/` — validation scripts for this repository.
 
 ## How to inspect a project
@@ -96,7 +116,7 @@ When auditing or changing another repository, look in this order:
    whether tools are installed through mise.
 3. Check the task contract in `STD-004 §3.3`–`§3.6`: install, dev, lint, test, deploy — and that
    lint and test can actually fail.
-4. Check skills against `STD-011` and the inventory in `best-practices/skills.md`.
+4. Check skills against `STD-011` and the inventory in `best-practices/GDE-008-skills.md`.
 5. Check secrets against `STD-007`: per-project vault, scoped service account, nothing committed.
 6. Check deployment against `STD-008`, then the platform guide for specifics.
 7. Check project organization: README, docs, prompts, architecture docs, test layout, and whether

@@ -289,11 +289,12 @@ mise run standard:render
 The renderer refuses to emit a page for a document that does not satisfy this
 standard. Conformance is not a separate audit — if it renders, it conforms.
 
-Guides render alongside the standards, checked against `STD-006` rather than
-against this document, and are published subordinate to them: no clauses, a
-memo stating that they bind nothing, and a link in both directions between a
-guide and the standards it names. A guide that names no standard says so on its
-own page, which is how an undecided area becomes visible instead of quiet.
+Guides, research notes, decision records, prompts and skills render alongside
+the standards, checked against `STD-006` rather than against this document, and
+are published subordinate to them: no clauses, a memo stating what the document
+is and what it does not do, and a link in both directions between it and the
+standards it names. A document that names no standard says so on its own page,
+which is how an undecided area becomes visible instead of quiet.
 
 ## 5. References
 

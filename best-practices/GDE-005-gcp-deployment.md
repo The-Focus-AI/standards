@@ -1,4 +1,5 @@
 ---
+number: "005"
 title: "GCP deployment"
 kind: guide
 issued: "2026-07-25"
@@ -20,11 +21,11 @@ Reference implementations:
 | **qbsync** | App Engine (+ cron) | Isolated gcloud config `qb-to-sheets` + fnox at deploy time |
 
 Longer research on multi-project gcloud configs:
-`reports/2026-02-02-gcloud-cloud-run-multi-project.md`. Secrets on GCP:
-`best-practices/fnox-secrets.md` § GCP. For Vercel apps see @vercel-deployment.md.
+`reports/NOTE-001-2026-02-02-gcloud-cloud-run-multi-project.md`. Secrets on GCP:
+`best-practices/GDE-003-fnox-secrets.md` § GCP. For Vercel apps see `best-practices/GDE-010-vercel-deployment.md`.
 
 For the **habitats / Umwelten agent runtime** (GCE VM, Docker-out-of-Docker,
-self-hosted GitHub runner, no PR previews on GCP), see @gce-gaia-runtime.md —
+self-hosted GitHub runner, no PR previews on GCP), see `best-practices/GDE-004-gce-gaia-runtime.md` —
 that CD shape does not apply to Cloud Run.
 
 ## Defaults
@@ -38,7 +39,7 @@ that CD shape does not apply to Cloud Run.
 | User auth | `mise run auth` → `gcloud auth login` + Application Default Credentials |
 | Automation | Prefer **service account impersonation** or Workload Identity; avoid downloaded SA key JSON when org policy allows |
 | App secrets | 1Password → fnox locally; on Cloud Run prefer **Secret Manager** (`--set-secrets`) — see fnox-secrets Pattern A/B |
-| Preferred compute for new services | **Cloud Run** (source deploy or image). Use App Engine when the existing project already standardized on it (qbsync). Agent orchestration that needs a host Docker daemon → @gce-gaia-runtime.md. |
+| Preferred compute for new services | **Cloud Run** (source deploy or image). Use App Engine when the existing project already standardized on it (qbsync). Agent orchestration that needs a host Docker daemon → `best-practices/GDE-004-gce-gaia-runtime.md`. |
 
 ## Mental model
 
@@ -139,7 +140,7 @@ Conventions:
 
 ### Secrets on Cloud Run
 
-Two supported patterns (detail in `best-practices/fnox-secrets.md`):
+Two supported patterns (detail in `best-practices/GDE-003-fnox-secrets.md`):
 
 | Pattern | When | How |
 | --- | --- | --- |
@@ -242,4 +243,4 @@ project-local; this standard prefers impersonation / WIF / Cloud Shell.
 | `foundtain-creek/reports/2026-02-02-gcloud-cloud-run-multi-project.md` | Original research (copied to `reports/` here) |
 | `foundtain-creek/mise.toml` + `docs/gcloud-*.md` | Cloud Run + auth tasks |
 | `qbsync/mise.toml` | App Engine + isolated config + fnox deploy |
-| `best-practices/fnox-secrets.md` | 1Password ↔ GSM / Cloud Run secret patterns |
+| `best-practices/GDE-003-fnox-secrets.md` | 1Password ↔ GSM / Cloud Run secret patterns |

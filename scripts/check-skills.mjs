@@ -95,26 +95,55 @@ for (const skill of skills) {
   }
 }
 
-/* ---- vendored list vs lint ignores ---- */
-// Vendored skills are excluded from markdownlint because they are somebody
-// else's prose. That exclusion is only honest while the two lists agree.
+/* ---- the skill register ---- */
+// skills/VENDORED.md assigns every skill its SKL-nnn number, because SKILL.md's
+// frontmatter belongs to the skills CLI. That makes the file authoritative, and
+// an authoritative file that nothing checks is one that drifts. Two things are
+// verified here: every skill on disk is registered exactly once with a unique
+// number, and the vendored half agrees with the markdownlint ignore list —
+// vendored skills are exempt from lint because they are somebody else's prose,
+// and that exemption is only honest while the two lists match.
 {
   const vendoredDoc = join(SKILLS_DIR, "VENDORED.md");
   const lintConfig = ".markdownlint-cli2.jsonc";
-  if (existsSync(vendoredDoc) && existsSync(lintConfig)) {
+  if (existsSync(vendoredDoc)) {
     const doc = readFileSync(vendoredDoc, "utf8");
-    const section = doc.split(/^## Vendored\s*$/m)[1]?.split(/^## /m)[0] ?? "";
-    const declared = new Set(
-      [...section.matchAll(/^\|\s*`([a-z0-9-]+)`\s*\|/gm)].map((m) => m[1])
-    );
-    const ignored = new Set(
-      [...readFileSync(lintConfig, "utf8").matchAll(/"skills\/([a-z0-9-]+)\/\*\*"/g)].map((m) => m[1])
-    );
-    for (const s of declared) {
-      if (!ignored.has(s)) problems.push(`VENDORED.md lists ${s} as vendored, but markdownlint does not ignore it`);
+    const sectionOf = (h) => doc.split(new RegExp(`^## ${h}\\s*$`, "m"))[1]?.split(/^## /m)[0] ?? "";
+    const rows = (s) => [...s.matchAll(/^\|\s*SKL-(\d{3})\s*\|\s*`([a-z0-9-]+)`\s*\|/gm)]
+      .map((m) => ({ num: m[1], name: m[2] }));
+
+    const authored = rows(sectionOf("Authored here"));
+    const vendored = rows(sectionOf("Vendored"));
+    const all = [...authored, ...vendored];
+
+    const byName = new Map();
+    const byNum = new Map();
+    for (const r of all) {
+      if (byName.has(r.name)) problems.push(`VENDORED.md registers ${r.name} twice`);
+      byName.set(r.name, r);
+      if (byNum.has(r.num)) {
+        problems.push(`VENDORED.md gives SKL-${r.num} to both ${byNum.get(r.num).name} and ${r.name}`);
+      }
+      byNum.set(r.num, r);
     }
-    for (const s of ignored) {
-      if (!declared.has(s)) problems.push(`markdownlint ignores skills/${s}, but VENDORED.md does not list it as vendored`);
+    for (const skill of skills) {
+      if (!byName.has(skill)) problems.push(`skills/${skill} is not registered in VENDORED.md — it has no SKL number`);
+    }
+    for (const r of all) {
+      if (!skills.includes(r.name)) problems.push(`VENDORED.md registers ${r.name} (SKL-${r.num}), which is not a directory under skills/`);
+    }
+
+    if (existsSync(lintConfig)) {
+      const declared = new Set(vendored.map((r) => r.name));
+      const ignored = new Set(
+        [...readFileSync(lintConfig, "utf8").matchAll(/"skills\/([a-z0-9-]+)\/\*\*"/g)].map((m) => m[1])
+      );
+      for (const s of declared) {
+        if (!ignored.has(s)) problems.push(`VENDORED.md lists ${s} as vendored, but markdownlint does not ignore it`);
+      }
+      for (const s of ignored) {
+        if (!declared.has(s)) problems.push(`markdownlint ignores skills/${s}, but VENDORED.md does not list it as vendored`);
+      }
     }
   }
 }

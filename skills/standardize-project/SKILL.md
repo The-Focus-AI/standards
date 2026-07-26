@@ -26,11 +26,11 @@ accidentally edit another.
 ## Source of truth
 
 The standards live in `The-Focus-AI/standards`. Read these before recommending anything:
-`AGENTS.md`, `best-practices/AGENTS.md`, `best-practices/skills.md`,
+`AGENTS.md`, `best-practices/GDE-009-technology-defaults.md`, `best-practices/GDE-008-skills.md`,
 `best-practices/security.md`, `best-practices/deployment.md`, and whichever deployment
-guide applies — `vercel-deployment.md`, `gcp-deployment.md`, or `gce-gaia-runtime.md`.
-Also `best-practices/clerk.md`, `best-practices/pi-extensions.md`,
-`reports/fnox-secrets.md`, and the default-project template for missing-file examples
+guide applies — `best-practices/GDE-010-vercel-deployment.md`, `best-practices/GDE-005-gcp-deployment.md`, or `best-practices/GDE-004-gce-gaia-runtime.md`.
+Also `best-practices/GDE-002-clerk.md`, `best-practices/GDE-007-pi-extensions.md`,
+`best-practices/GDE-003-fnox-secrets.md`, and the default-project template for missing-file examples
 only.
 
 If the standards conflict with the target project's own instructions, name the conflict
@@ -76,7 +76,7 @@ applicable: `install`, `setup`, `dev`, `lint`, `test`, `deploy`, `secrets:check`
 
 ### fnox and 1Password
 
-Follow `reports/fnox-secrets.md`. Target end state:
+Follow `best-practices/GDE-003-fnox-secrets.md`. Target end state:
 
 - A dedicated 1Password vault per project.
 - A scoped service account with access to that vault only.
@@ -93,7 +93,7 @@ conversation.
 
 Install missing skills with `skills add` (mise-pinned); never copy skill directories by
 hand. Prefer `--skill <folder>` over adding a whole upstream repo. The canonical set is
-`best-practices/skills.md` and the locked `skills-lock.json`.
+`best-practices/GDE-008-skills.md` and the locked `skills-lock.json`.
 
 Remove deprecated `to-prd` and `to-issues` entries when migrating. Replace title-case
 lock keys with kebab-case. Ensure the planning workflow skills are present and referenced

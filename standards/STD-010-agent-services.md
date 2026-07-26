@@ -12,7 +12,7 @@ author: W. Schenk
 
 ## 1. Introduction
 
-`best-practices/a2a-agent.md` documents the pattern proven in the first
+`best-practices/GDE-001-a2a-agent.md` documents the pattern proven in the first
 production agent deployment. Section 4 of that document is headed "The seven
 required patterns" and opens by saying everything in it is load-bearing rather
 than stylistic — which makes it a set of requirements sitting at line 100 of a
@@ -101,6 +101,6 @@ with fewer users is the one that quietly rots.
 [1] Bradner, S., *Key words for use in RFCs to Indicate Requirement Levels*,
 BCP 14, RFC 2119, March 1997.
 
-[2] The Focus AI, `best-practices/a2a-agent.md` — the reference walkthrough.
+[2] The Focus AI, `best-practices/GDE-001-a2a-agent.md` — the reference walkthrough.
 
 [3] The Focus AI, `STD-008` — Deployment. Draft.
