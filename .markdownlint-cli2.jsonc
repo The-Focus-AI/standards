@@ -9,15 +9,15 @@
     // Allow inline HTML in markdown
     "MD033": false
   },
-  // Skip generated/cached content
+  // Skip generated and cached content only. `reports/` and `architecture/` used
+  // to be skipped too; they are published documents now, so they are linted like
+  // everything else this repository writes.
   "ignores": [
     ".firecrawl/**",
     "node_modules/**",
     ".pi/**",
     ".agents/skills/**",
     "out/**",
-    "reports/**",
-    "architecture/**",
 
     // Vendored skills — copied in from other repositories, listed under
     // "Vendored" in skills/VENDORED.md. They are validated by

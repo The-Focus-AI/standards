@@ -139,13 +139,6 @@ run = "node scripts/validate-documents.mjs"
 description = "Validate DESIGN.md: token references, WCAG AA pairs, and the measured-contrast table"
 run = "node scripts/validate-design.mjs"
 
-[tasks."prototype:standards-site"]
-description = "Serve the standards.thefocus.ai direction round (throwaway prototype)"
-run = '''
-echo "==> http://localhost:8899/?variant=register|bulletin|decree|fieldguide"
-python3 -m http.server -d prototypes/standards-site-directions 8899
-'''
-
 [tasks."generate:dockerfile"]
 description = "Run pi in batch mode with the generate-dockerfile prompt"
 run = '''

@@ -236,7 +236,7 @@ Two things from the seed **retire** here, and the reasoning matters more than th
   person. An accent or a voice with no job does not survive a transposition, and keeping one would
   be decoration — which the seed forbids.
 
-Settled across three prototype rounds in `prototypes/standards-site-directions`: the Bulletin
+Settled across three prototype rounds, recorded in `ADR-003`: the Bulletin
 direction (technical bulletin / flight rules) beat a Federal Register docket, a stamped decree, and
 a green-bar field manual; the agent accent beat a hatched fill, a restored clause italic, and a
 command rail; and the RFC header block replaced the instrument strip outright. Rules below that came

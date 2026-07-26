@@ -237,6 +237,7 @@ truth; the generated Dockerfile is the derived artifact.
 ### Runtime contract
 
 The Dockerfile's top comment block documents:
+
 - Build command: `docker build -t focus-ai-standards-agent .`
 - Run command: `docker run -it --rm -v ~/.pi:/home/agent/.pi focus-ai-standards-agent`
 - First steps: `cd /standards && mise install` then `pi -p prompts/setup-project.md`
@@ -300,6 +301,7 @@ output. When standards evolve (new tools, new best-practices, new extensions),
 the prompt should be updated first, then the Dockerfile regenerated.
 
 The two prompts in this repo serve different audiences:
+
 - `prompts/PRM-001-generate-dockerfile.md` — consumed by pi to produce the standards
   container image
 - `setup-project.md` — consumed by pi at runtime inside the container to

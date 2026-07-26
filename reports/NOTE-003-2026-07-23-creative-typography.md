@@ -68,6 +68,7 @@ Brussels), plus one-offs. Foundry surveys: [Creative Boom](https://www.creativeb
 [A Type of Amigo](https://atypeofamigo.com/quality-fonts-for-everyone-type-foundries-that-all-designers-should-know/).
 
 ### Editorial drama (serifs with fashion-magazine contrast)
+
 - **Zodiak** (Fontshare) — big-contrast display serif, sharp and glossy.
 - **Boska** (Fontshare) — expressive serif with claws; fashion energy.
 - **Sentient** (Fontshare) — calmer, literary, beautiful true italic.
@@ -77,6 +78,7 @@ Brussels), plus one-offs. Foundry surveys: [Creative Boom](https://www.creativeb
   least-default face still on Google Fonts.
 
 ### Characterful grotesks (sans with an accent, not an absence)
+
 - **Clash Display / Clash Grotesk** (Fontshare) — angular, techy, built for
   large sizes ([overview](https://freebiesbug.com/free-fonts/clash-display/)).
 - **Cabinet Grotesk** (Fontshare) — neo-grotesque with expressive display
@@ -89,6 +91,7 @@ Brussels), plus one-offs. Foundry surveys: [Creative Boom](https://www.creativeb
   body under a wilder display.
 
 ### Genuinely weird (display-only, one per system, handle with rules)
+
 - **Le Murmure** (Velvetyne) — condensed, ink-trapped, award-winning;
   library-meets-nightclub.
 - **Pilowlava** (Velvetyne) — inflated blobby display; joyful and loud.
@@ -101,6 +104,7 @@ Brussels), plus one-offs. Foundry surveys: [Creative Boom](https://www.creativeb
 - **Typefesse** (Velvetyne) — letters drawn as bodies; illustration-as-type.
 
 ### Monospace with character (beyond "code font")
+
 - **Departure Mono** — pixel/terminal nostalgia at text sizes.
 - **Monaspace** (GitHub) — five superfamily voices with *texture healing*;
   the "argon/krypton" cuts have real personality.
@@ -108,6 +112,7 @@ Brussels), plus one-offs. Foundry surveys: [Creative Boom](https://www.creativeb
 - **Courier Prime** — typewriter done properly (screenplay heritage).
 
 ### Concept-locked faces (when the direction demands it)
+
 - **Redaction** (free, MoMA "Reconstruction" project by Titus Kaphar &
   Reginald Dwayne Betts) — degraded-photocopy serif in staged decay levels;
   made for archive/dossier directions.

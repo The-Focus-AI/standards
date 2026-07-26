@@ -12,9 +12,10 @@ status: Accepted
 Companion to `DESIGN.md`. Records what was settled, who settled it, and what was
 assumed — so the next agent knows what is decided versus what is merely current.
 
-Process: the `develop-design-md` skill (was `prompts/develop-design-md.md`). Prototypes:
-`prototypes/standards-site-directions/` (throwaway; delete once the site is
-built).
+Process: the `develop-design-md` skill (was `prompts/develop-design-md.md`). The
+prototypes lived in `prototypes/standards-site-directions/` and were deleted once
+the site was built, as this record said they would be. What they settled is
+below; what they looked like is in git history.
 
 Provenance column: **user** = answered directly in the grill · **evidenced** =
 taken from the repo or the seed without asking · **agent** = my recommendation,
