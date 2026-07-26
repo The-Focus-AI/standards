@@ -1,3 +1,14 @@
+---
+title: "Wrapping a habitat in an Electron app"
+kind: decision
+issued: "2026-07-25"
+author: W. Schenk
+status: Proposed
+---
+
+> Moved from `reports/`: it is a plan with open decisions, not research.
+> Status is Proposed — nothing here has been accepted.
+
 # Wrapping a Habitat in an Electron App
 
 A detailed plan for an Electron desktop shell around a single umwelten habitat. Modeled on `packages/desktop-electron` from the opencode repo. **Not a port** — the analogues are different (umwelten's "habitat container server" plays the role of opencode's embedded `Server`), and several decisions need to be made up front.

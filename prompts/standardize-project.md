@@ -26,7 +26,7 @@ The standards repository is the current working directory. Read these files befo
 - `best-practices/gce-gaia-runtime.md` — GCE Gaia/habitats runtime (if applicable)
 - `best-practices/clerk.md` — Clerk prod vs dev instances
 - `best-practices/pi-extensions.md` — required pi extensions
-- `reports/fnox-secrets.md` — detailed fnox + 1Password migration reference
+- `best-practices/fnox-secrets.md` — detailed fnox + 1Password migration reference
 - `templates/default-project/` — examples for missing files only; do not copy over existing files without review
 
 If these standards conflict with target-project instructions, identify the conflict and ask how to resolve it.
@@ -95,7 +95,7 @@ _.file = ".fnox/env"
 
 ### fnox and 1Password
 
-Follow `reports/fnox-secrets.md`.
+Follow `best-practices/fnox-secrets.md`.
 
 Expected end state:
 

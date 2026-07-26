@@ -4,80 +4,144 @@ kind: guide
 issued: "2026-07-25"
 author: W. Schenk
 status: Current
-verified: "2026-07-25"
+verified: "2026-07-26"
 ---
 
-> Replaces `deployment.md`, which was named for deployment but contained none.
-> Deployment rules are `STD-008`; tooling rules are `STD-004`; agent environment
-> bootstrap is `STD-005`. What remains here is the walkthrough for setting up a
-> working machine.
+> Was `deployment.md`, which was named for deployment but contained none of it.
+> The deployment routing it used to carry is now `STD-008`; the binding rules
+> for tooling are `STD-004`, for agent environments `STD-005`, and for secrets
+> `STD-007`. Everything below is the walkthrough, preserved as it was.
 
 # Local development environment
 
-Shell activation, remote servers, pi, and tmux. Everything in this guide is
-explanation — the binding rules live in the standards named above.
+Setting up a working machine: mise and fnox activation, remote servers, pi, and
+tmux. This is explanation — the rules it satisfies live in the standards above.
 
-## Shell activation
+# mise and fnox setup
 
-`mise` activation is what makes entering a project directory configure the
-shell, and fnox is what puts secrets into it. `STD-004 §3.7` requires this;
-here is how it is set up.
+Install mise:
 
 ```bash
-# bash — ~/.bashrc
-eval "$(mise activate bash)"
+curl https://mise.run | sh
 ```
 
-```zsh
-# zsh — ~/.zshrc
-eval "$(mise activate zsh)"
+Install fnox:
+
+```bash
+mise use fnox
 ```
 
-Both shells need it. A machine where only one is configured produces the
-long-running confusion where a task works in one terminal and not another.
+After installing mise and/or fnox, they may not be available in the current shell.
+Add activation to your shell config:
 
-`.fnox/env` holds the bootstrap token and is gitignored — see `STD-007 §3.3`.
+```bash
+# bash
+echo 'eval "$(/home/worker_user/.local/bin/mise activate bash)"' >> ~/.bashrc
 
-## Remote servers
+# zsh
+echo 'eval "$(/home/worker_user/.local/bin/mise activate zsh)"' >> ~/.zshrc
+echo 'command -v fnox >/dev/null 2>&1 && eval "$(fnox activate zsh)"' >> ~/.zshrc
+```
 
-Remote boxes get the same setup as a laptop: mise installed for the user, the
-activation line in the shell rc, and the project cloned with `mise trust` run
-once. Do not install project tooling with the system package manager; `STD-004
-§3.2` applies on servers exactly as it does locally.
+Both shells need activation. A machine where only one is configured produces
+the long-running confusion where a task works in one terminal and not another.
+`STD-004 §3.7` requires this; the two `eval` lines are how it is satisfied.
 
-## pi
+Note that fnox activation is **separate** from mise activation — mise loads
+`.fnox/env`, fnox resolves the secrets themselves.
 
-pi is installed per project through mise rather than globally, and its packages
-are pinned in `.pi/settings.json`. The current package list is in
-`pi-extensions.md`.
+# remote server setup
 
-```sh
+When manually running on a remote server:
+
+- `sudo loginctl enable-linger worker_user`
+- `gh auth login`
+- Set up git user and config:
+
+  ```bash
+  git config --global user.name "Your Name"
+  git config --global user.email "your@email.com"
+  ```
+
+# setting up pi
+
+## Install pi (project-level)
+
+Add Node and pi to the project's mise.toml:
+
+```bash
+mise use node
 mise use npm:@earendil-works/pi-coding-agent
-pi install -l
 ```
 
-Project-local configuration lives in `.pi/settings.json`, with sessions written
-to `.pi/sessions` so they stay inside the working tree and out of the home
-directory.
+Alternative: install pi globally with the install script:
 
-## tmux
+```bash
+curl -fsSL https://pi.dev/install.sh | sh
+```
 
-Long agent runs outlive terminal windows. tmux is the difference between an
-interrupted session and a resumable one, particularly on remote hosts.
+## Project-local pi configuration
 
-```sh
+Create `.pi/settings.json` to keep pi resources project-local:
+
+```json
+{
+  "npmCommand": ["mise", "exec", "node", "--", "npm"],
+  "sessionDir": ".pi/sessions"
+}
+```
+
+- **`npmCommand`** — Routes all pi npm operations through mise so they use the project's Node version.
+- **`sessionDir`** — Stores sessions inside the project instead of `~/.pi/agent/sessions/`.
+
+Add to `.gitignore` so per-developer artifacts aren't committed:
+
+```gitignore
+.pi/sessions/
+.pi/npm/
+.pi/git/
+```
+
+Note: `.pi/settings.json` itself **should be committed** so the team shares the same pi configuration.
+
+## Install pi packages (project-local)
+
+Always use `-l` (local) to install packages at the project level:
+
+```bash
+pi install -l git:github.com/offline-ant/pi-tmux
+```
+
+This writes to `.pi/settings.json` and installs to `.pi/git/`. Teammates who
+clone the repo and run pi will have packages auto-installed on startup.
+
+Everything in `.pi/` is pinned per project rather than globally, which is
+`STD-004 §3.1` applied to pi. The current package set is in `pi-extensions.md`.
+
+# tmux setup
+
+Add to `~/.tmux.conf`:
+
+```tmux
 set -g mouse on
 set -g extended-keys on
 set -g extended-keys-format csi-u
 ```
 
-The `pi-tmux` package integrates pi with a tmux session; it is in the standard
-pi package set.
+- **`mouse on`** — Enables mouse wheel scrolling, click/drag on scroll bars,
+  pane resizing, and window switching via mouse. Pi output is scrollable
+  with the mouse wheel.
+- **`extended-keys on` + `csi-u`** — Forwards modified keys like
+  `Shift+Enter` and `Ctrl+Enter` so pi can distinguish them from plain
+  `Enter` (required for multi-line input and custom keybindings). Requires
+  tmux 3.2+.
 
-## See also
+After updating `~/.tmux.conf`, restart tmux fully:
 
-- `STD-004` — repository tooling and the four required tasks
-- `STD-005` — agent environment bootstrap
-- `STD-007` — secrets and credentials
-- `STD-008` — deployment
-- `reports/fnox-secrets.md` — the full fnox and 1Password playbook
+```bash
+tmux kill-server
+tmux
+```
+
+> **Tip:** With `mouse on`, tmux captures mouse events. Hold **Shift** while
+> selecting text to temporarily bypass tmux's mouse handling for copy/paste.

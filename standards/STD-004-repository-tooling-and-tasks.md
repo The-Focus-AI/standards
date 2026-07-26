@@ -22,9 +22,9 @@ is what lets an agent — or a CI runner, or an agent platform's bootstrap — w
 somewhere it has no specific knowledge of.
 
 **Out of scope.** Which linter or test runner a repository chooses. The secrets
-policy itself — vault layout, rotation, provider configuration — is a separate
-standard not yet issued; this standard specifies only how secrets reach the
-process. Agent platform bootstrap is `STD-005`.
+policy itself — vault layout, rotation, provider configuration — is `STD-007`;
+this standard specifies only how secrets reach the process. Agent platform
+bootstrap is `STD-005`.
 
 ## 2. Requirements language
 
@@ -165,5 +165,6 @@ BCP 14, RFC 2119, March 1997.
 
 [3] The Focus AI, `STD-005` — Agent environment bootstrap. Draft.
 
-[4] The Focus AI, `best-practices/security.md` and `reports/fnox-secrets.md` —
-the fnox and 1Password playbook, pending promotion to a standard.
+[4] The Focus AI, `STD-007` — Secrets and credentials. Draft.
+
+[5] The Focus AI, `best-practices/fnox-secrets.md` — the fnox and 1Password playbook.

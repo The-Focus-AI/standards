@@ -12,7 +12,7 @@ runnable with `mise dev` after setup.
 - `best-practices/security.md` — fnox + 1Password secrets setup
 - `best-practices/skills.md` — required skills to install
 - `best-practices/pi-extensions.md` — required pi extensions
-- `reports/fnox-secrets.md` — full secrets reference
+- `best-practices/fnox-secrets.md` — full secrets reference
 
 ## Setup order (follow exactly, in this sequence)
 

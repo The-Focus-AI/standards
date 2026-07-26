@@ -120,4 +120,4 @@ BCP 14, RFC 2119, March 1997.
 
 [2] The Focus AI, `STD-004` — Repository tooling and tasks. Draft.
 
-[3] The Focus AI, `reports/fnox-secrets.md` — the fnox and 1Password playbook.
+[3] The Focus AI, `best-practices/fnox-secrets.md` — the fnox and 1Password playbook.

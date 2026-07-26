@@ -128,6 +128,23 @@ Provenance includes who decided. A choice an agent made under stated assumptions
 and a choice a person made are different kinds of fact, and the first is the one
 worth revisiting first when something turns out wrong.
 
+### 3.9
+
+Content moved between documents MUST be carried over, not summarised from
+memory.
+
+Migration copies; it does not paraphrase. When rules are lifted out of a guide
+into a standard, the guide keeps its walkthrough intact — the commands, the
+flags, the reasons a setting exists. This clause was written immediately after
+its own violation: `deployment.md` was replaced by a hand-written summary and
+lost all fifteen of its procedural details, including a shell activation line
+whose absence would silently break secret resolution. Diff the old file against
+the new one before deleting anything.
+
+```sh
+git show HEAD:path/to/old.md > /tmp/old.md && diff /tmp/old.md path/to/new.md
+```
+
 ## 4. Document classes
 
 | Kind | Lives in | Filename | Status values |

@@ -20,6 +20,11 @@ project_context:
     - pi coding agent (primary agent in use)
     - skills npm package (~14.2M weekly downloads, MIT license)
   our_convention: "Pinned in mise.toml as `\"npm:skills\" = \"1.5.13\"` and invoked as `skills ...` (not `npx skills`). See best-practices/skills.md."
+kind: note
+author: W. Schenk
+status: Current
+issued: "2026-06-25"
+verified: "2026-06-25"
 ---
 
 ## Summary

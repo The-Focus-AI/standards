@@ -1,3 +1,12 @@
+---
+title: "Creative typography: research notes for DESIGN.md work"
+kind: note
+issued: "2026-07-23"
+author: W. Schenk
+status: Current
+verified: "2026-07-23"
+---
+
 # Creative Typography — research notes for DESIGN.md work
 
 Companion to `prompts/develop-design-md.md` (Phase 2, typography-as-

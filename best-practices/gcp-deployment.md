@@ -21,7 +21,7 @@ Reference implementations:
 
 Longer research on multi-project gcloud configs:
 `reports/2026-02-02-gcloud-cloud-run-multi-project.md`. Secrets on GCP:
-`reports/fnox-secrets.md` § GCP. For Vercel apps see @vercel-deployment.md.
+`best-practices/fnox-secrets.md` § GCP. For Vercel apps see @vercel-deployment.md.
 
 For the **habitats / Umwelten agent runtime** (GCE VM, Docker-out-of-Docker,
 self-hosted GitHub runner, no PR previews on GCP), see @gce-gaia-runtime.md —
@@ -139,7 +139,7 @@ Conventions:
 
 ### Secrets on Cloud Run
 
-Two supported patterns (detail in `reports/fnox-secrets.md`):
+Two supported patterns (detail in `best-practices/fnox-secrets.md`):
 
 | Pattern | When | How |
 | --- | --- | --- |
@@ -242,4 +242,4 @@ project-local; this standard prefers impersonation / WIF / Cloud Shell.
 | `foundtain-creek/reports/2026-02-02-gcloud-cloud-run-multi-project.md` | Original research (copied to `reports/` here) |
 | `foundtain-creek/mise.toml` + `docs/gcloud-*.md` | Cloud Run + auth tasks |
 | `qbsync/mise.toml` | App Engine + isolated config + fnox deploy |
-| `reports/fnox-secrets.md` | 1Password ↔ GSM / Cloud Run secret patterns |
+| `best-practices/fnox-secrets.md` | 1Password ↔ GSM / Cloud Run secret patterns |

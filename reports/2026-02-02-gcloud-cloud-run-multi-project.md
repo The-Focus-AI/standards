@@ -18,6 +18,11 @@ avoid_when:
 project_context:
   language: bash/shell
   relevant_dependencies: [gcloud CLI, direnv, Cloud Run]
+kind: note
+author: W. Schenk
+status: Current
+issued: "2026-02-02"
+verified: "2026-02-02"
 ---
 
 > **Canonical standard:** Prefer `best-practices/gcp-deployment.md`. That doc

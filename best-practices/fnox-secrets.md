@@ -1,3 +1,15 @@
+---
+title: "Project secrets with fnox and 1Password"
+kind: guide
+issued: "2026-07-25"
+author: W. Schenk
+status: Current
+verified: "2026-07-26"
+---
+
+> Moved from `reports/`: this is a walkthrough, not a point-in-time research
+> note. The binding rules it satisfies are `STD-007`.
+
 # Project Secrets with fnox + 1Password
 
 A reference for setting up isolated, auditable secret management on any project.

@@ -1,3 +1,11 @@
+---
+title: "standards.thefocus.ai design decision log"
+kind: decision
+issued: "2026-07-25"
+author: W. Schenk
+status: Accepted
+---
+
 # standards.thefocus.ai — design decision log
 
 Companion to `DESIGN.md`. Records what was settled, who settled it, and what was

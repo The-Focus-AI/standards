@@ -1,3 +1,11 @@
+---
+title: "Standards Dockerfile redesign"
+kind: decision
+issued: "2026-07-23"
+author: W. Schenk
+status: Accepted
+---
+
 # PRD: Standards Dockerfile Redesign
 
 ## Problem Statement

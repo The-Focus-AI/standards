@@ -81,6 +81,9 @@ node scripts/validate-design.mjs
 echo ""
 echo "==> Checking standards conform to STD-001..."
 node scripts/render-standard.mjs
+echo ""
+echo "==> Checking documents conform to STD-006..."
+node scripts/validate-documents.mjs
 '''
 
 [tasks."lint:fix"]
@@ -117,6 +120,10 @@ node scripts/render-standard.mjs
 echo "==> http://localhost:8900/"
 python3 -m http.server -d out/standards 8900
 '''
+
+[tasks."docs:validate"]
+description = "Validate guides, notes, and decision records against STD-006"
+run = "node scripts/validate-documents.mjs"
 
 [tasks."design:validate"]
 description = "Validate DESIGN.md: token references, WCAG AA pairs, and the measured-contrast table"

@@ -17,7 +17,7 @@ repo (`mise.toml` `vercel:sync`, `fnox.toml`, Neon + Blob + Clerk).
 
 For remote-server / pi / tmux setup see `local-environment.md`. For Clerk domain and
 OAuth rules see @clerk.md. For the full fnox playbook see
-`reports/fnox-secrets.md`.
+`best-practices/fnox-secrets.md`.
 
 ## Defaults
 
@@ -62,7 +62,7 @@ Add `crons` only when the app needs them. Cron handlers must verify
 ### 3. Required mise tools and tasks
 
 Pin Vercel CLI via mise. Copy the habitats-style tasks (see
-`reports/fnox-secrets.md` for the full sync script):
+`best-practices/fnox-secrets.md` for the full sync script):
 
 | Task | Purpose |
 | --- | --- |
@@ -125,7 +125,7 @@ Vercel has three scopes. Map them deliberately:
 **Blast radius:** Prefer separate 1Password vaults (and Neon branches) for
 Preview vs Production so a leaked preview token cannot read prod. Use fnox
 profiles (`FNOX_PROFILE=preview` / `prod`) locally when syncing; see
-`reports/fnox-secrets.md` § Staging vs production isolation. Habitats currently
+`best-practices/fnox-secrets.md` § Staging vs production isolation. Habitats currently
 runs a single vault with profiles commented out — fine for dogfood, not the
 long-term default for client work.
 
