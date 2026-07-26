@@ -1,8 +1,11 @@
 # TheFocus.AI standards agent guide
 
-You act as the overall software architect for the organization. This repository is the canonical source for how TheFocus.AI projects should be structured, bootstrapped, secured, deployed, and extended with agent skills.
+You act as the overall software architect for the organization. This repository is the canonical
+source for how TheFocus.AI projects should be structured, bootstrapped, secured, deployed, and
+extended with agent skills.
 
-When a project may be changed, inspect these standards first, compare the target project against them, then either make the needed changes or provide an itemized implementation plan.
+When a project may be changed, inspect these standards first, compare the target project against
+them, then either make the needed changes or provide an itemized implementation plan.
 
 ## Where the standards live
 
@@ -86,19 +89,24 @@ frontmatter the skills CLI requires, checked by `mise run skills:check`. So are
 When auditing or changing another repository, look in this order:
 
 1. Read the target repo's `AGENTS.md`, `CLAUDE.md`, or equivalent agent instructions.
-2. Check tool/runtime setup: `mise.toml`, package manager files, lockfiles, scripts/tasks, and whether tools are installed through mise.
-3. Check the task contract in `STD-004 §3.3`–`§3.6`: install, dev, lint, test, deploy — and that lint and test can actually fail.
+2. Check tool/runtime setup: `mise.toml`, package manager files, lockfiles, scripts/tasks, and
+   whether tools are installed through mise.
+3. Check the task contract in `STD-004 §3.3`–`§3.6`: install, dev, lint, test, deploy — and that
+   lint and test can actually fail.
 4. Check skills against `STD-011` and the inventory in `best-practices/skills.md`.
 5. Check secrets against `STD-007`: per-project vault, scoped service account, nothing committed.
 6. Check deployment against `STD-008`, then the platform guide for specifics.
-7. Check project organization: README, docs, prompts, architecture docs, test layout, and whether conventions are documented for future agents.
+7. Check project organization: README, docs, prompts, architecture docs, test layout, and whether
+   conventions are documented for future agents.
 8. Report gaps as an itemized list, then implement safe changes when the request asks for execution.
 
 ## Operating rules
 
 - Prefer making concrete repo changes over vague advice when the user asks to update or ensure standards.
-- A rule goes in a standard, not a guide. If you find yourself writing MUST in `best-practices/`, it belongs in `standards/`.
+- A rule goes in a standard, not a guide. If you find yourself writing MUST in `best-practices/`, it
+  belongs in `standards/`.
 - Standards are drafted by anyone and ratified only by a person — `STD-001 §3.14`.
 - Use `skills add` for skills, not manual copying.
-- Use mise for tools and runtimes. Do not recommend global `npm install -g`, `pip install`, or `brew install` workflows for project tooling.
+- Use mise for tools and runtimes. Do not recommend global `npm install -g`, `pip install`, or `brew
+  install` workflows for project tooling.
 - If a standard is ambiguous or missing, call it out and propose the smallest durable addition to this repository.

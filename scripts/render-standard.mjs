@@ -18,7 +18,9 @@ const STD_DIR = join(ROOT, "standards");
 const OUT_DIR = join(ROOT, "out", "standards");
 
 const REQUIRED = ["standard", "title", "category", "status", "issued", "revision", "applies-to", "author"];
-const CATEGORIES = ["Practice", "Process", "Guide"];
+// Guide was removed as a category in STD-001 R2 — a guide is a document
+// kind under STD-006, not a weaker standard. (STD-001 §3.17)
+const CATEGORIES = ["Practice", "Process"];
 const STATUSES = ["Draft", "In force", "Obsoleted"];
 const SHELL_LANGS = new Set(["sh", "bash", "zsh", "shell", "console"]);
 const LEVELS = [
@@ -111,7 +113,7 @@ export function parseStandard(src, file) {
   }
   closeClause();
 
-  if (meta.category !== "Guide" && clauses.length === 0) {
+  if (clauses.length === 0) {
     errors.push(`category ${meta.category} requires at least one clause (### N.N), found none`);
   }
   return { meta, nodes, clauses, errors };
@@ -305,6 +307,94 @@ ${bodyHtml}
 </body></html>`;
 }
 
+/* ---------------- the register ---------------- */
+// The index DESIGN.md describes: every standard, its category, status and what
+// it binds, in one page. A field with no value is omitted, never placeholdered.
+function renderRegister(entries, cssVars) {
+  const row = (e) => {
+    const cls = e.status === "Obsoleted" ? "is-attn" : e.status === "Draft" ? "is-muted" : "is-force";
+    return `<tr>
+      <td><a href="${esc(e.file)}">${esc(e.id)}</a></td>
+      <td>${esc(e.title)}</td>
+      <td>${esc(e.category)}</td>
+      <td>${esc(e.applies)}</td>
+      <td><span class="pip ${cls}">${esc(e.status)}</span></td>
+      <td class="num">${e.clauses || "—"}</td>
+    </tr>`;
+  };
+  const inForce = entries.filter((e) => e.status === "In force").length;
+  const drafts = entries.filter((e) => e.status === "Draft").length;
+  return `<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Focus AI Standards — the register</title>
+<style>
+${cssVars}
+* { box-sizing: border-box; }
+body { margin:0; background:var(--color-page); color:var(--color-ink);
+  font-family:var(--font-body); line-height:var(--lh-body); padding:1.5rem 1rem 3rem; }
+*:focus-visible { outline:2px solid var(--color-focus-ring); outline-offset:2px; }
+.sheet { background:var(--color-sheet); max-width:58rem; margin:0 auto;
+  border:1px solid var(--color-line-strong); padding:2.25rem 2.5rem 3rem; }
+.rfc-head { font-family:var(--font-mono); font-size:var(--size-mono-block); line-height:1.75;
+  display:grid; grid-template-columns:1fr auto; gap:0 1.5rem;
+  border-bottom:2px solid var(--color-ink); padding-bottom:.9rem; }
+.rfc-head .right { text-align:right; }
+h1 { font-family:var(--font-display); font-weight:var(--fw-display); letter-spacing:var(--ls-display);
+  text-transform:uppercase; line-height:var(--lh-display); font-size:var(--size-title);
+  text-align:center; margin:2rem 0 1.75rem; text-wrap:balance; }
+h2 { font-family:var(--font-display); font-weight:var(--fw-display); letter-spacing:var(--ls-display);
+  text-transform:uppercase; line-height:var(--lh-display); font-size:var(--size-section); margin:2.25rem 0 .75rem; }
+p { margin:0 0 .85rem; font-size:var(--size-body); max-width:68ch; }
+a { color:var(--color-action); }
+.status-memo { border:1px solid var(--color-line); background:rgba(20,26,23,.03); padding:.9rem 1.05rem; }
+.status-memo p:last-child { margin-bottom:0; }
+.lbl { font-family:var(--font-mono); font-size:var(--size-micro); font-weight:700;
+  letter-spacing:var(--ls-mono); text-transform:uppercase; color:var(--color-muted);
+  display:block; margin-bottom:.45rem; }
+.table-scroll { overflow-x:auto; }
+table { width:100%; min-width:38rem; border-collapse:collapse; font-size:.8125rem; }
+th { text-align:left; font-family:var(--font-mono); font-size:var(--size-micro); font-weight:700;
+  letter-spacing:var(--ls-mono); text-transform:uppercase; color:var(--color-muted);
+  padding:.4rem .5rem; border-bottom:1px solid var(--color-line-strong); }
+td { padding:.5rem; border-bottom:1px solid var(--color-line); vertical-align:top; }
+td:first-child { font-family:var(--font-mono); white-space:nowrap; }
+td.num { font-family:var(--font-mono); text-align:right; font-variant-numeric:tabular-nums; }
+.pip { display:inline-flex; align-items:center; gap:.4em; white-space:nowrap; }
+.pip::before { content:""; width:.55em; height:.55em; background:currentColor; flex:none; }
+.is-force { color:var(--color-in-force); } .is-attn { color:var(--color-attention); }
+.is-muted { color:var(--color-muted); }
+@media (max-width:700px){ .rfc-head{grid-template-columns:1fr} .rfc-head .right{text-align:left}
+  .sheet{padding:1.4rem 1.15rem 2rem} }
+@media print { body{background:#fff;color:#000;padding:0} .sheet{border:none;max-width:none;padding:0}
+  a::after{content:" <" attr(href) ">";font-size:.72em} @page{margin:18mm 16mm} }
+</style>
+</head><body>
+<main class="sheet">
+<div class="rfc-head">
+  <div><b>The Focus AI Standards</b><br>The register<br>Standards: ${entries.length}<br>In force: ${inForce}<br>Draft: ${drafts}</div>
+  <div class="right">The Focus AI<br>standards.thefocus.ai</div>
+</div>
+<h1>The register</h1>
+<div class="status-memo">
+  <span class="lbl">Status of this register</span>
+  <p>Every standard The Focus AI has issued, with what it binds and whether it is
+     in force. A standard in <b>Draft</b> binds nothing: it reflects current
+     understanding and is awaiting ratification, which only a person can give
+     (<code>STD-001 §3.14</code>).</p>
+  <p>This page is generated from the standards themselves. A standard that does
+     not conform to <code>STD-001</code> does not render, and so does not appear here.</p>
+</div>
+<h2>Standards</h2>
+<div class="table-scroll"><table>
+  <thead><tr><th>Ref</th><th>Title</th><th>Category</th><th>Applies to</th><th>Status</th><th>Clauses</th></tr></thead>
+  <tbody>${entries.map(row).join("")}</tbody>
+</table></div>
+</main>
+</body></html>`;
+}
+
 /* ---------------- cli ---------------- */
 function main() {
   const args = process.argv.slice(2);
@@ -328,6 +418,7 @@ function main() {
   mkdirSync(OUT_DIR, { recursive: true });
 
   let failed = 0;
+  const register = [];
   for (const f of files) {
     const parsed = parseStandard(readFileSync(f, "utf8"), basename(f));
     const name = basename(f).replace(/\.md$/, ".html");
@@ -338,6 +429,11 @@ function main() {
       continue;
     }
     writeFileSync(join(OUT_DIR, name), renderStandard(parsed, cssVars));
+    register.push({
+      id: `STD-${parsed.meta.standard}`, title: parsed.meta.title,
+      category: parsed.meta.category, status: parsed.meta.status,
+      applies: parsed.meta["applies-to"], clauses: parsed.clauses.length, file: name,
+    });
     const levels = parsed.clauses.reduce((a, c) => {
       const k = c.deprecated ? "DEPRECATED" : c.keyword;
       a[k] = (a[k] || 0) + 1;
@@ -347,7 +443,9 @@ function main() {
     console.log(`  ok ${basename(f).padEnd(42)} ${String(parsed.meta.category).padEnd(9)} ${summary}`);
   }
 
-  console.log(`\n  rendered to out/standards/`);
+  register.sort((a, b) => a.id.localeCompare(b.id));
+  writeFileSync(join(OUT_DIR, "index.html"), renderRegister(register, cssVars));
+  console.log(`\n  rendered to out/standards/ (index.html lists ${register.length})`);
   if (failed) {
     console.log(`  ${failed} document(s) did not conform.`);
     process.exit(1);

@@ -4,13 +4,13 @@ kind: note
 issued: "2026-07-25"
 author: W. Schenk
 status: Current
-verified: "2026-07-25"
+verified: "2026-07-26"
 ---
 
 # best-practices/ inventory
 
 A file-by-file audit of `best-practices/` against the standards corpus
-(`STD-001` … `STD-006`), to settle what becomes a numbered standard, what stays
+(`STD-001` … `STD-011` as they now stand), to settle what becomes a numbered standard, what stays
 a guide, and what is already absorbed.
 
 Written per `STD-006`. Classifications below were decided by an agent reading
@@ -43,7 +43,7 @@ titled "The seven required patterns" buried at line 100 of 694.
 | File | Size | Verdict |
 | --- | --- | --- |
 | `AGENTS.md` | 1.2 KB | **Mostly absorbed.** Tooling, tasks, no-global-installs and fnox are now `STD-004`; skills defer to `skills.md`. Residue is the Technologies block — TypeScript, pnpm, Neon, "avoid a build step where possible" — which is four lines of undecided policy, not a standard. |
-| `security.md` | 292 B | **Author as a Practice.** The subject with the worst failure mode has the smallest file. `STD-004 §3.7–3.8` already specify how secrets reach a process; vault layout, scoping and rotation are still undecided. Defers to `reports/fnox-secrets.md`, which is where the real content lives. |
+| `security.md` | 292 B | **Author as a Practice.** The subject with the worst failure mode has the smallest file. `STD-004 §3.7–3.8` already specify how secrets reach a process; vault layout, scoping and rotation are still undecided. Deferred to the fnox playbook, since moved to `best-practices/fnox-secrets.md`. |
 | `organization.md` | **0 B** | **Delete or write.** An empty file that root `AGENTS.md` directs readers to. Currently the corpus's clearest instance of the failure it exists to prevent. |
 | `pi-extensions.md` | 260 B | **Fold into `STD-005`.** It is agent-environment configuration, and it does not even list the five packages actually pinned in `.pi/settings.json`. |
 | `skills.md` | 7.2 KB | **Split.** The rules — install via `skills add`, pin in `skills-lock.json`, never hand-copy, kebab-case names — are a Practice. The standard skill set is an inventory that changes independently and should be data, not prose. "Adding a new skill" and "Keeping skills current" are Process. |
