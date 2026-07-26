@@ -395,6 +395,147 @@ td.num { font-family:var(--font-mono); text-align:right; font-variant-numeric:ta
 </body></html>`;
 }
 
+/* ---------------- one-file bundle ---------------- */
+// The whole corpus as a single self-contained page: the register, every
+// standard, and hash routing between them. For sharing and preview where
+// eleven separate files cannot travel together. `standard:render` still emits
+// the real multi-page site alongside it.
+function renderBundle(entries, cssVars) {
+  const nav = entries.map((e) =>
+    `<a class="reg-link" href="#${e.id}" data-std="${e.id}">${e.id}</a>`).join("");
+
+  const panels = entries.map((e) => {
+    // reuse each standard's rendered body, minus its document shell
+    const body = e.html.split("<main class=\"sheet\">")[1].split("</main>")[0];
+    return `<div class="panel" id="${e.id}" hidden>
+      <a class="back" href="#register">← the register</a>
+      ${body}
+    </div>`;
+  }).join("\n");
+
+  const registerBody = renderRegister(entries, cssVars)
+    .split('<main class="sheet">')[1].split("</main>")[0]
+    .replace(/href="STD-[^"]*\.html"/g, (m) => {
+      const id = m.match(/STD-\d+/)[0];
+      return `href="#${id}"`;
+    });
+
+  return `<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Focus AI Standards</title>
+<style>
+${cssVars}
+* { box-sizing: border-box; }
+body { margin:0; background:var(--color-page); color:var(--color-ink);
+  font-family:var(--font-body); line-height:var(--lh-body); padding:0 1rem 3rem; }
+*:focus-visible { outline:2px solid var(--color-focus-ring); outline-offset:2px; }
+.sheet { background:var(--color-sheet); max-width:58rem; margin:0 auto;
+  border:1px solid var(--color-line-strong); padding:2.25rem 2.5rem 3rem; }
+.railbar { max-width:58rem; margin:0 auto; padding:1rem 0 .9rem;
+  display:flex; flex-wrap:wrap; gap:.4rem .55rem; align-items:baseline; }
+.railbar .home { font-family:var(--font-display); font-weight:var(--fw-display);
+  letter-spacing:var(--ls-display); text-transform:uppercase; font-size:1rem;
+  color:var(--color-ink); text-decoration:none; margin-right:.5rem; }
+.reg-link { font-family:var(--font-mono); font-size:.68rem; letter-spacing:.06em;
+  color:var(--color-muted); text-decoration:none; padding:.15rem .3rem; }
+.reg-link:hover { color:var(--color-action); }
+.reg-link[aria-current="true"] { color:var(--color-action); font-weight:700; }
+.back { font-family:var(--font-mono); font-size:.68rem; letter-spacing:.06em;
+  color:var(--color-action); text-decoration:none; display:inline-block; margin-bottom:1.2rem; }
+.rfc-head { font-family:var(--font-mono); font-size:var(--size-mono-block); line-height:1.75;
+  display:grid; grid-template-columns:1fr auto; gap:0 1.5rem;
+  border-bottom:2px solid var(--color-ink); padding-bottom:.9rem; }
+.rfc-head .right { text-align:right; }
+h1 { font-family:var(--font-display); font-weight:var(--fw-display); letter-spacing:var(--ls-display);
+  text-transform:uppercase; line-height:var(--lh-display); font-size:var(--size-title);
+  text-align:center; margin:2rem 0 1.75rem; text-wrap:balance; }
+h2 { font-family:var(--font-display); font-weight:var(--fw-display); letter-spacing:var(--ls-display);
+  text-transform:uppercase; line-height:var(--lh-display); font-size:var(--size-section); margin:2.25rem 0 .75rem; }
+h3 { font-family:var(--font-body); font-size:var(--size-subsection); font-weight:700; margin:1.4rem 0 .5rem; }
+p { margin:0 0 .85rem; font-size:var(--size-body); max-width:68ch; }
+ul, ol { max-width:68ch; font-size:var(--size-body); } li { margin-bottom:.3rem; }
+a { color:var(--color-action); }
+blockquote { margin:1.1rem 0; padding:.9rem 1.05rem; background:rgba(20,26,23,.03); border:1px solid var(--color-line); }
+blockquote p:last-child { margin-bottom:0; }
+hr { border:none; border-top:1px solid var(--color-line); margin:2rem 0; }
+code { font-family:var(--font-mono); font-size:.88em; }
+pre.code { font-family:var(--font-mono); font-size:var(--size-mono-block); line-height:1.7;
+  background:rgba(20,26,23,.05); border:1px solid var(--color-line); padding:.6rem .75rem; overflow-x:auto; }
+pre.mermaid { font-family:var(--font-mono); font-size:var(--size-mono-block); line-height:1.7;
+  background:var(--color-sheet); border:1px solid var(--color-line-strong); padding:1rem; overflow-x:auto; }
+pre.mermaid svg { display:block; margin:0 auto; height:auto; max-width:100%; }
+.table-scroll { overflow-x:auto; }
+table { width:100%; min-width:30rem; border-collapse:collapse; font-size:.8125rem; margin-bottom:1.1rem; }
+th { text-align:left; font-family:var(--font-mono); font-size:var(--size-micro); font-weight:700;
+  letter-spacing:var(--ls-mono); text-transform:uppercase; color:var(--color-muted);
+  padding:.4rem .5rem; border-bottom:1px solid var(--color-line-strong); }
+td { padding:.5rem; border-bottom:1px solid var(--color-line); vertical-align:top; }
+td:first-child { font-family:var(--font-mono); white-space:nowrap; }
+td.num { font-family:var(--font-mono); text-align:right; font-variant-numeric:tabular-nums; }
+.clause { margin:1.5rem 0; border:1px solid var(--color-line); }
+.band { display:flex; flex-wrap:wrap; align-items:stretch;
+  border-bottom:1px solid var(--color-line); background:rgba(20,26,23,.035); }
+.band .tab { font-family:var(--font-display); font-weight:var(--fw-display); font-size:.95rem;
+  letter-spacing:.1em; text-transform:uppercase; line-height:1; padding:.55rem .8rem;
+  color:var(--color-sheet); display:flex; align-items:center; }
+.band .tab.must { background:var(--color-ink); }
+.band .tab.should { background:var(--color-action); }
+.band .tab.may { background:transparent; color:var(--color-ink); border-right:1px solid var(--color-line); }
+.band .tab.dep { background:var(--color-attention); }
+.band .ref { font-family:var(--font-mono); font-size:.68rem; padding:.55rem .8rem;
+  color:var(--color-muted); display:flex; align-items:center; }
+.clause-body { padding:.95rem 1rem 1.05rem; }
+.clause-body > *:last-child { margin-bottom:0; }
+.norm { font-size:var(--size-clause); font-weight:600; line-height:1.45; }
+.clause-body p:not(.norm) { font-size:var(--size-small); color:var(--color-muted); }
+.agent-head { font-family:var(--font-mono); font-size:var(--size-micro); font-weight:700;
+  letter-spacing:var(--ls-mono); text-transform:uppercase; color:var(--color-agent); margin:.8rem 0 .3rem; }
+pre.cmd { font-family:var(--font-mono); font-size:.8rem; line-height:1.7; margin:0;
+  background:rgba(44,85,96,.07); border-left:3px solid var(--color-agent); padding:.6rem .75rem; overflow-x:auto; }
+.status-memo { border:1px solid var(--color-line); background:rgba(20,26,23,.03); padding:.9rem 1.05rem; }
+.status-memo p:last-child { margin-bottom:0; }
+.lbl { font-family:var(--font-mono); font-size:var(--size-micro); font-weight:700;
+  letter-spacing:var(--ls-mono); text-transform:uppercase; color:var(--color-muted);
+  display:block; margin-bottom:.45rem; }
+.pip { display:inline-flex; align-items:center; gap:.4em; white-space:nowrap; }
+.pip::before { content:""; width:.55em; height:.55em; background:currentColor; flex:none; }
+.is-force { color:var(--color-in-force); } .is-attn { color:var(--color-attention); }
+.is-muted { color:var(--color-muted); }
+@media (max-width:700px){ .rfc-head{grid-template-columns:1fr} .rfc-head .right{text-align:left}
+  .sheet{padding:1.4rem 1.15rem 2rem} }
+@media print { body{background:#fff;color:#000;padding:0} .sheet{border:none;max-width:none;padding:0}
+  .railbar,.back{display:none} .band{background:transparent}
+  .band .tab{color:#000!important;background:transparent!important;border:1.5px solid #000;margin:.3rem;padding:.3rem .55rem}
+  pre.cmd{background:transparent;border:1px solid #bbb;border-left:3px solid #000;white-space:pre-wrap}
+  .clause,h2,h3{break-inside:avoid} h1,h2,h3{break-after:avoid}
+  a::after{content:" <" attr(href) ">";font-size:.72em} a[href^="#"]::after{content:""}
+  @page{margin:18mm 16mm} }
+</style>
+</head><body>
+<nav class="railbar"><a class="home" href="#register">The Focus AI Standards</a>${nav}</nav>
+<main class="sheet">
+<div class="panel" id="register">${registerBody}</div>
+${panels}
+</main>
+<script>
+const panels = [...document.querySelectorAll(".panel")];
+function show() {
+  const id = (location.hash || "#register").slice(1);
+  const target = document.getElementById(id) ? id : "register";
+  panels.forEach((p) => { p.hidden = p.id !== target; });
+  document.querySelectorAll(".reg-link").forEach((a) => {
+    a.setAttribute("aria-current", String(a.dataset.std === target));
+  });
+  window.scrollTo(0, 0);
+}
+addEventListener("hashchange", show);
+show();
+</script>
+</body></html>`;
+}
+
 /* ---------------- cli ---------------- */
 function main() {
   const args = process.argv.slice(2);
@@ -428,8 +569,10 @@ function main() {
       for (const e of parsed.errors) console.log(`      ${e}`);
       continue;
     }
-    writeFileSync(join(OUT_DIR, name), renderStandard(parsed, cssVars));
+    const html = renderStandard(parsed, cssVars);
+    writeFileSync(join(OUT_DIR, name), html);
     register.push({
+      html,
       id: `STD-${parsed.meta.standard}`, title: parsed.meta.title,
       category: parsed.meta.category, status: parsed.meta.status,
       applies: parsed.meta["applies-to"], clauses: parsed.clauses.length, file: name,
@@ -445,7 +588,8 @@ function main() {
 
   register.sort((a, b) => a.id.localeCompare(b.id));
   writeFileSync(join(OUT_DIR, "index.html"), renderRegister(register, cssVars));
-  console.log(`\n  rendered to out/standards/ (index.html lists ${register.length})`);
+  writeFileSync(join(OUT_DIR, "standards.html"), renderBundle(register, cssVars));
+  console.log(`\n  rendered to out/standards/ — index.html lists ${register.length}, standards.html bundles them`);
   if (failed) {
     console.log(`  ${failed} document(s) did not conform.`);
     process.exit(1);
