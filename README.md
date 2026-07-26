@@ -53,6 +53,7 @@ mise dev               # Run lint + test
 mise run generate:dockerfile   # Regenerate the Dockerfile via pi
 ./scripts/setup-default-project.sh ../my-project   # New/empty project bootstrap
 pi @skills/standardize-project/SKILL.md "Target project: ../qbsync"   # Audit a project against these standards
+pi @skills/standards-map/SKILL.md "Target project: ../local-library"  # Map project → latest standards report
 ```
 
 ## Design Philosophy

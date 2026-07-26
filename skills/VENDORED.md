@@ -17,6 +17,7 @@ old location and expect the two to converge.
 | `pptx-decks` | Split out of `focus-ai-brand` — the PptxGenJS mechanics |
 | `setup-project` | Converted from `prompts/setup-project.md` |
 | `standardize-project` | Converted from `prompts/standardize-project.md` |
+| `standards-map` | Authored here — latest standards → project mapping report (read-only) |
 | `develop-design-md` | Converted from `prompts/develop-design-md.md` |
 
 ## Vendored

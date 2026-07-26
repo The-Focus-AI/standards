@@ -27,7 +27,8 @@ Start with these files, depending on the work being requested:
 - `scripts/setup-default-project.sh` — quick bootstrap script for new/empty projects; copies default `mise.toml`, `.pi/settings.json`, `skills-lock.json`, `AGENTS.md`, and issue-workflow docs, then runs `mise trust`, `mise install`, setup, and locked skill installation.
 - `templates/default-project/` — source templates used by the bootstrap script and by prompts as examples for missing files.
 - `prompts/generate-dockerfile.md` — prompt for regenerating the standards container Dockerfile. The other
-  prompts became skills: `setup-project`, `standardize-project`, and `develop-design-md` now live in `skills/`.
+  prompts became skills: `setup-project`, `standardize-project`, `standards-map`, and
+  `develop-design-md` now live in `skills/`.
 - `architecture/` — design notes and decisions for this standards repo itself.
 - `reports/` — longer research/reference material, including fnox secrets, the skills CLI, and creative typography for DESIGN.md work.
 - `tests/` — validation scripts for this standards repo.

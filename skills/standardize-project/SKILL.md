@@ -17,6 +17,9 @@ Inspect first, propose a plan, then change. Never overwrite existing project
 configuration blindly — the goal is a repo that meets the standard *and* still works
 the way its team expects.
 
+For a **read-only mapping report** (which guides apply, exceptions vs gaps, no
+migration), use `standards-map` instead — or run it first, then return here to apply.
+
 ## Target
 
 Resolve the target repository before doing anything. If none was given, ask and stop.
