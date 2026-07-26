@@ -11,11 +11,16 @@ verified: "2026-07-25"
 
 # Building an A2A Agent
 
-How to spin up a new A2A-discoverable AI agent on Vercel using the AI Gateway, with MCP-emitted UI resources, typed refusals + citations, and Postgres session tracking.
+How to spin up a new A2A-discoverable AI agent on Vercel using the AI Gateway, with MCP-emitted UI
+resources, typed refusals + citations, and Postgres session tracking.
 
-This document describes the working pattern proven in the first production deployment. New agents follow this shape; deviate only when you can name a specific reason.
+This document describes the working pattern proven in the first production deployment. New agents
+follow this shape; deviate only when you can name a specific reason.
 
-> **Scope.** This is a backend agent template. The chat harness at `/chat` is one reference consumer — use [`focus/a2a-probe`](#testing--probing) (TODO repo) to verify a new agent without writing any web UI. UI frameworks, data modeling, multi-tenant patterns, and eval frameworks are explicitly out of scope.
+> **Scope.** This is a backend agent template. The chat harness at `/chat` is one reference consumer
+> — use [`focus/a2a-probe`](#11-testing--probing) (TODO repo) to verify a new agent without writing any
+> web UI. UI frameworks, data modeling, multi-tenant patterns, and eval frameworks are explicitly
+> out of scope.
 
 ---
 
@@ -23,14 +28,19 @@ This document describes the working pattern proven in the first production deplo
 
 A deployed agent that exposes:
 
-- **`GET /.well-known/agent-card.json`** — public A2A AgentCard per RFC 8615, advertises skills, transport, auth, and custom extensions (refusal posture, data source identity).
-- **`POST /api/a2a/jsonrpc`** — authenticated A2A JSON-RPC endpoint. Discovery is public, invocation requires Clerk M2M JWT (browser sessions also accepted for same-origin callers).
-- **`POST /api/mcp`** — MCP server over `WebStandardStreamableHTTPServerTransport`. Serves the same tool catalog as the A2A endpoint; powers MCP-UI resource rendering for any MCP client.
+- **`GET /.well-known/agent-card.json`** — public A2A AgentCard per RFC 8615, advertises skills,
+  transport, auth, and custom extensions (refusal posture, data source identity).
+- **`POST /api/a2a/jsonrpc`** — authenticated A2A JSON-RPC endpoint. Discovery is public, invocation
+  requires Clerk M2M JWT (browser sessions also accepted for same-origin callers).
+- **`POST /api/mcp`** — MCP server over `WebStandardStreamableHTTPServerTransport`. Serves the same
+  tool catalog as the A2A endpoint; powers MCP-UI resource rendering for any MCP client.
 - **`POST /api/chat`** *(optional reference)* — internal route for the in-repo chat harness if you want one.
 - **`GET /api/health`** — public uptime ping.
 - **`/api/cron/*`** *(optional)* — scheduled-job entrypoints gated by `CRON_SECRET` header.
 
-The agent is **session-tracked**: every conversation, user message, assistant message, and tool call (with full args + output as `jsonb`) is appended to Postgres. Silent tool bugs become diagnosable in production.
+The agent is **session-tracked**: every conversation, user message, assistant message, and tool call
+(with full args + output as `jsonb`) is appended to Postgres. Silent tool bugs become diagnosable in
+production.
 
 ---
 
@@ -58,7 +68,7 @@ Lock these unless you have a specific reason to swap one out:
 
 ## 3. Directory layout
 
-```
+```text
 my-agent/
 ├── app/                          ← Next.js project (the agent host)
 │   ├── app/
@@ -104,13 +114,17 @@ my-agent/
 └── CLAUDE.md                     ← project guide for AI agents working on the repo
 ```
 
-The `extractor/` name above is illustrative — rename it for your project (`crawler/`, `analytics/`, `crm-client/`). What matters is the **shape**: it's a workspace package that exposes async functions returning plain JSON. The agent only imports from there; it never touches your domain logic directly.
+The `extractor/` name above is illustrative — rename it for your project (`crawler/`, `analytics/`,
+`crm-client/`). What matters is the **shape**: it's a workspace package that exposes async functions
+returning plain JSON. The agent only imports from there; it never touches your domain logic
+directly.
 
 ---
 
 ## 4. The seven required patterns
 
-Everything in this section is **load-bearing** — not stylistic preference. Drop or weaken any of these and the agent loses a guarantee the template promises.
+Everything in this section is **load-bearing** — not stylistic preference. Drop or weaken any of
+these and the agent loses a guarantee the template promises.
 
 ### 4.1 Two-tier tool contract
 
@@ -156,7 +170,9 @@ Each tool exports **one** `ToolSpec` object. From that, derive:
 1. An AI SDK v6 `tool({...})` via `toAiTool(spec)` — registered on `streamText`.
 2. An MCP server registration via `registerOnMcp(server, spec)` — registered on the MCP route.
 
-Same `run(args, { signal })` function in both cases. **Zero per-tool duplication, zero drift.** New tool? One file. Add to `tools/index.ts` barrel. Done — appears on both the LLM tool surface and the external MCP surface automatically.
+Same `run(args, { signal })` function in both cases. **Zero per-tool duplication, zero drift.** New
+tool? One file. Add to `tools/index.ts` barrel. Done — appears on both the LLM tool surface and the
+external MCP surface automatically.
 
 ```ts
 // agent/tools/_spec.ts (abbreviated)
@@ -174,7 +190,8 @@ export function registerOnMcp(server: McpServer, spec: ToolSpec) { /* wraps for 
 
 ### 4.3 Refusals are typed, advertised, intentional
 
-Every agent has things it won't compute (missing data, blocked stakeholder decisions, methodologically-unsafe inputs). Make this explicit:
+Every agent has things it won't compute (missing data, blocked stakeholder decisions,
+methodologically-unsafe inputs). Make this explicit:
 
 ```ts
 // agent/refusals.ts
@@ -200,7 +217,9 @@ export const REFUSAL_REASONS: Record<RefusalRule, string> = {
 2. System prompt (instructs the LLM to refuse before tool-calling).
 3. AgentCard `capabilities.extensions[urn:{project}:refusals/v1]` (advertises to other agents).
 
-**Tools enforce refusals as a backstop:** every tool calls `detectInputRefusal(args)` before any I/O. If it fires, return `{ refusal }`; the rest never runs. The system prompt + tool guard form a double-enforcement.
+**Tools enforce refusals as a backstop:** every tool calls `detectInputRefusal(args)` before any
+I/O. If it fires, return `{ refusal }`; the rest never runs. The system prompt + tool guard form a
+double-enforcement.
 
 **A2A adapter emits refusals as a typed Part:**
 
@@ -212,13 +231,16 @@ if (output.refusal) {
 }
 ```
 
-JSON-RPC response is **successful** — the refusal is intentional behavior, not an error. Consumer agents filter on the mediaType.
+JSON-RPC response is **successful** — the refusal is intentional behavior, not an error. Consumer
+agents filter on the mediaType.
 
-**Any consumer (chat harness, probe CLI, other agent) shows refusals visibly** — a yellow notice in a UI, a flagged line in a CLI. Never swallow.
+**Any consumer (chat harness, probe CLI, other agent) shows refusals visibly** — a yellow notice in
+a UI, a flagged line in a CLI. Never swallow.
 
 ### 4.4 Citations on every quantitative claim
 
-Every visual tool returns a `Citation` alongside its data. Same pattern as refusals — typed Part with its own mediaType, advertised on AgentCard.
+Every visual tool returns a `Citation` alongside its data. Same pattern as refusals — typed Part
+with its own mediaType, advertised on AgentCard.
 
 ```ts
 // agent/citations.ts
@@ -238,7 +260,8 @@ export interface Citation {
 }
 ```
 
-The `source` triple is the audit hook: a debugger pastes it into a SQL console (or calls the named function) and reproduces the number. **Every visual tool, every call, no exceptions.**
+The `source` triple is the audit hook: a debugger pastes it into a SQL console (or calls the named
+function) and reproduces the number. **Every visual tool, every call, no exceptions.**
 
 ### 4.5 System prompt as `.md` + lockstep `.ts` mirror
 
@@ -247,7 +270,9 @@ Two files in `agent/`:
 - `system-prompt.md` — canonical, edit this. PR reviewers read it as markdown.
 - `system-prompt.ts` — exports `SYSTEM_PROMPT` string literal. The agent loop imports this.
 
-**Why two files:** Next.js route bundling can't reliably `readFileSync` arbitrary `.md` at runtime in production. Bundling the string into a TS module avoids the issue. The `.md` exists for human/diff/grep ergonomics.
+**Why two files:** Next.js route bundling can't reliably `readFileSync` arbitrary `.md` at runtime
+in production. Bundling the string into a TS module avoids the issue. The `.md` exists for
+human/diff/grep ergonomics.
 
 **Lockstep enforcement:** a vitest test asserts the two contents match:
 
@@ -262,7 +287,9 @@ it("system-prompt.ts mirrors system-prompt.md", () => {
 });
 ```
 
-**Refusal rules appear in BOTH** the system prompt's "Refusal rules" section and `agent/refusals.ts`. Same wording. The LLM may try to compute a refused thing anyway; the tool-level guard catches it.
+**Refusal rules appear in BOTH** the system prompt's "Refusal rules" section and
+`agent/refusals.ts`. Same wording. The LLM may try to compute a refused thing anyway; the tool-level
+guard catches it.
 
 ### 4.6 Postgres session persistence (required)
 
@@ -304,7 +331,9 @@ CREATE INDEX chat_messages_context_id_idx ON chat_messages (context_id, created_
 - `insertToolCall({ contextId, toolName, args, output, citation?, refusalRule?, userId? })`.
 - `listRecentConversations(opts)` — reader, for a future history UI.
 
-**Best-effort, non-blocking:** every writer wraps its own try/catch and logs to stderr. Callers wrap in `void` or `.catch()` — Vercel Fluid Compute may end the instance before the write completes, that's fine, the response already shipped.
+**Best-effort, non-blocking:** every writer wraps its own try/catch and logs to stderr. Callers wrap
+in `void` or `.catch()` — Vercel Fluid Compute may end the instance before the write completes,
+that's fine, the response already shipped.
 
 **Wiring point:** `runAgent` calls these in `streamText`'s `onFinish` callback:
 
@@ -339,11 +368,13 @@ SELECT context_id, tool_args, tool_output
  ORDER BY created_at DESC LIMIT 20;
 ```
 
-That query finds every call where a specific input produced a null where you expected a number — the kind of silent bug that eats days of debugging when this layer doesn't exist.
+That query finds every call where a specific input produced a null where you expected a number — the
+kind of silent bug that eats days of debugging when this layer doesn't exist.
 
 ### 4.7 One `runAgent`, two surfaces
 
-`agent/loop.ts` exposes a single function called by both the A2A endpoint AND any internal chat route. Tag the entry point with `surface`:
+`agent/loop.ts` exposes a single function called by both the A2A endpoint AND any internal chat
+route. Tag the entry point with `surface`:
 
 ```ts
 export type RunAgentOptions = {
@@ -358,7 +389,8 @@ export type RunAgentOptions = {
 export async function runAgent(opts: RunAgentOptions) { /* streamText(...) */ }
 ```
 
-A2A route and chat route both call this; the only difference is what they do with the returned stream (A2A adapter translates parts; chat route calls `.toUIMessageStreamResponse()`).
+A2A route and chat route both call this; the only difference is what they do with the returned
+stream (A2A adapter translates parts; chat route calls `.toUIMessageStreamResponse()`).
 
 ---
 
@@ -424,7 +456,8 @@ const card: AgentCard = {
 - `urn:{project}:refusals/v1` — what we won't compute (mirrors `REFUSAL_REASONS`).
 - `urn:{project}:data-source/v1` — identity of the underlying dataset.
 
-**Skill IDs are the contract** — they match `agent/tools/{id}.ts` AND `tool-{id}` part-type names. Don't rename without updating all three.
+**Skill IDs are the contract** — they match `agent/tools/{id}.ts` AND `tool-{id}` part-type names.
+Don't rename without updating all three.
 
 ---
 
@@ -466,7 +499,9 @@ export default middlewareImpl;
 export const config = { matcher: ["/((?!_next/static|_next/image|.*\\.(?:png|jpg|...)).*)", "/(api|trpc)(.*)"] };
 ```
 
-**Sign-up restriction:** configure in **Clerk dashboard → Restrictions → "Restrict sign-ups by email domain"**, NOT in code. The allowlist lives in Clerk so you can edit it without redeploys. Default for Focus agents: `thefocus.ai` + the project's customer domain.
+**Sign-up restriction:** configure in **Clerk dashboard → Restrictions → "Restrict sign-ups by email
+domain"**, NOT in code. The allowlist lives in Clerk so you can edit it without redeploys. Default
+for Focus agents: `thefocus.ai` + the project's customer domain.
 
 **Cron auth** (when applicable):
 
@@ -493,7 +528,8 @@ And add `/api/cron/(.*)` to the middleware's public list so Clerk doesn't gate i
 
 ## 7. The MCP server route
 
-`/api/mcp/route.ts` registers the same tools the agent loop uses, over Streamable HTTP transport. Stateless per request — Vercel Fluid Compute can suspend instances between calls.
+`/api/mcp/route.ts` registers the same tools the agent loop uses, over Streamable HTTP transport.
+Stateless per request — Vercel Fluid Compute can suspend instances between calls.
 
 ```ts
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
@@ -530,7 +566,10 @@ export const GET = handle;     // server-initiated SSE
 export const DELETE = handle;  // session terminate (no-op stateless)
 ```
 
-**Why a separate MCP route exists when we already have A2A:** MCP-UI's `AppRenderer` (used by the chat harness OR by any external MCP client) needs an MCP server it can connect to so its sandboxed iframe can forward UI actions (`tools/call`, `resources/read`) back into the tool surface. A2A's JSON-RPC envelope doesn't expose that sandbox-proxy protocol.
+**Why a separate MCP route exists when we already have A2A:** MCP-UI's `AppRenderer` (used by the
+chat harness OR by any external MCP client) needs an MCP server it can connect to so its sandboxed
+iframe can forward UI actions (`tools/call`, `resources/read`) back into the tool surface. A2A's
+JSON-RPC envelope doesn't expose that sandbox-proxy protocol.
 
 For a pure-A2A agent (no MCP-UI rendering), you can skip this route. **If your tools emit UI resources, you need it.**
 
@@ -538,7 +577,8 @@ For a pure-A2A agent (no MCP-UI rendering), you can skip this route. **If your t
 
 ## 8. Environment variables
 
-Source of truth: `fnox.toml` mapping env vars to 1Password items in a per-project vault. Locally `fnox exec -- pnpm dev` injects them; on Vercel they live in the project's env vars.
+Source of truth: `fnox.toml` mapping env vars to 1Password items in a per-project vault. Locally
+`fnox exec -- pnpm dev` injects them; on Vercel they live in the project's env vars.
 
 **Required:**
 
@@ -558,9 +598,11 @@ Source of truth: `fnox.toml` mapping env vars to 1Password items in a per-projec
 | `CLERK_DOMAIN` | `https://clerk.{project}.thefocus.ai` | For M2M token URL in AgentCard |
 | `CRON_SECRET` | — | Required if `/api/cron/*` routes exist |
 
-**fnox.toml** ships with `if_missing = "ignore"` on every entry that isn't strictly required, so `fnox check` stays green for partially-provisioned projects.
+**fnox.toml** ships with `if_missing = "ignore"` on every entry that isn't strictly required, so
+`fnox check` stays green for partially-provisioned projects.
 
-**Dev-mode without Clerk:** if `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` is absent, the middleware no-ops and the app boots unauthenticated. Useful for local dev before keys are provisioned.
+**Dev-mode without Clerk:** if `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` is absent, the middleware no-ops
+and the app boots unauthenticated. Useful for local dev before keys are provisioned.
 
 ---
 
@@ -614,7 +656,8 @@ export const config: VercelConfig = {
 };
 ```
 
-**Env var sync:** add all four required vars in Vercel dashboard (Production + Preview). Or wire `mise run sync-vercel-env` task that walks fnox and `vercel env add` each.
+**Env var sync:** add all four required vars in Vercel dashboard (Production + Preview). Or wire
+`mise run sync-vercel-env` task that walks fnox and `vercel env add` each.
 
 **First-deploy checklist:**
 
@@ -623,7 +666,8 @@ export const config: VercelConfig = {
 3. `curl https://{project}.vercel.app/.well-known/agent-card.json` → AgentCard JSON.
 4. In an unauthenticated browser: visit `/` → bounces to Clerk sign-in.
 5. Sign in with an allowlisted email → reach `/chat` (if harness shipped) or any protected route.
-6. From the `focus/a2a-probe` CLI (see §11): point at the agent URL, M2M-auth, invoke a tool, verify Citation Part comes back.
+6. From the `focus/a2a-probe` CLI (see §11): point at the agent URL, M2M-auth, invoke a tool, verify
+   Citation Part comes back.
 
 ---
 
@@ -638,7 +682,7 @@ export const config: VercelConfig = {
 - One `mcp-server.test.ts` covering tool registration.
 - Per-tool tests for any non-trivial logic in `run()`.
 
-**End-to-end probing:** use [`focus/a2a-probe`](#) (TODO — separate repo). The probe is a CLI/TUI that:
+**End-to-end probing:** use `focus/a2a-probe` (TODO — separate repo). The probe is a CLI/TUI that:
 
 - Fetches an AgentCard from any URL.
 - Authenticates via Clerk M2M (client_credentials grant) or session cookie.
@@ -647,18 +691,22 @@ export const config: VercelConfig = {
 - Renders MCP-UI resources in a terminal-friendly way (or pops them into a local browser).
 - Logs the full JSON-RPC round-trip.
 
-The point of the probe: **new agents don't need to ship a `/chat` harness just to verify they work.** Drop the probe at a deployed agent URL, run through every skill, confirm citations come back.
+The point of the probe: **new agents don't need to ship a `/chat` harness just to verify they
+work.** Drop the probe at a deployed agent URL, run through every skill, confirm citations come
+back.
 
 ---
 
 ## 12. CLAUDE.md for the project
 
-Every Focus agent repo ships a `CLAUDE.md` at the root that points future AI agents (Claude Code working on the codebase) at the structure. Required sections:
+Every Focus agent repo ships a `CLAUDE.md` at the root that points future AI agents (Claude Code
+working on the codebase) at the structure. Required sections:
 
 - Layout (where code lives, where docs live, where inputs live).
 - Quick reference table (most-asked questions and where to find the answer).
 - Conventions (TS in `app/`, domain code in `{extractor}/`, secrets in fnox).
-- "When you're asked to do X" runbooks for common changes (add a new tool, add a new data source, refresh the underlying dataset).
+- "When you're asked to do X" runbooks for common changes (add a new tool, add a new data source,
+  refresh the underlying dataset).
 - Status snapshot dated at the top.
 
 See the reference implementation's `CLAUDE.md` for an example.
@@ -676,10 +724,12 @@ See the reference implementation's `CLAUDE.md` for an example.
    - `app/agent/citations.ts` — rewrite for your dataset's identity fields.
    - `app/app/.well-known/agent-card.json/route.ts` — rewrite skills, extensions, descriptions.
    - `app/app/chat/page.tsx` — keep or drop (optional reference harness).
-   - `app/__tests__/*` — keep `tools-shape`, `system-prompt`, `chat-log`, `a2a-adapter`, `mcp-server`; delete per-tool tests.
+   - `app/__tests__/*` — keep `tools-shape`, `system-prompt`, `chat-log`, `a2a-adapter`,
+     `mcp-server`; delete per-tool tests.
 3. Rename the workspace package (`{reference}-extractor`) to `{project}-{domain}`.
 4. Update `CLAUDE.md` with new project context.
-5. Provision: create 1P vault, populate `DATABASE_URL` / `AI_GATEWAY_API_KEY` / Clerk keys, run migration SQL against new Neon DB.
+5. Provision: create 1P vault, populate `DATABASE_URL` / `AI_GATEWAY_API_KEY` / Clerk keys, run
+   migration SQL against new Neon DB.
 6. Write your first tool. Follow §4.1. Add to `tools/index.ts` barrel.
 7. Probe: point `focus/a2a-probe` at `http://localhost:3000` — confirm AgentCard + tool invocation.
 
@@ -691,12 +741,17 @@ That's the agent. The work after that is your domain logic in `{domain}/`.
 
 Items not yet in the template but planned:
 
-- **`focus/a2a-probe`** — the standalone test client referenced in §11. Once it exists, the chat harness becomes truly optional.
+- **`focus/a2a-probe`** — the standalone test client referenced in §11. Once it exists, the chat
+  harness becomes truly optional.
 - **`standards/scripts/setup-a2a-agent.sh`** — automate §13.
-- **`AGENT_TOOL_MODEL`** — second model env var for tools that themselves make LLM calls (e.g. summarizer tools). Add when an agent first needs it.
-- **Streaming (`SendStreamingMessage`)** — A2A v1.0 supports SSE for token streaming. The reference implementation declares `streaming: true` on the AgentCard but the adapter currently returns `UNSUPPORTED_OPERATION`. Wire when the first consumer asks for it.
+- **`AGENT_TOOL_MODEL`** — second model env var for tools that themselves make LLM calls (e.g.
+  summarizer tools). Add when an agent first needs it.
+- **Streaming (`SendStreamingMessage`)** — A2A v1.0 supports SSE for token streaming. The reference
+  implementation declares `streaming: true` on the AgentCard but the adapter currently returns
+  `UNSUPPORTED_OPERATION`. Wire when the first consumer asks for it.
 - **Task cancellation (`CancelTask`)** — same as above, declared but not implemented.
-- **JWS signatures on AgentCard** — `signatures: []` is empty; add when we have a keypair for verifying agent authenticity.
+- **JWS signatures on AgentCard** — `signatures: []` is empty; add when we have a keypair for
+  verifying agent authenticity.
 
 ---
 
@@ -706,4 +761,5 @@ Items not yet in the template but planned:
 - Repository layout conventions are not yet written; see the gap register in `reports/`.
 - [`security.md`](./security.md) — secrets management, Clerk patterns.
 - [`AGENTS.md`](./AGENTS.md) — how AI coding agents work in Focus repos.
-- Reference implementation: ask in `#engineering` for the current pointer — read its `app/` and the workspace-package directory.
+- Reference implementation: ask in `#engineering` for the current pointer — read its `app/` and the
+  workspace-package directory.

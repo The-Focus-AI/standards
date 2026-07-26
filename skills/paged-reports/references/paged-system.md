@@ -11,22 +11,24 @@ The `/report` command converts markdown to styled HTML reports. Three modes, pic
 
 1. **Standard** — Simple HTML opened in browser for Cmd+P printing
 2. **Paged** — Full paged.js rendering with running headers, page numbers, smart page breaks, and a component library
-3. **Magazine** — Horizontal-scroll, full-viewport spreads with arrow-key navigation. For shareable URLs (artifacts, link drops) where the reader scrolls through the report on screen instead of printing it.
+3. **Magazine** — Horizontal-scroll, full-viewport spreads with arrow-key navigation. For shareable
+   URLs (artifacts, link drops) where the reader scrolls through the report on screen instead of
+   printing it.
 
 **Picking a mode:**
 
-| When                                                        | Mode         |
-| ----------------------------------------------------------- | ------------ |
-| Internal draft, quick read in the browser                   | **Standard** |
-| Emailing a PDF, client deliverable, archival print          | **Paged**    |
-| Shareable URL (artifact, Slack link), screen-only reading   | **Magazine** |
+| When                                                        | Mode                                                                    |
+| ----------------------------------------------------------- | ------------                                                            |
+| Internal draft, quick read in the browser                   | **Standard**                                                            |
+| Emailing a PDF, client deliverable, archival print          | **Paged**                                                               |
+| Shareable URL (artifact, Slack link), screen-only reading   | **Magazine**                                                            |
 | You want both a PDF and a scrollable URL                    | Generate **Magazine** — its `@media print` fallback emits paged spreads |
 
 ---
 
 ## Usage
 
-```
+```text
 # Standard: open in browser for manual print
 /report file:./my-document.md style:labs
 
@@ -54,16 +56,22 @@ The `/report` command converts markdown to styled HTML reports. Three modes, pic
 
 ## Magazine Mode
 
-Horizontal scroll-snap track of full-viewport spreads. `←` / `→` arrow keys page between spreads, `↑` / `↓` scroll within the current spread. Designed for shareable URLs where the reader consumes the report on screen.
+Horizontal scroll-snap track of full-viewport spreads. `←` / `→` arrow keys page between spreads,
+`↑` / `↓` scroll within the current spread. Designed for shareable URLs where the reader consumes
+the report on screen.
 
 ### When to use it
 
 - Output is a URL you'll share (artifacts.thefocus.ai, Slack link, email link), not a file you'll attach.
 - Reader is on a desktop or laptop with arrow keys.
-- The report has 3–12 logical sections that each fit one viewport-width. (More than ~12 and the horizontal track gets tedious.)
-- You also want a paged PDF as a side-effect — magazine mode's `@media print` fallback emits one page per spread automatically.
+- The report has 3–12 logical sections that each fit one viewport-width. (More than ~12 and the
+  horizontal track gets tedious.)
+- You also want a paged PDF as a side-effect — magazine mode's `@media print` fallback emits one
+  page per spread automatically.
 
-**Don't use it for:** long-form articles, single-section status updates, anything reading on a phone (the layout falls back to vertical stacking on narrow viewports, but the magazine premise is desktop-first).
+**Don't use it for:** long-form articles, single-section status updates, anything reading on a phone
+(the layout falls back to vertical stacking on narrow viewports, but the magazine premise is
+desktop-first).
 
 ### Required scaffolding
 
@@ -96,8 +104,10 @@ html, body {
 
 The two key invariants:
 
-1. **`overflow: hidden` on `body`** — without it, the page itself becomes scrollable on top of the track, and you get double-scroll weirdness.
-2. **`overflow-y: auto` on each `.spread`** — so a spread taller than the viewport scrolls vertically without affecting the horizontal track.
+1. **`overflow: hidden` on `body`** — without it, the page itself becomes scrollable on top of the
+   track, and you get double-scroll weirdness.
+2. **`overflow-y: auto` on each `.spread`** — so a spread taller than the viewport scrolls
+   vertically without affecting the horizontal track.
 
 ### Required keyboard handler
 
@@ -138,7 +148,9 @@ window.addEventListener("keydown", (e) => {
 window.addEventListener("resize", () => { targetIndex = currentIndex(); });
 ```
 
-`PageDown` / `PageUp` / `Space` are aliased to ←/→ so presentation-style remotes work. Why `targetIndex` (not just reading `scrollLeft`): rapid key presses fire faster than smooth-scroll completes, so we track the intended target and let `scrollTo` chase it.
+`PageDown` / `PageUp` / `Space` are aliased to ←/→ so presentation-style remotes work. Why
+`targetIndex` (not just reading `scrollLeft`): rapid key presses fire faster than smooth-scroll
+completes, so we track the intended target and let `scrollTo` chase it.
 
 ### Required fixed chrome
 
@@ -156,11 +168,14 @@ Three persistent overlays, fixed-positioned with `pointer-events: none` so they 
 </div>
 ```
 
-Where `.arrow` has a 1.6s `translateX` keyframe animation in Vermilion so first-time readers see they should press a key. The hint is non-blocking and not interactive — purely affordance signaling.
+Where `.arrow` has a 1.6s `translateX` keyframe animation in Vermilion so first-time readers see
+they should press a key. The hint is non-blocking and not interactive — purely affordance signaling.
 
 ### Spread structure
 
-Each `.spread` uses a 3-column asymmetric grid: 144px label column / flexible content (max 60ch) / 192px marginalia. For spreads without marginalia, use `.spread-inner.no-marginalia` (drops the third column).
+Each `.spread` uses a 3-column asymmetric grid: 144px label column / flexible content (max 60ch) /
+192px marginalia. For spreads without marginalia, use `.spread-inner.no-marginalia` (drops the third
+column).
 
 ```html
 <section class="spread" style="background:var(--tint-cool)">
@@ -183,9 +198,11 @@ Each `.spread` uses a 3-column asymmetric grid: 144px label column / flexible co
 </section>
 ```
 
-**The cover spread** is special — uses `.spread-inner.full` (single column), `.cover-title` (72px Source Serif 4 Black), and a `.meta-grid` for Project / Repo / Stack / Prepared-by labels.
+**The cover spread** is special — uses `.spread-inner.full` (single column), `.cover-title` (72px
+Source Serif 4 Black), and a `.meta-grid` for Project / Repo / Stack / Prepared-by labels.
 
-**The closing spread** typically inverts: `background: var(--ink)` with `color: var(--paper)` and translucent borders on cards. Lets a confident takeaway land as the final view.
+**The closing spread** typically inverts: `background: var(--ink)` with `color: var(--paper)` and
+translucent borders on cards. Lets a confident takeaway land as the final view.
 
 ### Background variation
 
@@ -199,11 +216,14 @@ Vary the `background` of consecutive spreads to give the reader spatial awarenes
 | `--tint-sage` | `#eef6ee` | UI / rendering spreads           |
 | `--ink`       | `#161616` | Closing spread (inverted)        |
 
-Don't alternate every spread — group by semantic affinity. The Versant architecture report uses paper → cool → paper → paper → warm → paper → sage → paper → ink, where each tint marks a thematic shift.
+Don't alternate every spread — group by semantic affinity. The Versant architecture report uses
+paper → cool → paper → paper → warm → paper → sage → paper → ink, where each tint marks a thematic
+shift.
 
 ### Print fallback (paged PDF as side-effect)
 
-Magazine mode includes a `@media print` block that converts horizontal spreads into landscape pages. So you can `Cmd+P → Save as PDF` and get an emailable artifact for free:
+Magazine mode includes a `@media print` block that converts horizontal spreads into landscape pages.
+So you can `Cmd+P → Save as PDF` and get an emailable artifact for free:
 
 ```css
 @media print {
@@ -233,25 +253,39 @@ Magazine mode includes a `@media print` block that converts horizontal spreads i
 }
 ```
 
-This is why magazine mode is the right pick when "we email PDFs sometimes and share URLs sometimes" — one HTML file ships both.
+This is why magazine mode is the right pick when "we email PDFs sometimes and share URLs sometimes"
+— one HTML file ships both.
 
 ### Reference implementation
 
-The Versant architecture report ships the canonical example: nine spreads, paper + four background tints + closing on `--ink`, full keyboard wiring, print fallback. Read `docs/status/architecture-report.html` in the versant repo for a complete starting point.
+The Versant architecture report ships the canonical example: nine spreads, paper + four background
+tints + closing on `--ink`, full keyboard wiring, print fallback. Read
+`docs/status/architecture-report.html` in the versant repo for a complete starting point.
 
 ### Gotchas
 
-- **Avoid `wheel`/`deltaX` hijacking.** Trackpad horizontal swipe + `scroll-snap-type: x mandatory` is already the correct experience. Adding a wheel handler to "page" on horizontal scroll fights the OS gesture and feels broken. Trust scroll-snap.
-- **Section count vs viewport count.** Don't 1-to-1 map markdown sections to spreads. Consolidate. A report with 12 markdown h2s probably wants 6 spreads; group adjacent sections.
-- **Tall content in a single spread.** If a spread's content overflows the viewport, that's fine — the spread itself becomes vertically scrollable. The arrow-key handler routes `↑`/`↓` into the active spread. Don't try to fit everything horizontally.
-- **Don't add a per-spread nav.** Spread index in `.running-foot` (e.g. `02`) is enough. Sidebar nav fights the magazine premise.
-- **Mobile fallback.** Below ~768px, the magazine premise dies. Either add a vertical-stack media query (each `.spread` becomes `width: 100vw; height: auto;` and the track flips to `flex-direction: column; scroll-snap-type: y mandatory;`), or accept that magazine mode is desktop-only and add a noscript / narrow-viewport notice. The reference implementation chooses the latter.
+- **Avoid `wheel`/`deltaX` hijacking.** Trackpad horizontal swipe + `scroll-snap-type: x mandatory`
+  is already the correct experience. Adding a wheel handler to "page" on horizontal scroll fights
+  the OS gesture and feels broken. Trust scroll-snap.
+- **Section count vs viewport count.** Don't 1-to-1 map markdown sections to spreads. Consolidate. A
+  report with 12 markdown h2s probably wants 6 spreads; group adjacent sections.
+- **Tall content in a single spread.** If a spread's content overflows the viewport, that's fine —
+  the spread itself becomes vertically scrollable. The arrow-key handler routes `↑`/`↓` into the
+  active spread. Don't try to fit everything horizontally.
+- **Don't add a per-spread nav.** Spread index in `.running-foot` (e.g. `02`) is enough. Sidebar nav
+  fights the magazine premise.
+- **Mobile fallback.** Below ~768px, the magazine premise dies. Either add a vertical-stack media
+  query (each `.spread` becomes `width: 100vw; height: auto;` and the track flips to
+  `flex-direction: column; scroll-snap-type: y mandatory;`), or accept that magazine mode is
+  desktop-only and add a noscript / narrow-viewport notice. The reference implementation chooses the
+  latter.
 
 ---
 
 ## Smart Page Break System
 
-The paged templates implement a comprehensive page-break strategy. **No manual intervention needed for most documents** — the CSS handles it automatically.
+The paged templates implement a comprehensive page-break strategy. **No manual intervention needed
+for most documents** — the CSS handles it automatically.
 
 ### How It Works
 
@@ -270,7 +304,7 @@ The paged templates implement a comprehensive page-break strategy. **No manual i
 
 For optimal pagination, structure content as:
 
-```
+```text
 cover → optional stat-grid → first h2 (.no-break-before) → content →
 h2 → content → h2 → content → footer
 ```
@@ -289,7 +323,8 @@ When you have an h3 followed by related content (paragraphs, lists, cards) that 
 </div>
 ```
 
-Without the wrapper, `break-after: avoid` only prevents a break _immediately_ after the heading — the content could still break away. The `.section` wrapper keeps the entire block together.
+Without the wrapper, `break-after: avoid` only prevents a break _immediately_ after the heading —
+the content could still break away. The `.section` wrapper keeps the entire block together.
 
 ### When to Add `.no-break-before`
 
@@ -568,7 +603,7 @@ For magazine-style flowing text across columns within paged reports:
 }
 ```
 
-### Usage
+### Column usage
 
 ```html
 <h2 class="no-break-before">Analysis</h2>

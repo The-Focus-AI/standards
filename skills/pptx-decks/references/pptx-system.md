@@ -8,7 +8,8 @@ examples below are those palettes, declared once at the top of the generated scr
 
 ## Overview
 
-Generate branded PowerPoint presentations using PptxGenJS. Sub-brands have distinct slide aesthetics that match their print and web identities.
+Generate branded PowerPoint presentations using PptxGenJS. Sub-brands have distinct slide aesthetics
+that match their print and web identities.
 
 **Dependencies:**
 
@@ -557,7 +558,7 @@ steps.forEach((step, i) => {
 
 Generate a branded presentation from content.
 
-```
+```text
 /deck file:./content.md style:client output:./presentation.pptx
 /deck file:./research.md style:labs output:./research-deck.pptx
 ```

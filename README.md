@@ -34,9 +34,9 @@ Sessions are ephemeral — lost when the container exits. Mount a volume to
 | `Dockerfile`        | Minimal container: `debian:stable-slim`, mise, bash, tmux, git, gh. `/app` is left empty for your project.   |
 | `skills-lock.json`  | Company-approved skills (locked hashes for reproducibility)                                                  |
 | `skills/`           | Every skill we own — brand, research, reporting, docs/decks, project setup. See `skills/VENDORED.md`         |
-| `best-practices/`   | Deployment, Vercel, GCP, GCE Gaia, Clerk, security, skills, pi extensions, project organization             |
+| `best-practices/`   | Deployment, Vercel, GCP, GCE Gaia, Clerk, security, skills, pi extensions, project organization              |
 | `prompts/`          | Pi prompts — `generate-dockerfile.md` regenerates this Dockerfile (the rest became skills)                   |
-| `reports/`          | Technical research (fnox secrets reference, skills CLI guide, electron shell)                               |
+| `reports/`          | Technical research (fnox secrets reference, skills CLI guide, electron shell)                                |
 | `tests/`            | Dockerfile integration tests — `mise test` validates the image                                               |
 | `architecture/`     | Design documents — PRDs and decision records                                                                 |
 | `.pi/settings.json` | Project-local pi config (npmCommand routes through mise, sessionDir keeps sessions local)                    |

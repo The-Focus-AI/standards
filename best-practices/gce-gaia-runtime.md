@@ -109,7 +109,7 @@ with the ~10 minute cycle cost.
 
 Repo-backed habitats only going forward:
 
-```
+```text
 config.json      # id metadata, toolsDir, stimulusFile, requiredSecrets
 STIMULUS.md
 tools/<name>/    # TOOL.md + handler.ts

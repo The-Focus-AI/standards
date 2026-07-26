@@ -15,19 +15,27 @@ verified: "2026-07-26"
 A reference for setting up isolated, auditable secret management on any project.
 Goals:
 
-1. **Full isolation** — each project's secrets live in their own 1Password vault, accessed by a service account that can only see that vault.
-2. **1Password is the source of truth** — secrets are never committed, never written to disk in plaintext, and never live in a personal shell profile.
-3. **Control where every key comes from** — `fnox.toml` declaratively maps each `ENV_VAR` to a specific provider/vault/item.
-4. **Usage visibility** — every secret has metadata pointing to its billing/usage dashboard, plus optional scripts to programmatically check balances.
+1. **Full isolation** — each project's secrets live in their own 1Password vault, accessed by a
+   service account that can only see that vault.
+2. **1Password is the source of truth** — secrets are never committed, never written to disk in
+   plaintext, and never live in a personal shell profile.
+3. **Control where every key comes from** — `fnox.toml` declaratively maps each `ENV_VAR` to a
+   specific provider/vault/item.
+4. **Usage visibility** — every secret has metadata pointing to its billing/usage dashboard, plus
+   optional scripts to programmatically check balances.
 
 ---
 
 ## Concepts
 
-- **fnox** — a CLI that resolves env vars at runtime from one or more *providers* (1Password, age, keychain, AWS, etc.). It does not store secrets itself; it's a router.
-- **Service account (1Password)** — a non-human identity scoped to specific vaults. Authenticates with a long-lived `OP_SERVICE_ACCOUNT_TOKEN`. Cannot access Personal/Private vaults.
-- **Profile (fnox)** — named environment (e.g. `default`, `prod`, `staging`) that selects different secrets or providers. `FNOX_PROFILE=prod fnox exec -- ./run.sh`.
-- **Provider (fnox)** — a backend declared in `fnox.toml`. You can have multiple per project (e.g. `op-dev`, `op-prod`, `keychain-local`).
+- **fnox** — a CLI that resolves env vars at runtime from one or more *providers* (1Password, age,
+  keychain, AWS, etc.). It does not store secrets itself; it's a router.
+- **Service account (1Password)** — a non-human identity scoped to specific vaults. Authenticates
+  with a long-lived `OP_SERVICE_ACCOUNT_TOKEN`. Cannot access Personal/Private vaults.
+- **Profile (fnox)** — named environment (e.g. `default`, `prod`, `staging`) that selects different
+  secrets or providers. `FNOX_PROFILE=prod fnox exec -- ./run.sh`.
+- **Provider (fnox)** — a backend declared in `fnox.toml`. You can have multiple per project (e.g.
+  `op-dev`, `op-prod`, `keychain-local`).
 
 ---
 
@@ -78,7 +86,7 @@ Then `mise install`.
 > ```
 >
 > in a fresh tab inside the project directory.
-
+>
 > **Why `fnox activate` is the smart default.** It registers a `chpwd` hook
 > that walks up looking for `fnox.toml`; when it finds one, every declared
 > secret is exported into your shell. When you leave that directory tree, the
@@ -131,7 +139,7 @@ op item create --category="API Credential" --vault="thefocus" \
 
 ### 4. `.gitignore`
 
-```
+```text
 .fnox/
 *.env
 *.env.local
@@ -250,7 +258,7 @@ project. No `fnox exec --` wrapper needed:
 > non-interactive context, or you skipped the zshrc step), wrap each script
 > in `fnox exec --` instead — `"dev": "fnox exec -- pnpm --filter web dev"`.
 > Both styles work; activation just removes the boilerplate.
-
+>
 > **Gotcha — `pnpm --filter web tsx ...` does NOT work.** That tries to run
 > `tsx` as a *package script*. Use `pnpm --filter web exec tsx ...` to run
 > `tsx` as a binary from `node_modules/.bin`.
@@ -326,11 +334,12 @@ Now `pnpm dev` boots with secrets pulled from 1Password at process start, and
 
 Two patterns — pick one:
 
-**A. One vault, profiles select different items.** Items named `DATABASE_URL_prod`, etc. Profile maps them to the same env var.
+**A. One vault, profiles select different items.** Items named `DATABASE_URL_prod`, etc. Profile
+maps them to the same env var.
 
 **B. One vault per environment** (recommended for stricter isolation). Separate service accounts:
 
-```
+```text
 "<Project> - Dev"   → dev-sa   token →  $OP_SERVICE_ACCOUNT_TOKEN_DEV
 "<Project> - Prod"  → prod-sa  token →  $OP_SERVICE_ACCOUNT_TOKEN_PROD
 ```
@@ -347,7 +356,8 @@ type  = "1password"
 vault = "<Project> - Prod"
 ```
 
-CI/Vercel sets only the `_PROD` token; local devs have only the `_DEV` token. Compromised dev creds cannot read prod values.
+CI/Vercel sets only the `_PROD` token; local devs have only the `_DEV` token. Compromised dev creds
+cannot read prod values.
 
 ---
 
@@ -372,7 +382,7 @@ cache; bootstrap-token keeps fnox in the loop at runtime.
 > handles runtime injection. **1Password stays the source of truth, Vercel
 > is a derived cache.** This avoids brittle "install fnox in the build" hacks.
 
-**1. Project settings (one-time, in dashboard)**
+#### 1. Project settings (one-time, in dashboard)
 
 - **Settings → General → Root Directory** → `web` (the Next.js app folder).
   Check "Include source files outside of the Root Directory in the Build Step"
@@ -480,11 +490,13 @@ functions keep running.
 
 ### GCP (Cloud Run, GKE, Compute Engine)
 
-Two viable patterns — pick based on whether you want fnox in the runtime image or want GCP to handle secret delivery natively.
+Two viable patterns — pick based on whether you want fnox in the runtime image or want GCP to handle
+secret delivery natively.
 
 #### Pattern A — fnox at container start (most portable)
 
-The container has `fnox` installed; entrypoint is `fnox exec -- <your app>`. The bootstrap token comes from **Google Secret Manager**.
+The container has `fnox` installed; entrypoint is `fnox exec -- <your app>`. The bootstrap token
+comes from **Google Secret Manager**.
 
 **Dockerfile:**
 
@@ -517,15 +529,23 @@ gcloud run deploy my-app \
   --set-secrets=OP_SERVICE_ACCOUNT_TOKEN=op-service-account-token:latest
 ```
 
-Cloud Run injects `OP_SERVICE_ACCOUNT_TOKEN` into the container env. Entrypoint runs `fnox exec --`, which calls 1Password and re-execs your app with all the project secrets resolved. The container itself never persists those secrets.
+Cloud Run injects `OP_SERVICE_ACCOUNT_TOKEN` into the container env. Entrypoint runs `fnox exec --`,
+which calls 1Password and re-execs your app with all the project secrets resolved. The container
+itself never persists those secrets.
 
-**GKE equivalent:** mount the GSM secret via [Secret Manager CSI driver](https://secrets-store-csi-driver.sigs.k8s.io/) or sync to a K8s `Secret` via External Secrets Operator, then reference as an env var in the pod spec.
+**GKE equivalent:** mount the GSM secret via [Secret Manager CSI
+driver](https://secrets-store-csi-driver.sigs.k8s.io/) or sync to a K8s `Secret` via External
+Secrets Operator, then reference as an env var in the pod spec.
 
-**Compute Engine:** use [the metadata server + Secret Manager](https://cloud.google.com/secret-manager/docs/access-control#vm) at boot via a startup script, write to `/etc/fnox/token`, run app via systemd unit with `EnvironmentFile`.
+**Compute Engine:** use [the metadata server + Secret
+Manager](https://cloud.google.com/secret-manager/docs/access-control#vm) at boot via a startup
+script, write to `/etc/fnox/token`, run app via systemd unit with `EnvironmentFile`.
 
 #### Pattern B — sync 1Password → GCP Secret Manager (no fnox in prod)
 
-If you'd rather keep production lean and not depend on outbound network calls to 1Password.com from Cloud Run cold starts, use fnox **only locally and in CI**, and have CI sync the resolved values into GSM:
+If you'd rather keep production lean and not depend on outbound network calls to 1Password.com from
+Cloud Run cold starts, use fnox **only locally and in CI**, and have CI sync the resolved values
+into GSM:
 
 ```bash
 # In CI, after fnox exec is verified working:
@@ -537,7 +557,9 @@ done
 
 Then `gcloud run deploy --set-secrets=DATABASE_URL=DATABASE_URL:latest,ANTHROPIC_API_KEY=ANTHROPIC_API_KEY:latest,...`
 
-Trade-off: production reads from GSM (faster, no external dependency, IAM-controlled), but you've now got two systems to keep in sync. The CI sync step is the bridge — only 1Password is ever a source of truth, GSM is a derived cache.
+Trade-off: production reads from GSM (faster, no external dependency, IAM-controlled), but you've
+now got two systems to keep in sync. The CI sync step is the bridge — only 1Password is ever a
+source of truth, GSM is a derived cache.
 
 #### Pattern A vs Pattern B
 
@@ -557,11 +579,13 @@ For most projects start with **A**, switch to **B** if cold starts become measur
 
 ### Staging vs production isolation
 
-Treat **each environment as its own blast-radius boundary**: separate vault, separate service account, separate token. fnox profiles are the local switch; the platform's environment is the deploy-time switch.
+Treat **each environment as its own blast-radius boundary**: separate vault, separate service
+account, separate token. fnox profiles are the local switch; the platform's environment is the
+deploy-time switch.
 
 #### Recommended layout
 
-```
+```text
 1Password
 ├── "Trinity Hunt Pilot - Dev"      ← devs' machines + Vercel "Development"
 │   ├── DATABASE_URL                  (points at dev Neon branch)
@@ -607,7 +631,8 @@ type  = "1password"
 vault = "Trinity Hunt Pilot - Prod"
 ```
 
-The `[secrets]` table is shared — same set of env vars for every environment. Only the *vault* changes per profile, so you can't accidentally have prod missing a key that staging has.
+The `[secrets]` table is shared — same set of env vars for every environment. Only the *vault*
+changes per profile, so you can't accidentally have prod missing a key that staging has.
 
 #### Switching profiles
 
@@ -629,20 +654,25 @@ The pair `(FNOX_PROFILE, OP_SERVICE_ACCOUNT_TOKEN)` is the entire environment se
 
 Vercel's three environments (Development / Preview / Production) each have their own env var scope. Set in dashboard:
 
-```
+```text
 Production:   OP_SERVICE_ACCOUNT_TOKEN = ops_prod_...     FNOX_PROFILE = prod
 Preview:      OP_SERVICE_ACCOUNT_TOKEN = ops_staging_...  FNOX_PROFILE = staging
 Development:  OP_SERVICE_ACCOUNT_TOKEN = ops_dev_...      (no FNOX_PROFILE → default)
 ```
 
-A pushed commit to `main` builds with prod creds, a PR builds with staging creds, `vercel dev` locally pulls dev creds. Three vaults, three blast radii, one config file.
+A pushed commit to `main` builds with prod creds, a PR builds with staging creds, `vercel dev`
+locally pulls dev creds. Three vaults, three blast radii, one config file.
 
 #### GCP specifics
 
 Two common shapes:
 
-- **Single GCP project, environment by Cloud Run service** — `my-app-staging` and `my-app-prod` both run the same image; each has its own GSM secret holding its own SA token, each has `FNOX_PROFILE` set in `--set-env-vars`.
-- **Separate GCP projects per environment** (preferred for hard isolation) — `acme-staging` and `acme-prod` projects each have their own GSM, IAM, billing. The Docker image is identical; only platform env differs.
+- **Single GCP project, environment by Cloud Run service** — `my-app-staging` and `my-app-prod` both
+  run the same image; each has its own GSM secret holding its own SA token, each has `FNOX_PROFILE`
+  set in `--set-env-vars`.
+- **Separate GCP projects per environment** (preferred for hard isolation) — `acme-staging` and
+  `acme-prod` projects each have their own GSM, IAM, billing. The Docker image is identical; only
+  platform env differs.
 
 ```bash
 # Staging
@@ -667,7 +697,10 @@ The flow you want:
 1. Dev tweaks `ANTHROPIC_API_KEY` in 1P **dev** vault → `pnpm dev` picks it up.
 2. Code merged to `main` → CI runs against **staging** profile → smoke tests pass.
 3. Tag a release → CI redeploys with **prod** profile.
-4. If a staging-only secret needs promoting: `op item get ... --vault "Trinity Hunt Pilot - Staging"` → `op item create ... --vault "Trinity Hunt Pilot - Prod"`. Or write a tiny `scripts/promote-secret.sh` that does this for one secret at a time. Never bulk-copy a vault — that defeats the isolation.
+4. If a staging-only secret needs promoting: `op item get ... --vault "Trinity Hunt Pilot -
+   Staging"` → `op item create ... --vault "Trinity Hunt Pilot - Prod"`. Or write a tiny
+   `scripts/promote-secret.sh` that does this for one secret at a time. Never bulk-copy a vault —
+   that defeats the isolation.
 
 #### Comparing what changed between environments
 
@@ -677,7 +710,8 @@ diff \
   <(FNOX_PROFILE=prod    fnox export -f env | sort)
 ```
 
-Quickly answers "is staging missing a secret that prod has?" or "did someone forget to update prod's `INNGEST_SIGNING_KEY`?" Run this in CI before deploy as a sanity check (compare keys, not values).
+Quickly answers "is staging missing a secret that prod has?" or "did someone forget to update prod's
+`INNGEST_SIGNING_KEY`?" Run this in CI before deploy as a sanity check (compare keys, not values).
 
 #### `fnox check` per profile in CI
 
@@ -700,8 +734,10 @@ Fails the build if either vault is missing a declared secret — catches drift b
 
 - **Fly.io** — `fly secrets set OP_SERVICE_ACCOUNT_TOKEN=ops_...`, run `fnox exec --` as `CMD` in Dockerfile.
 - **Railway / Render** — set `OP_SERVICE_ACCOUNT_TOKEN` in dashboard, prefix start command with `fnox exec --`.
-- **AWS (ECS/Lambda)** — store token in AWS Secrets Manager, inject as env, container entrypoint = `fnox exec --`. For Lambda, bake at build time (same as Vercel functions).
-- **Kubernetes (any)** — bootstrap token via External Secrets Operator from your secret backend; `command: ["fnox", "exec", "--", ...]` in the pod spec.
+- **AWS (ECS/Lambda)** — store token in AWS Secrets Manager, inject as env, container entrypoint =
+  `fnox exec --`. For Lambda, bake at build time (same as Vercel functions).
+- **Kubernetes (any)** — bootstrap token via External Secrets Operator from your secret backend;
+  `command: ["fnox", "exec", "--", ...]` in the pod spec.
 
 ---
 
@@ -743,7 +779,8 @@ rotation).
 
 ## Tracking key usage (Anthropic, OpenAI, etc.)
 
-fnox is a **vault, not a proxy** — it doesn't see API calls and can't directly tell you usage. But you can build lightweight visibility two ways:
+fnox is a **vault, not a proxy** — it doesn't see API calls and can't directly tell you usage. But
+you can build lightweight visibility two ways:
 
 ### A. Static dashboard map (lowest effort)
 
@@ -775,7 +812,7 @@ fnox list 2>/dev/null | awk 'NR>1 {
 
 Output:
 
-```
+```text
 ANTHROPIC_API_KEY    Anthropic — https://console.anthropic.com/settings/billing
 DATABASE_URL         Neon Postgres — https://console.neon.tech
 CLERK_SECRET_KEY     Clerk backend — https://dashboard.clerk.com
@@ -785,11 +822,13 @@ CLERK_SECRET_KEY     Clerk backend — https://dashboard.clerk.com
 
 ### B. Programmatic balance/usage checks
 
-Each provider exposes its own usage API. Wrap them in `scripts/check-balances.ts` (or .sh) and run via fnox so the right keys are present:
+Each provider exposes its own usage API. Wrap them in `scripts/check-balances.ts` (or .sh) and run
+via fnox so the right keys are present:
 
 #### Anthropic
 
-Requires a separate **Admin API key** (`ANTHROPIC_ADMIN_KEY`, prefix `sk-ant-admin-...`), stored in fnox alongside the regular key:
+Requires a separate **Admin API key** (`ANTHROPIC_ADMIN_KEY`, prefix `sk-ant-admin-...`), stored in
+fnox alongside the regular key:
 
 ```bash
 fnox exec -- bash -c '
@@ -835,7 +874,7 @@ for (const c of checks) {
 
 Run with `fnox exec -- tsx scripts/balances.ts`. Output:
 
-```
+```text
 Anthropic: $14.32 (last 7d)
 OpenAI:    $2.10  (last 7d)
 Neon:      0.42 GB compute / 100 GB plan
@@ -845,27 +884,34 @@ Schedule it in CI nightly, post to Slack, and you've got proactive cost alerts w
 
 ### C. Optional: meter at the proxy layer
 
-If you need per-request attribution (which agent / which user burned which tokens), put a proxy like [LiteLLM](https://github.com/BerriAI/litellm), Helicone, or your own logging middleware in front of provider APIs. fnox supplies the upstream key; the proxy emits structured usage events. Out of scope for most projects but worth knowing about.
+If you need per-request attribution (which agent / which user burned which tokens), put a proxy like
+[LiteLLM](https://github.com/BerriAI/litellm), Helicone, or your own logging middleware in front of
+provider APIs. fnox supplies the upstream key; the proxy emits structured usage events. Out of scope
+for most projects but worth knowing about.
 
 ---
 
 ## Security checklist
 
-- [ ] Service account scoped to **one** vault (verify by `OP_SERVICE_ACCOUNT_TOKEN=ops_... op vault list` — should show ONLY the project vault).
+- [ ] Service account scoped to **one** vault (verify by `OP_SERVICE_ACCOUNT_TOKEN=ops_... op vault
+  list` — should show ONLY the project vault).
 - [ ] `.fnox/`, `*.env`, `*.env.local` in `.gitignore`.
 - [ ] `fnox scan` clean before every release.
 - [ ] Production token only on production hosts; dev token only on dev machines.
-- [ ] Rotation policy: every 90 days, run `op service-account create` again, update the token backup item in 1P, distribute via `mise run secrets:rotate-token`, revoke the old service account.
-- [ ] Admin/usage keys (Anthropic admin, OpenAI admin) stored under distinct names so they aren't accidentally exported to runtime processes that don't need them.
+- [ ] Rotation policy: every 90 days, run `op service-account create` again, update the token backup
+  item in 1P, distribute via `mise run secrets:rotate-token`, revoke the old service account.
+- [ ] Admin/usage keys (Anthropic admin, OpenAI admin) stored under distinct names so they aren't
+  accidentally exported to runtime processes that don't need them.
 - [ ] `mise run secrets:check` runs in CI as a pre-build step — fails fast if a secret is missing.
 - [ ] After any Vercel `vercel:sync`, verify with `vercel env ls` that no extras leaked in (compare with `fnox list`).
-- [ ] Service account token backup lives in a *different* vault than the one it can access (avoids a circular bootstrap if the SA loses access).
+- [ ] Service account token backup lives in a *different* vault than the one it can access (avoids a
+  circular bootstrap if the SA loses access).
 
 ---
 
 ## TL;DR mental model
 
-```
+```text
 Developer      mise              fnox activate          1Password         App
 ─────────      ────              ─────────────          ─────────         ───
 $ cd project → loads SA token →  chpwd hook fires    →  fetches items  →  shell env populated
