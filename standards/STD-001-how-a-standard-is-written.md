@@ -5,7 +5,7 @@ title: How a standard is written
 category: Process
 status: In force
 issued: "2026-07-25"
-revision: R3
+revision: R4
 applies-to: Every document in standards/
 author: W. Schenk
 ---
@@ -288,6 +288,12 @@ mise run standard:render
 
 The renderer refuses to emit a page for a document that does not satisfy this
 standard. Conformance is not a separate audit — if it renders, it conforms.
+
+Guides render alongside the standards, checked against `STD-006` rather than
+against this document, and are published subordinate to them: no clauses, a
+memo stating that they bind nothing, and a link in both directions between a
+guide and the standards it names. A guide that names no standard says so on its
+own page, which is how an undecided area becomes visible instead of quiet.
 
 ## 5. References
 

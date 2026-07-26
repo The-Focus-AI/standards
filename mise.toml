@@ -85,7 +85,7 @@ echo ""
 echo "==> Validating DESIGN.md..."
 node scripts/validate-design.mjs
 echo ""
-echo "==> Checking standards conform to STD-001..."
+echo "==> Rendering the site (STD-001 for standards, STD-006 for guides)..."
 node scripts/render-standard.mjs
 echo ""
 echo "==> Checking documents conform to STD-006..."
@@ -119,11 +119,11 @@ echo "==> Deploy: Standards are reference-only, nothing to deploy."
 '''
 
 [tasks."standard:render"]
-description = "Render every standard in standards/ to out/standards/ and check STD-001 conformance"
+description = "Render standards/ and best-practices/ to out/standards/ and check conformance"
 run = "node scripts/render-standard.mjs"
 
 [tasks."standard:preview"]
-description = "Render the standards and serve them for preview"
+description = "Render the standards and guides, and serve the site for preview"
 run = '''
 set -euo pipefail
 node scripts/render-standard.mjs

@@ -30,8 +30,11 @@ clauses. When a guide turns out to contain rules, the rules move to a standard.
 | `STD-010` | Agent services — the seven required patterns. |
 | `STD-011` | Agent skills: installation, pinning, and updates. |
 
-`mise run standard:render` renders them and refuses to emit a page for a
-document that does not conform, so rendering *is* the conformance check.
+`mise run standard:render` renders the standards *and* the guides into
+`out/standards/`, and refuses to emit a page for a document that does not
+conform, so rendering *is* the conformance check. `mise run standard:preview`
+serves the result; `out/standards/standards.html` is the whole corpus as one
+shareable file.
 
 ### Guides — explanation
 

@@ -129,6 +129,16 @@ components:
     borderColor: "{colors.line-strong}"
     captionTypography: "{typography.mono}"
     fallbackRequired: true
+  guide-stamp:
+    backgroundColor: "{colors.agent}"
+    color: "{colors.sheet}"
+    typography: "{typography.display}"
+  guide-head:
+    borderBottom: "2px solid {colors.agent}"
+    fields: "guide, status, relates-to | author, org, issued, verified"
+  related-kindmark:
+    typography: "{typography.mono}"
+    color: "{colors.muted}"
   register-table:
     headTypography: "{typography.mono}"
     rowBorder: "1px solid {colors.line}"
@@ -344,9 +354,10 @@ extension to this file.
   name in bold, `Standard:`, `Obsoletes:`, `Category:`, `Status:`, `Applies to:`. Right: author,
   organisation, date, revision. A field with no value is **omitted**, not shown empty.
   **`Category` and `Status` are separate axes** and must never be collapsed into one line: category
-  is the document's class (Practice, Process, Guide), status is whether it is Draft, In force, or
-  Obsoleted. A Guide can be in force; a Practice can be a draft. The first cut of this file
-  conflated them; `STD-001 §3.3` is the authority.
+  is the standard's class (Practice or Process), status is whether it is Draft, In force, or
+  Obsoleted. A Process can be in force; a Practice can be a draft. The first cut of this file
+  conflated them; `STD-001 §3.3` is the authority. Guide is **not** a category — a guide is a
+  different kind of document (`STD-001 §3.17`) and carries the guide header below.
 - **Title** — display, centred, `text-wrap: balance`, below the header block. One per document.
 - **Status memo** — a bordered block on a 3% ink tint, headed `STATUS OF THIS STANDARD` in mono
   micro. States what the document specifies, that it requests comment, that it expects revision, and
@@ -367,6 +378,18 @@ extension to this file.
   it demonstrates, the live component, and — **mandatory** — a `<details>` carrying the text an
   agent receives from raw source. A demonstration that only works rendered is invisible to the
   primary reader and is a defect.
+- **Guide header** — the header block a guide gets instead of a standard's. A `GUIDE · NOT
+  NORMATIVE` stamp in reversed `agent` sits above it, and the 2px rule that closes it is `agent`
+  rather than `ink`. Left: organisation, `Guide:`, `Status:`, `Relates to:`. Right: author,
+  organisation, date, `Verified`. The palette does the work — a reader who has seen one standard
+  knows at a glance that this document is not one.
+- **Guide memo** — headed `STATUS OF THIS GUIDE`, in the status memo's shell. Generated, not
+  written: every guide gets the same sentence about binding nothing, then the standards it sits
+  under, then the guide's own provenance note lifted out of the body. A guide under no standard
+  says so, which is how an undecided area stays visible.
+- **Related block** — the cross-reference between a standard and its guides, set below a hairline
+  as chrome rather than as a numbered section, because it is generated. Mono micro label, mono
+  `GUIDE` / `PRACTICE` / `PROCESS` kindmark in `muted`, then the link.
 - **Register table** — mono uppercase heads, hairline rows, ref column mono and non-wrapping,
   state column carrying a labelled pip. Obsoleted rows drop to `muted`. Wraps in an
   `overflow-x: auto` container; the page body never scrolls sideways.

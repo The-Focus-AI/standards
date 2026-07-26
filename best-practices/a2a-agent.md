@@ -759,7 +759,8 @@ Items not yet in the template but planned:
 
 - `STD-008` — deployment rules; `best-practices/vercel-deployment.md` for Vercel specifics.
 - Repository layout conventions are not yet written; see the gap register in `reports/`.
-- [`security.md`](./security.md) — secrets management, Clerk patterns.
-- [`AGENTS.md`](./AGENTS.md) — how AI coding agents work in Focus repos.
+- `STD-007` — secrets and credentials. It absorbed `security.md`, which is gone.
+- `STD-009` — authentication; [`clerk.md`](./clerk.md) for the Clerk walkthrough.
+- [`AGENTS.md`](./AGENTS.md) — the technology defaults for Focus repos.
 - Reference implementation: ask in `#engineering` for the current pointer — read its `app/` and the
   workspace-package directory.
