@@ -11,7 +11,7 @@ status: Accepted
 Companion to `DESIGN.md`. Records what was settled, who settled it, and what was
 assumed — so the next agent knows what is decided versus what is merely current.
 
-Process: `prompts/develop-design-md.md`. Prototypes:
+Process: the `develop-design-md` skill (was `prompts/develop-design-md.md`). Prototypes:
 `prototypes/standards-site-directions/` (throwaway; delete once the site is
 built).
 

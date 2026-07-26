@@ -40,15 +40,26 @@ document that does not conform, so rendering *is* the conformance check.
 - `best-practices/vercel-deployment.md`, `gcp-deployment.md`, `gce-gaia-runtime.md` — platform walkthroughs.
 - `best-practices/a2a-agent.md` — the A2A agent reference implementation.
 
+### Skills — capabilities
+
+`skills/` holds every skill The Focus AI owns, one folder per skill
+(`skills/<name>/SKILL.md`), installable with
+`skills add The-Focus-AI/standards --skill <name>`. `skills/VENDORED.md` records
+provenance and `mise run skills:check` validates them. `STD-011` governs how
+skills are installed and pinned in consuming repositories.
+
+Three former prompts are now skills: `setup-project`, `standardize-project`, and
+`develop-design-md`.
+
 ### Everything else
 
 - `DESIGN.md` — the design system for standards.thefocus.ai. Validate edits with `mise run design:validate`.
 - `architecture/` — decision records for this repository.
 - `reports/` — research notes, including the standards gap register and the `best-practices/` inventory.
 - `skills-lock.json`, `mise.toml`, `.pi/settings.json` — the repo's own configuration.
-- `scripts/` — the bootstrap script, the design validator, and the standards renderer.
+- `scripts/` — the bootstrap script, the standards renderer, and the design, document, and skill validators.
 - `templates/default-project/` — source templates used by the bootstrap script.
-- `prompts/` — reusable prompts: setup, standardize, generate a Dockerfile, develop a DESIGN.md.
+- `prompts/` — `generate-dockerfile.md` only; the rest became skills.
 - `tests/` — validation scripts for this repository.
 
 ## How to inspect a project

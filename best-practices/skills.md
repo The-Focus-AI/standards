@@ -49,28 +49,46 @@ Source repos are GitHub (`sourceType: github`). Install only this set — do not
 `skills add mattpocock/skills -y` blindly; that repo also contains course/writing
 skills that are not part of TheFocus.AI standards.
 
-### Always installed
+### Skills we own — all in this repository
+
+Every Focus-authored skill lives in `skills/` here, one folder per skill, and installs
+the same way:
+
+```bash
+skills add The-Focus-AI/standards --skill <name> -y
+```
+
+| Skill | What it does |
+| --- | --- |
+| `activity-report` | Live production usage joined against git history → interpreted, client-ready report |
+| `tech-research` | Pick the best library/tool for a need; write a dated, cited report into `reports/` |
+| `research-methodology` | General research method and report templates (literature review, comparative, exec summary) |
+| `browser-automation` | Drive Chrome: navigate, extract, screenshot, fill forms, print PDFs |
+| `nano-banana-imagegen` | Generate images — icons, headers, illustrations, photo edits |
+| `nano-banana-videogen` | Generate video — image-to-video, scene extension, dialogue |
+| `focus-ai-brand` | The Focus.AI brand: palettes, type, grid, components, voice |
+| `paged-reports` | Markdown → paged HTML → PDF, with page-break control and magazine mode |
+| `pptx-decks` | Markdown → branded `.pptx` via PptxGenJS, with visual QA |
+| `setup-project` | Scaffold a new project to these standards |
+| `standardize-project` | Audit an existing project against these standards, plan the migration |
+| `develop-design-md` | Take a project from no identity to a validated `DESIGN.md` |
+
+`skills/VENDORED.md` records where each one came from and at which commit.
+
+**Brand and mechanics are separate on purpose.** `focus-ai-brand` says what things look
+like; `paged-reports` and `pptx-decks` say how documents get made. A project with its own
+brand uses the mechanics skills with its own `DESIGN.md` and never touches ours. When the
+brand changes, only the brand skill changes.
+
+### Third-party skills
+
+Not ours; installed from upstream so `skills update` keeps giving us their fixes.
 
 | Skill | Source repo | Skill folder |
 | --- | --- | --- |
-| `nano-banana-imagegen` | The-Focus-AI/nano-banana-cli | `skills/nano-banana-imagegen` |
-| `nano-banana-videogen` | The-Focus-AI/nano-banana-cli | `skills/nano-banana-videogen` |
-| `research-methodology` | The-Focus-AI/focus-agents | `skills/research-methodology` |
 | `firecrawl` + 8 `firecrawl-*` | firecrawl/cli | `skills/firecrawl-*` |
 | `find-skills` | vercel-labs/skills | `skills/find-skills` |
-
-### Running a browser
-
-| Skill | Source repo | Skill folder |
-| --- | --- | --- |
-| `browser-automation` | The-Focus-AI/chrome-driver | `skills/browser-automation` |
-
-### Design
-
-| Skill | Source repo | Skill folder |
-| --- | --- | --- |
 | `swiss-design` | zeke/swiss-design-skill | `swiss-design` |
-| `focus-ai-brand` | The-Focus-AI/focus-ai-brand | `skills/focus-ai-brand` |
 
 ### Product / planning / architecture workflow
 
@@ -133,6 +151,56 @@ local fallback path — in its `AGENTS.md`.
 `mattpocock/skills` renamed `to-prd` → `to-spec` and merged `to-plan` /
 `to-issues` → `to-tickets`. Do not install the deprecated `to-prd` or
 `to-issues` skills in new projects.
+
+## Authoring a skill in this repository
+
+Skills we own live under `skills/<skill-name>/SKILL.md` at the root of this repo, one
+folder per skill, so `skills add The-Focus-AI/standards --skill <skill-name>` works the
+same way as any third-party source. Write the frontmatter `description` for triggering —
+say what the skill does *and* the phrases that should invoke it. `writing-great-skills`
+is the reference for the rest.
+
+Layout, per skill:
+
+```text
+skills/<name>/
+  SKILL.md          # required — frontmatter + the process
+  references/       # optional — long-form detail, read on demand
+  templates/        # optional — files the skill produces from
+  examples/         # optional — worked examples
+```
+
+Keep `SKILL.md` to the process and the pitfalls; push anything long into `references/`
+and link it from a table. A skill that inlines 600 lines of detail is a skill nobody
+reads to the end of.
+
+`mise run skills:check` validates the whole directory — frontmatter present, `name`
+kebab-case and matching the folder, `description` substantial and within the CLI's
+1024-character limit, and every `references/…` path actually existing. It runs as part
+of `mise lint`, so a broken skill fails CI rather than failing at install time.
+
+Once the skill is on `main`, run `skills add` against it from a project so the CLI
+computes and records the hash in that project's `skills-lock.json`; commit the standards
+copy of the lock file from the same run. Never hand-write a `computedHash` — a wrong
+hash makes `experimental_install` non-reproducible.
+
+### Vendoring policy
+
+Skills TheFocus.AI writes belong here, not scattered across the repos that happened to
+birth them. When a skill turns up elsewhere, move it in, record it in
+`skills/VENDORED.md` with its source commit, and delete the original so the two cannot
+drift.
+
+Third-party skills are the opposite: leave them upstream. Copying them in means
+republishing someone else's work and inheriting their maintenance — `skills update`
+already gives us their fixes for free.
+
+### Note on repository visibility
+
+`The-Focus-AI/standards` is private, so `skills add` against it needs GitHub auth. That
+is fine locally (the CLI falls back to `gh auth token`) but CI needs `GH_TOKEN` set. If
+these skills are ever to be installable by people outside the org, they need to move to
+a public repo — that is a decision, not an oversight.
 
 ## Adding a new skill
 

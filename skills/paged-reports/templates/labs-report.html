@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{TITLE}}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    /* ========================================
+       Focus.AI Labs Brand - Report Styles
+       "Future Systems Report" Aesthetic
+       ======================================== */
+
+    :root {
+      --color-paper: #f3f2ea;
+      --color-void: #1a1a1a;
+      --color-rand-blue: #0055aa;
+      --color-alert-red: #d93025;
+      --color-surface: #e6e4dc;
+      --color-page-bg: #e8e6df;
+    }
+
+    /* Reset */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Base */
+    html {
+      font-size: 16px;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      font-weight: 400;
+      font-size: 16px;
+      line-height: 1.6;
+      color: var(--color-void);
+      background-color: var(--color-page-bg);
+      padding: 2rem;
+    }
+
+    /* Report Container - Bell Labs style with offset shadow */
+    .report {
+      max-width: 900px;
+      margin: 0 auto;
+      background: var(--color-paper);
+      padding: 4rem;
+      border: 1px solid var(--color-void);
+      box-shadow: 10px 10px 0px 0px rgba(0,0,0,0.1);
+    }
+
+    /* Document Header */
+    .doc-header {
+      font-family: 'Courier Prime', monospace;
+      font-size: 12px;
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid var(--color-void);
+    }
+
+    .doc-header p {
+      margin-bottom: 0.25rem;
+    }
+
+    .doc-header .doc-label {
+      font-weight: 700;
+    }
+
+    /* Typography */
+    h1 {
+      font-size: clamp(36px, 8vw, 60px);
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      line-height: 0.9;
+      color: var(--color-void);
+      margin-bottom: 1.5rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 2px solid var(--color-void);
+    }
+
+    h1 .accent {
+      color: var(--color-rand-blue);
+    }
+
+    h2 {
+      font-size: clamp(20px, 3vw, 24px);
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      line-height: 1.2;
+      color: var(--color-void);
+      margin-top: 3rem;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--color-void);
+    }
+
+    h2::before {
+      content: counter(h2-counter, decimal-leading-zero) " ";
+      counter-increment: h2-counter;
+      color: var(--color-alert-red);
+      font-family: 'Courier Prime', monospace;
+      font-size: 0.7em;
+      font-weight: 400;
+      margin-right: 0.5rem;
+    }
+
+    .report {
+      counter-reset: h2-counter;
+    }
+
+    h3 {
+      font-size: 20px;
+      font-weight: 700;
+      line-height: 1.3;
+      color: var(--color-void);
+      margin-top: 2rem;
+      margin-bottom: 0.75rem;
+    }
+
+    h4 {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--color-void);
+      margin-top: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    p {
+      margin-bottom: 1rem;
+    }
+
+    /* Lead paragraph with left border */
+    .lead {
+      font-size: 18px;
+      font-weight: 500;
+      line-height: 1.5;
+      border-left: 4px solid var(--color-alert-red);
+      padding-left: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    /* Links */
+    a {
+      color: var(--color-rand-blue);
+      text-decoration: underline;
+      text-decoration-thickness: 2px;
+      text-underline-offset: 3px;
+      transition: opacity 150ms ease;
+    }
+
+    a:hover {
+      opacity: 0.8;
+    }
+
+    /* Lists */
+    ul, ol {
+      margin-bottom: 1rem;
+      padding-left: 1.5rem;
+    }
+
+    li {
+      margin-bottom: 0.5rem;
+    }
+
+    li::marker {
+      color: var(--color-alert-red);
+      font-family: 'Courier Prime', monospace;
+      font-weight: 700;
+    }
+
+    /* Blockquotes */
+    blockquote {
+      margin: 1.5rem 0;
+      padding: 1.5rem;
+      background: white;
+      border: 1px solid var(--color-void);
+      border-left: 4px solid var(--color-rand-blue);
+    }
+
+    blockquote p:last-child {
+      margin-bottom: 0;
+    }
+
+    /* Code */
+    code {
+      font-family: 'Courier Prime', monospace;
+      font-size: 0.9em;
+      background: var(--color-surface);
+      padding: 0.15em 0.4em;
+      border: 1px solid rgba(26, 26, 26, 0.2);
+    }
+
+    pre {
+      margin: 1.5rem 0;
+      padding: 1.5rem;
+      background: var(--color-void);
+      color: var(--color-paper);
+      overflow-x: auto;
+      font-family: 'Courier Prime', monospace;
+      font-size: 14px;
+      line-height: 1.5;
+      border: 1px solid var(--color-void);
+    }
+
+    pre code {
+      background: none;
+      padding: 0;
+      border: none;
+      color: inherit;
+      font-size: inherit;
+    }
+
+    /* Tables */
+    table {
+      width: 100%;
+      margin: 1.5rem 0;
+      border-collapse: collapse;
+      font-size: 15px;
+      border: 1px solid var(--color-void);
+    }
+
+    th, td {
+      padding: 0.75rem 1rem;
+      text-align: left;
+      border: 1px solid var(--color-void);
+    }
+
+    th {
+      font-family: 'Courier Prime', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      background: var(--color-void);
+      color: var(--color-paper);
+    }
+
+    tr:nth-child(even) td {
+      background: rgba(0, 0, 0, 0.02);
+    }
+
+    /* Horizontal rule */
+    hr {
+      margin: 3rem 0;
+      border: none;
+      border-top: 2px solid var(--color-void);
+    }
+
+    /* Images */
+    img {
+      max-width: 100%;
+      height: auto;
+      margin: 1.5rem 0;
+      border: 1px solid var(--color-void);
+      filter: grayscale(100%) contrast(110%) brightness(0.95) sepia(10%);
+      transition: filter 0.3s ease;
+    }
+
+    img:hover {
+      filter: grayscale(0%) contrast(100%) brightness(1) sepia(0%);
+    }
+
+    /* Labels - Courier Prime, monospace */
+    .label {
+      font-family: 'Courier Prime', monospace;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.3em;
+      color: var(--color-void);
+    }
+
+    /* Emphasis */
+    strong {
+      font-weight: 700;
+    }
+
+    em {
+      font-style: italic;
+    }
+
+    /* Highlight */
+    mark {
+      background: rgba(217, 48, 37, 0.15);
+      padding: 0.1em 0.2em;
+    }
+
+    /* Numbered items - Alert Red */
+    .num {
+      font-family: 'Courier Prime', monospace;
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--color-alert-red);
+    }
+
+    /* Document footer */
+    .doc-footer {
+      margin-top: 4rem;
+      padding-top: 1rem;
+      border-top: 2px solid var(--color-void);
+      font-family: 'Courier Prime', monospace;
+      font-size: 11px;
+      color: rgba(26, 26, 26, 0.6);
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+    }
+
+    /* Page break control classes */
+    .page-break {
+      page-break-before: always;
+    }
+
+    .keep-together {
+      page-break-inside: avoid;
+    }
+
+    /* Print Styles */
+    @media print {
+      body {
+        background: white !important;
+        padding: 0;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      .report {
+        max-width: 100%;
+        margin: 0;
+        padding: 0.5in;
+        border: none;
+        box-shadow: none;
+        background: white !important;
+      }
+
+      h1 {
+        font-size: 36px;
+      }
+
+      h2 {
+        font-size: 18px;
+        margin-top: 1.5rem;
+        page-break-after: avoid;
+      }
+
+      h3, h4, h5, h6 {
+        page-break-after: avoid;
+      }
+
+      p {
+        orphans: 3;
+        widows: 3;
+      }
+
+      pre, blockquote, table {
+        page-break-inside: avoid;
+      }
+
+      img {
+        filter: none;
+        page-break-inside: avoid;
+        max-height: 4.5in;
+      }
+
+      ul, ol {
+        page-break-inside: avoid;
+      }
+
+      hr {
+        page-break-after: avoid;
+      }
+
+      .page-break {
+        page-break-before: always;
+      }
+
+      .keep-together {
+        page-break-inside: avoid;
+      }
+
+      /* White background alternatives for colored elements */
+      code {
+        background: #eee !important;
+        color: #1a1a1a !important;
+      }
+
+      pre {
+        background: #f5f5f5 !important;
+        color: #1a1a1a !important;
+        border: 1px solid #ccc !important;
+      }
+
+      pre code {
+        background: transparent !important;
+        color: #1a1a1a !important;
+      }
+
+      th {
+        background: #333 !important;
+        color: #fff !important;
+      }
+
+      tr:nth-child(even) td {
+        background: #f5f5f5 !important;
+      }
+
+      a {
+        color: var(--color-rand-blue);
+        text-decoration: underline;
+      }
+
+      a[href^="http"]::after {
+        content: " (" attr(href) ")";
+        font-size: 0.8em;
+        color: rgba(26, 26, 26, 0.6);
+        word-break: break-all;
+      }
+    }
+
+    @page {
+      margin: 0.6in;
+      size: letter;
+    }
+  </style>
+</head>
+<body>
+  <main class="report">
+    {{CONTENT}}
+  </main>
+</body>
+</html>

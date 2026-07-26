@@ -1,6 +1,12 @@
 {
   "version": 1,
   "skills": {
+    "activity-report": {
+      "source": "The-Focus-AI/standards",
+      "sourceType": "github",
+      "skillPath": "skills/activity-report/SKILL.md",
+      "computedHash": "6e13c0f6a84affe263bbc48850ba09f35087cfa45322643796fc2999dc09efd7"
+    },
     "ask-matt": {
       "source": "mattpocock/skills",
       "sourceType": "github",
@@ -8,10 +14,10 @@
       "computedHash": "0f843160e34a24f5bd12cdc7de7d40951e77fbdc05ce8f891b37ca32eac2c44d"
     },
     "browser-automation": {
-      "source": "The-Focus-AI/chrome-driver",
+      "source": "The-Focus-AI/standards",
       "sourceType": "github",
       "skillPath": "skills/browser-automation/SKILL.md",
-      "computedHash": "2d11976a004bf5aae104118992504d303e5a14ac9bf03fc9f05700286486ba51"
+      "computedHash": "d4421518c3d5142f9184a444baaadcf6d731dcece3a910b7c686f17ebca79291"
     },
     "code-review": {
       "source": "mattpocock/skills",
@@ -24,6 +30,12 @@
       "sourceType": "github",
       "skillPath": "skills/engineering/codebase-design/SKILL.md",
       "computedHash": "6d9d51d8caa01633fd00cf87089c5618c982321f942ac69f62565dc001c6b22f"
+    },
+    "develop-design-md": {
+      "source": "The-Focus-AI/standards",
+      "sourceType": "github",
+      "skillPath": "skills/develop-design-md/SKILL.md",
+      "computedHash": "dc1ff1e19a3063f0531e75cef448c74688d336bb20fabe2ad22805dbdd3c8cd2"
     },
     "diagnosing-bugs": {
       "source": "mattpocock/skills",
@@ -98,10 +110,10 @@
       "computedHash": "57c6d1777f0574de182e7569f36f6fb60eb1912a3db3942dd03092f6e2e5054b"
     },
     "focus-ai-brand": {
-      "source": "The-Focus-AI/focus-ai-brand",
+      "source": "The-Focus-AI/standards",
       "sourceType": "github",
       "skillPath": "skills/focus-ai-brand/SKILL.md",
-      "computedHash": "9d7c7ef2c9dd47c6f717a43cb47865b45912bfbf03064b6afc8a6f23c7579407"
+      "computedHash": "27c2bc0c16d2307974aaa1186462fbb7ca91c0083d71509cc5d0e7b5f5ab2213"
     },
     "grill-me": {
       "source": "mattpocock/skills",
@@ -140,16 +152,28 @@
       "computedHash": "66e8a50c83c3c724fcfe0769701b665c56cec220cc4f49cc1aee8bdfc07de94a"
     },
     "nano-banana-imagegen": {
-      "source": "The-Focus-AI/nano-banana-cli",
+      "source": "The-Focus-AI/standards",
       "sourceType": "github",
       "skillPath": "skills/nano-banana-imagegen/SKILL.md",
-      "computedHash": "19e800f65a5425b7cc56e2f523e4163bb7359bbbaedb172e1d8c2b2a296350ee"
+      "computedHash": "9a17cd86b5fb2ca41ace2fddecf4f161a154915a213130a8ab7f13d722571661"
     },
     "nano-banana-videogen": {
-      "source": "The-Focus-AI/nano-banana-cli",
+      "source": "The-Focus-AI/standards",
       "sourceType": "github",
       "skillPath": "skills/nano-banana-videogen/SKILL.md",
-      "computedHash": "887e73a48b6d571924361b23dfa4b287d5682cddea9c3a49d7788e4e504e9147"
+      "computedHash": "81e5703675dc05434e66a1865184cc4728d82c3c788f11740ee99c67d4c0cd24"
+    },
+    "paged-reports": {
+      "source": "The-Focus-AI/standards",
+      "sourceType": "github",
+      "skillPath": "skills/paged-reports/SKILL.md",
+      "computedHash": "0bb5b09c8dc9a83c43760e47f2e7b3bef8159465fe6278f87c9c5a3de50be3f9"
+    },
+    "pptx-decks": {
+      "source": "The-Focus-AI/standards",
+      "sourceType": "github",
+      "skillPath": "skills/pptx-decks/SKILL.md",
+      "computedHash": "560de76b6ec363456d388a5d794928858a3889543efa7b67ffd327ad708194c2"
     },
     "prototype": {
       "source": "mattpocock/skills",
@@ -164,10 +188,10 @@
       "computedHash": "bd3e2c6826671d82c86ed0da3dac3370ebcf63b0fe847f91bb444e1fb7dac21b"
     },
     "research-methodology": {
-      "source": "The-Focus-AI/focus-agents",
+      "source": "The-Focus-AI/standards",
       "sourceType": "github",
       "skillPath": "skills/research-methodology/SKILL.md",
-      "computedHash": "c15bd4ffa0e707b348060838d98531ab609676248d8ff8197003718e759a07c2"
+      "computedHash": "eb75bae051946c694ef0ef9a6a52f5adb3047fd12175849f532ab8d90b68c3e1"
     },
     "resolving-merge-conflicts": {
       "source": "mattpocock/skills",
@@ -180,6 +204,18 @@
       "sourceType": "github",
       "skillPath": "skills/engineering/setup-matt-pocock-skills/SKILL.md",
       "computedHash": "74e894a3509e2676d4cdb771c8eace087092430635e845e02a9cc2f757c552a4"
+    },
+    "setup-project": {
+      "source": "The-Focus-AI/standards",
+      "sourceType": "github",
+      "skillPath": "skills/setup-project/SKILL.md",
+      "computedHash": "df4b0d1ce53ba4bb23b716bfe19cdbe972526acd1590cd89c5c173253d553269"
+    },
+    "standardize-project": {
+      "source": "The-Focus-AI/standards",
+      "sourceType": "github",
+      "skillPath": "skills/standardize-project/SKILL.md",
+      "computedHash": "122d9b0968742f3c73c3d80f8105ea65e76d9ce70a1c6f418bf0fd8b314da67c"
     },
     "swiss-design": {
       "source": "zeke/swiss-design-skill",
@@ -198,6 +234,12 @@
       "sourceType": "github",
       "skillPath": "skills/productivity/teach/SKILL.md",
       "computedHash": "68999bb1a241384b2f921f3321d779b7d05eb6089077b70d88cee2aee3d75ccc"
+    },
+    "tech-research": {
+      "source": "The-Focus-AI/standards",
+      "sourceType": "github",
+      "skillPath": "skills/tech-research/SKILL.md",
+      "computedHash": "40461be70095f49a4f8b78ffde8304d0e096a8b5cf4e6f7fff7d8b20d50feb45"
     },
     "to-spec": {
       "source": "mattpocock/skills",

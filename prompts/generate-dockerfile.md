@@ -98,7 +98,7 @@ The generated Dockerfile must include comments at the top documenting:
    ```bash
    cd /standards
    mise install
-   pi -p prompts/setup-project.md   # follow the prompt to scaffold /app
+   pi -p skills/setup-project/SKILL.md   # follow the skill to scaffold /app
    ```
 
 4. Explanation that `~/.pi` is mounted to give pi access to the host's LLM

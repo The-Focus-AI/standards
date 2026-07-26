@@ -1,6 +1,6 @@
 # Prototype: standards.thefocus.ai Direction Rounds (THROWAWAY)
 
-Throwaway prototype built per `prompts/develop-design-md.md` Phase 2.
+Throwaway prototype built per the `develop-design-md` skill, Phase 2.
 
 | File | Round | Question |
 | --- | --- | --- |
@@ -44,7 +44,7 @@ RFC 2119 has it and §3.5 needed it.
 ## Tickets discovered
 
 Capabilities the specimens implied that the codebase does not have. Per
-`prompts/develop-design-md.md`, these belong to `to-tickets`, not to the
+the `develop-design-md` skill, these belong to `to-tickets`, not to the
 DESIGN.md.
 
 1. **Fleet distribution state.** Every round-1 and round-2 panel showed

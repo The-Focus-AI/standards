@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{TITLE}}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&family=Inter:wght@400;500;600;700;900&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,700;0,8..60,900;1,8..60,400&display=swap" rel="stylesheet">
+  <style>
+    /* ========================================
+       Focus.AI Client Brand - Paged Report
+       Paged.js-powered PDF with running headers,
+       page numbers, and component library
+       ======================================== */
+
+    :root {
+      --color-paper: #faf9f6;
+      --color-ink: #161616;
+      --color-graphite: #4a4a4a;
+      --color-petrol: #0e3b46;
+      --color-vermilion: #c3471d;
+      --color-border: #d4d3cf;
+
+      --font-display: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+      --font-sans: 'Inter', system-ui, sans-serif;
+      --font-mono: 'Courier Prime', monospace;
+    }
+
+    /* ---- Paged.js @page rules ---- */
+
+    @page {
+      size: letter;
+      margin: 0.75in 0.75in 1in 0.75in;
+      background: var(--color-paper);
+
+      @top-left {
+        content: "THEFOCUS.AI";
+        font-family: 'Inter', sans-serif;
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 2px;
+        color: #c3471d;
+        vertical-align: bottom;
+        padding-bottom: 8px;
+      }
+
+      @top-right {
+        content: counter(page, decimal-leading-zero);
+        font-family: 'Courier Prime', monospace;
+        font-size: 10px;
+        color: #4a4a4a;
+        vertical-align: bottom;
+        padding-bottom: 8px;
+      }
+    }
+
+    @page cover {
+      @top-left { content: none; }
+      @top-right { content: none; }
+    }
+
+    @page :first {
+      @top-left { content: none; }
+      @top-right { content: none; }
+    }
+
+    /* ---- Reset ---- */
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* ---- Base ---- */
+
+    html {
+      font-size: 16px;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      font-weight: 500;
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--color-ink);
+      background: var(--color-paper);
+      print-color-adjust: exact;
+      -webkit-print-color-adjust: exact;
+    }
+
+    /* ---- Cover Page ---- */
+
+    .cover {
+      page: cover;
+      break-after: page;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 2rem 0;
+    }
+
+    .cover .brand-mark {
+      font-family: var(--font-sans);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      color: var(--color-vermilion);
+      margin-bottom: 3rem;
+    }
+
+    .cover h1 {
+      font-family: var(--font-display);
+      font-size: 48px;
+      font-weight: 900;
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+      color: var(--color-ink);
+      margin-bottom: 1.5rem;
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+
+    .cover .subtitle {
+      font-family: var(--font-sans);
+      font-size: 20px;
+      font-weight: 500;
+      line-height: 1.4;
+      color: var(--color-graphite);
+      margin-bottom: 3rem;
+      max-width: 480px;
+    }
+
+    .cover .cover-meta {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--color-graphite);
+      line-height: 1.8;
+    }
+
+    .cover .cover-meta strong {
+      font-weight: 700;
+      color: var(--color-petrol);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-size: 10px;
+    }
+
+    .cover .cover-rule {
+      width: 60px;
+      height: 3px;
+      background: var(--color-petrol);
+      margin-bottom: 2rem;
+    }
+
+    /* ---- Typography ---- */
+
+    h1 {
+      font-family: var(--font-display);
+      font-size: 36px;
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+      color: var(--color-ink);
+      margin-bottom: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid var(--color-petrol);
+    }
+
+    h2 {
+      font-family: var(--font-sans);
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.2;
+      color: var(--color-ink);
+      margin-top: 0;
+      margin-bottom: 0.75rem;
+      padding-bottom: 0.4rem;
+      border-bottom: 1px solid var(--color-border);
+      break-before: page;
+      break-after: avoid;
+    }
+
+    /* First h2 after cover or at start of body should not force a break */
+    .cover + h2,
+    .cover + .stat-grid + h2,
+    body > h2:first-child,
+    .no-break-before { break-before: auto; }
+
+    h3 {
+      font-family: var(--font-sans);
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.3;
+      color: var(--color-ink);
+      margin-top: 1.5rem;
+      margin-bottom: 0.5rem;
+      break-after: avoid;
+    }
+
+    h4 {
+      font-family: var(--font-sans);
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      color: var(--color-ink);
+      margin-top: 1.25rem;
+      margin-bottom: 0.4rem;
+      break-after: avoid;
+    }
+
+    /* ---- Section wrapper ---- */
+    /* Wrap h3 + its content in <div class="section"> to keep them together */
+    .section {
+      break-inside: avoid;
+    }
+
+    p {
+      margin-bottom: 0.75rem;
+    }
+
+    .lead {
+      font-size: 18px;
+      font-weight: 500;
+      line-height: 1.5;
+      color: var(--color-graphite);
+    }
+
+    /* ---- Links ---- */
+
+    a {
+      color: var(--color-petrol);
+      text-decoration: none;
+      border-bottom: 1px solid transparent;
+    }
+
+    /* ---- Lists ---- */
+
+    ul, ol {
+      margin-bottom: 0.75rem;
+      padding-left: 1.5rem;
+    }
+
+    li {
+      margin-bottom: 0.35rem;
+    }
+
+    li::marker {
+      color: var(--color-petrol);
+    }
+
+    /* ---- Blockquotes ---- */
+
+    blockquote {
+      margin: 1.25rem 0;
+      padding: 0.75rem 1.25rem;
+      border-left: 3px solid var(--color-petrol);
+      background: rgba(14, 59, 70, 0.03);
+      font-style: italic;
+      color: var(--color-graphite);
+      break-inside: avoid;
+    }
+
+    blockquote p:last-child {
+      margin-bottom: 0;
+    }
+
+    /* ---- Code ---- */
+
+    code {
+      font-family: var(--font-mono);
+      font-size: 0.88em;
+      background: rgba(14, 59, 70, 0.06);
+      padding: 0.1em 0.35em;
+      border-radius: 3px;
+      color: var(--color-petrol);
+    }
+
+    pre {
+      margin: 1.25rem 0;
+      padding: 1.25rem;
+      background: var(--color-ink);
+      color: var(--color-paper);
+      border-radius: 4px;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      line-height: 1.5;
+      break-inside: avoid;
+    }
+
+    pre code {
+      background: none;
+      padding: 0;
+      color: inherit;
+      font-size: inherit;
+    }
+
+    /* ---- Tables ---- */
+
+    table {
+      width: 100%;
+      margin: 1.25rem 0;
+      border-collapse: collapse;
+      font-size: 14px;
+      break-inside: avoid;
+    }
+
+    th, td {
+      padding: 0.5rem 0.75rem;
+      text-align: left;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    th {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--color-petrol);
+      background: rgba(14, 59, 70, 0.03);
+    }
+
+    /* ---- Horizontal rule ---- */
+
+    hr {
+      margin: 2rem 0;
+      border: none;
+      height: 1px;
+      background: var(--color-border);
+    }
+
+    /* ---- Images ---- */
+
+    img {
+      max-width: 100%;
+      height: auto;
+      margin: 1rem 0;
+      border-radius: 4px;
+    }
+
+    /* ---- Labels ---- */
+
+    .label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--color-petrol);
+    }
+
+    /* ---- Emphasis ---- */
+
+    strong { font-weight: 700; }
+    em { font-style: italic; }
+
+    mark {
+      background: rgba(195, 71, 29, 0.12);
+      padding: 0.1em 0.2em;
+    }
+
+    /* ---- Page break helpers ---- */
+
+    .page-break { break-before: page; }
+    .keep-together { break-inside: avoid; }
+
+    /* ========================================
+       Component Library
+       ======================================== */
+
+    /* ---- Two-column layouts ---- */
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin: 1.25rem 0;
+      break-inside: avoid;
+    }
+
+    .two-col-wide-left {
+      display: grid;
+      grid-template-columns: 3fr 2fr;
+      gap: 1.5rem;
+      margin: 1.25rem 0;
+      break-inside: avoid;
+    }
+
+    .two-col-wide-right {
+      display: grid;
+      grid-template-columns: 2fr 3fr;
+      gap: 1.5rem;
+      margin: 1.25rem 0;
+      break-inside: avoid;
+    }
+
+    /* ---- Cards ---- */
+
+    .card-dark {
+      background: var(--color-petrol);
+      color: #fff;
+      padding: 1.5rem;
+      border-radius: 6px;
+      break-inside: avoid;
+    }
+
+    .card-dark h3, .card-dark h4 {
+      color: #fff;
+    }
+
+    .card-dark .stat-number {
+      color: #fff;
+    }
+
+    .card-dark .stat-label {
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .card-light {
+      background: #fff;
+      border: 1px solid var(--color-border);
+      border-left: 3px solid var(--color-petrol);
+      padding: 1.5rem;
+      border-radius: 0 6px 6px 0;
+      break-inside: avoid;
+    }
+
+    .card-accent {
+      background: #fff;
+      border: 1px solid var(--color-border);
+      border-left: 3px solid var(--color-vermilion);
+      padding: 1.5rem;
+      border-radius: 0 6px 6px 0;
+      break-inside: avoid;
+    }
+
+    /* ---- Stat blocks ---- */
+
+    .stat-number {
+      font-family: var(--font-display);
+      font-size: 48px;
+      font-weight: 900;
+      line-height: 1;
+      color: var(--color-petrol);
+      margin-bottom: 0.25rem;
+    }
+
+    .stat-label {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--color-vermilion);
+    }
+
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+      margin: 1.5rem 0;
+      break-inside: avoid;
+    }
+
+    .stat-grid > div {
+      text-align: center;
+      padding: 1.25rem;
+    }
+
+    /* ---- Callouts ---- */
+
+    .callout {
+      background: rgba(14, 59, 70, 0.04);
+      border: 1px solid rgba(14, 59, 70, 0.12);
+      border-radius: 6px;
+      padding: 1.25rem 1.5rem;
+      margin: 1.25rem 0;
+      break-inside: avoid;
+    }
+
+    .callout p:last-child {
+      margin-bottom: 0;
+    }
+
+    .callout-key {
+      background: var(--color-petrol);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 1.25rem 1.5rem;
+      margin: 1.25rem 0;
+      break-inside: avoid;
+    }
+
+    .callout-key p:last-child {
+      margin-bottom: 0;
+    }
+
+    .callout-key strong {
+      color: #fff;
+    }
+
+    /* ---- Process flow ---- */
+
+    .process-flow {
+      display: flex;
+      align-items: flex-start;
+      gap: 0;
+      margin: 1.5rem 0;
+      break-inside: avoid;
+    }
+
+    .process-flow .step {
+      flex: 1;
+      text-align: center;
+      padding: 1rem 0.75rem;
+      position: relative;
+    }
+
+    .process-flow .step::after {
+      content: "\2192";
+      position: absolute;
+      right: -0.6rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 18px;
+      color: var(--color-vermilion);
+    }
+
+    .process-flow .step:last-child::after {
+      content: none;
+    }
+
+    .process-flow .step-number {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--color-vermilion);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 0.5rem;
+    }
+
+    .process-flow .step-title {
+      font-family: var(--font-sans);
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--color-petrol);
+      margin-bottom: 0.35rem;
+    }
+
+    .process-flow .step-desc {
+      font-size: 12px;
+      color: var(--color-graphite);
+      line-height: 1.4;
+    }
+
+    /* ---- Pull quote ---- */
+
+    .pull-quote {
+      font-family: var(--font-display);
+      font-size: 24px;
+      font-weight: 400;
+      font-style: italic;
+      line-height: 1.35;
+      color: var(--color-petrol);
+      border-left: 3px solid var(--color-vermilion);
+      padding-left: 1.5rem;
+      margin: 2rem 0;
+      break-inside: avoid;
+    }
+
+    .pull-quote cite {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-style: normal;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--color-vermilion);
+      margin-top: 0.75rem;
+    }
+
+    /* ---- Document metadata ---- */
+
+    .meta {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--color-graphite);
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    /* ---- Footer ---- */
+
+    .doc-footer {
+      margin-top: 3rem;
+      padding-top: 0.75rem;
+      border-top: 2px solid var(--color-petrol);
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--color-graphite);
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+    }
+
+    /* ---- Orphan/widow control ---- */
+
+    p {
+      orphans: 3;
+      widows: 3;
+    }
+
+    img {
+      break-inside: avoid;
+    }
+
+    ul, ol {
+      break-inside: avoid;
+    }
+  </style>
+
+  <!-- Paged.js: defer pagination until fonts are ready -->
+  <script>
+    window.PagedConfig = { auto: false };
+  </script>
+  <script src="https://unpkg.com/pagedjs/dist/paged.polyfill.js"></script>
+  <script>
+    document.fonts.ready.then(function() {
+      window.PagedPolyfill.preview();
+    });
+  </script>
+</head>
+<body>
+  {{CONTENT}}
+</body>
+</html>

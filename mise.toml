@@ -68,6 +68,12 @@ npx markdownlint-cli2 "**/*.md" "#node_modules" "#.pi" "#.agents" || {
 }
 echo "  ✓ Markdown OK"
 echo ""
+echo "==> Validating skills..."
+node scripts/check-skills.mjs || {
+  echo "  ✗ Skill validation failed"
+  exit 1
+}
+echo ""
 echo "==> Validating mise config..."
 mise doctor
 echo "  ✓ mise config OK"
@@ -85,6 +91,10 @@ echo ""
 echo "==> Checking documents conform to STD-006..."
 node scripts/validate-documents.mjs
 '''
+
+[tasks."skills:check"]
+description = "Validate every skill under skills/ (frontmatter, naming, reference paths)"
+run = "node scripts/check-skills.mjs"
 
 [tasks."lint:fix"]
 description = "Auto-fix markdown lint violations"

@@ -9,7 +9,7 @@ verified: "2026-07-23"
 
 # Creative Typography — research notes for DESIGN.md work
 
-Companion to `prompts/develop-design-md.md` (Phase 2, typography-as-
+Companion to the `develop-design-md` skill (Phase 2, typography-as-
 composition). The goal: stop shipping type that reads as "default with a
 costume on." A typeface only becomes a direction when the composition
 around it changes; this note covers both halves — which faces have a point
