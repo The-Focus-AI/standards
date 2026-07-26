@@ -6,10 +6,12 @@ author: W. Schenk
 status: Current
 name: "The Focus AI Standards"
 description: >-
-  The register of standards for a fleet of agents, set as an early RFC.
-  Cool near-white stock, level bands that classify every clause, a mono
-  header block that makes provenance unavoidable, and four accents with
-  non-transferable jobs. Humble in the frame, absolute in the clause.
+  The register for a fleet of agents — standards, guides, notes, decisions,
+  prompts and skills — set as an early RFC. Cool near-white stock, level
+  bands that classify every clause, a mono header block that makes
+  provenance unavoidable, and four accents with non-transferable jobs. Ink
+  is authority; teal is everything that binds nothing. Humble in the frame,
+  absolute in the clause.
 colors:
   page: "#e4e7e4"
   sheet: "#f1f3f0"
