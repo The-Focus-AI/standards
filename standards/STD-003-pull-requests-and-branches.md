@@ -1,5 +1,6 @@
 ---
 standard: "003"
+kind: standard
 title: Pull requests and branches
 category: Practice
 status: Draft

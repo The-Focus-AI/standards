@@ -11,10 +11,16 @@ import { join, basename } from "node:path";
 import { splitFrontmatter, parseYaml } from "./lib/yaml.mjs";
 import { ROOT } from "./lib/design-tokens.mjs";
 
+// One axis: every document this repository owns declares `kind`. Skills carry
+// the schema the skills CLI imposes, and AGENTS.md / README.md are navigation
+// read by external tooling — both are deliberately outside, per STD-006 §4.
 const DIRS = {
-  "best-practices": { kind: "guide", statuses: ["Current", "Superseded"], datedFilename: false },
+  "best-practices": { kind: "guide", statuses: ["Current", "Superseded"] },
   reports: { kind: "note", statuses: ["Current", "Superseded"], datedFilename: true },
-  architecture: { kind: "decision", statuses: ["Proposed", "Accepted", "Superseded"], datedFilename: false },
+  architecture: { kind: "decision", statuses: ["Proposed", "Accepted", "Superseded"] },
+  prompts: { kind: "prompt", statuses: ["Current", "Superseded"] },
+  standards: { kind: "standard", statuses: ["Draft", "In force", "Obsoleted"], extra: ["standard", "category", "revision", "applies-to"] },
+  ".": { kind: "design", statuses: ["Current", "Superseded"], only: ["DESIGN.md"] },
 };
 
 const REQUIRED = ["title", "kind", "issued", "author", "status"];
@@ -25,8 +31,9 @@ for (const [dir, spec] of Object.entries(DIRS)) {
   const abs = join(ROOT, dir);
   if (!existsSync(abs)) continue;
 
-  for (const file of readdirSync(abs).filter((f) => f.endsWith(".md"))) {
-    const path = `${dir}/${file}`;
+  const files = spec.only ?? readdirSync(abs).filter((f) => f.endsWith(".md"));
+  for (const file of files) {
+    const path = dir === "." ? file : `${dir}/${file}`;
     const src = readFileSync(join(abs, file), "utf8");
     checked++;
 
@@ -40,6 +47,9 @@ for (const [dir, spec] of Object.entries(DIRS)) {
 
     for (const k of REQUIRED) {
       if (!meta[k]) errors.push(`${path}: missing ${k} (STD-006 §3.1)`);
+    }
+    for (const k of spec.extra ?? []) {
+      if (!meta[k]) errors.push(`${path}: missing ${k} (STD-001 §3.18)`);
     }
     if (meta.kind && meta.kind !== spec.kind) {
       errors.push(`${path}: kind is "${meta.kind}" but ${dir}/ holds ${spec.kind} documents (STD-006 §4)`);

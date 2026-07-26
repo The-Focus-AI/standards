@@ -1,5 +1,6 @@
 ---
 standard: "011"
+kind: standard
 title: Agent skills
 category: Practice
 status: Draft

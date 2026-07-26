@@ -1,11 +1,12 @@
 ---
 standard: "006"
+kind: standard
 title: Documents and provenance
 category: Process
 status: Draft
 issued: "2026-07-25"
 revision: R1
-applies-to: Research notes, decision records, and guides
+applies-to: Every document in this repository
 author: W. Schenk
 ---
 
@@ -49,7 +50,7 @@ repositories still running it can find out what replaced it.
 Every durable document MUST open with frontmatter declaring `title`, `kind`,
 `issued`, `author` and `status`.
 
-`kind` is `note`, `decision`, or `guide`. `issued` and `author` are what let a reader
+`kind` is `standard`, `guide`, `note`, `decision`, `prompt` or `design`. `issued` and `author` are what let a reader
 weigh the document; `status` is what stops them acting on something already
 overtaken. The field names match `STD-001` deliberately, so one parser reads the
 whole corpus.
@@ -152,7 +153,19 @@ git show HEAD:path/to/old.md > /tmp/old.md && diff /tmp/old.md path/to/new.md
 | `note` | `reports/` | `YYYY-MM-DD-slug.md` | `Current`, `Superseded` |
 | `decision` | `architecture/` | `slug.md` | `Proposed`, `Accepted`, `Superseded` |
 | `guide` | `best-practices/` | `slug.md` | `Current`, `Superseded` |
-| standard | `standards/` | `STD-nnn-slug.md` | see `STD-001 §3.3` |
+| `standard` | `standards/` | `STD-nnn-slug.md` | `Draft`, `In force`, `Obsoleted` |
+| `prompt` | `prompts/` | `slug.md` | `Current`, `Superseded` |
+| `design` | repository root | `DESIGN.md` | `Current`, `Superseded` |
+
+A standard carries four more fields on top of these — `standard`, `category`,
+`revision`, `applies-to` — specified by `STD-001 §3.18`. Everything else in the
+table needs only the five.
+
+**Outside this axis.** `skills/<name>/SKILL.md` carries the frontmatter the
+skills CLI requires (`name`, `description`) and is validated by
+`mise run skills:check`; imposing a second schema on it would break
+installation. `AGENTS.md` and `README.md` are navigation read by external
+tooling. Neither is a defect — both are formats this repository does not own.
 
 A **guide** is long-form explanation with no binding clauses: a walkthrough, a
 reference implementation, an inventory. `STD-001 §3.2` originally listed Guide

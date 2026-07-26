@@ -1,4 +1,9 @@
 ---
+title: "The Focus AI Standards design system"
+kind: design
+issued: "2026-07-25"
+author: W. Schenk
+status: Current
 name: "The Focus AI Standards"
 description: >-
   The register of standards for a fleet of agents, set as an early RFC.

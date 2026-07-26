@@ -1,5 +1,6 @@
 ---
 standard: "009"
+kind: standard
 title: Authentication
 category: Practice
 status: Draft

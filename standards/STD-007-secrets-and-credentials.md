@@ -1,5 +1,6 @@
 ---
 standard: "007"
+kind: standard
 title: Secrets and credentials
 category: Practice
 status: Draft

@@ -1,5 +1,6 @@
 ---
 standard: "008"
+kind: standard
 title: Deployment
 category: Practice
 status: Draft

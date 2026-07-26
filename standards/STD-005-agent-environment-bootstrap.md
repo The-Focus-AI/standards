@@ -1,5 +1,6 @@
 ---
 standard: "005"
+kind: standard
 title: Agent environment bootstrap
 category: Practice
 status: Draft

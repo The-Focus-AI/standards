@@ -1,5 +1,6 @@
 ---
 standard: "004"
+kind: standard
 title: Repository tooling and tasks
 category: Practice
 status: Draft

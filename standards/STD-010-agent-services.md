@@ -1,5 +1,6 @@
 ---
 standard: "010"
+kind: standard
 title: Agent services
 category: Practice
 status: Draft

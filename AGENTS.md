@@ -51,6 +51,25 @@ skills are installed and pinned in consuming repositories.
 Three former prompts are now skills: `setup-project`, `standardize-project`, and
 `develop-design-md`.
 
+### Document kinds
+
+Every document this repository owns declares `kind` in its frontmatter, and the
+directory it lives in fixes which kind that is. `mise run docs:validate` checks
+all of them.
+
+| `kind` | Lives in | Is |
+| --- | --- | --- |
+| `standard` | `standards/` | binding clauses, numbered and citable |
+| `guide` | `best-practices/` | explanation and walkthroughs, no clauses |
+| `note` | `reports/` | research at a point in time, cited and dated |
+| `decision` | `architecture/` | a settled question and its alternatives |
+| `prompt` | `prompts/` | instructions an agent executes |
+| `design` | `DESIGN.md` | the design system and its tokens |
+
+Skills are outside the axis on purpose: `skills/<name>/SKILL.md` carries the
+frontmatter the skills CLI requires, checked by `mise run skills:check`. So are
+`AGENTS.md` and `README.md`, which external tooling reads.
+
 ### Everything else
 
 - `DESIGN.md` — the design system for standards.thefocus.ai. Validate edits with `mise run design:validate`.

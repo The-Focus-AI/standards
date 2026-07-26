@@ -1,5 +1,6 @@
 ---
 standard: "002"
+kind: standard
 title: Issues and agent workflow
 category: Practice
 status: Draft

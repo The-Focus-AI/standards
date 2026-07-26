@@ -1,10 +1,11 @@
 ---
 standard: "001"
+kind: standard
 title: How a standard is written
 category: Process
 status: In force
 issued: "2026-07-25"
-revision: R2
+revision: R3
 applies-to: Every document in standards/
 author: W. Schenk
 ---
@@ -33,10 +34,14 @@ repositories still running it can find out what replaced it.
 
 ## 3. Requirements
 
-### 3.1
+### 3.1 DEPRECATED
 
 Every standard MUST open with YAML frontmatter carrying `standard`, `title`,
 `category`, `status`, `issued`, `revision`, `applies-to` and `author`.
+
+**Obsoleted in R3 by 3.18.** The list omitted `kind`, which every other document
+in the corpus carries. Provenance now has one owner — `STD-006` — and this
+standard adds only what a standard needs beyond it.
 
 `obsoletes` is optional and is present only when this document replaces another.
 A field with no value is omitted rather than left empty — an empty field renders
@@ -238,6 +243,31 @@ A **Practice** binds repositories; a **Process** describes how the organisation
 works. Both are written as clauses and both live in `standards/`. Long-form
 explanation is a guide, which is a document under `STD-006` rather than a
 standard — see 3.2, obsoleted.
+
+### 3.18
+
+A standard MUST carry the provenance frontmatter `STD-006 §3.1` requires, plus
+`standard`, `category`, `revision` and `applies-to`.
+
+`kind: standard`, and the rest as `STD-006` defines it. One axis reads the whole
+corpus: `kind` says what a document is, wherever it lives. `category`,
+`revision` and `applies-to` are the fields only a standard needs — what it
+binds, which cut it is, and who it binds.
+
+```yaml
+---
+standard: "014"
+kind: standard
+title: Preview deployments on pull requests
+category: Practice
+status: In force
+issued: "2026-07-14"
+revision: R3
+obsoletes: STD-009
+applies-to: Web repositories
+author: W. Schenk
+---
+```
 
 ## 4. File layout
 

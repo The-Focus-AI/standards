@@ -1,3 +1,11 @@
+---
+title: "Generate the standards Dockerfile"
+kind: prompt
+issued: "2026-07-25"
+author: W. Schenk
+status: Current
+---
+
 # Prompt: Generate Standards Dockerfile
 
 Produce a `Dockerfile` that packages this standards repo into a containerized
