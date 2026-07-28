@@ -72,6 +72,12 @@ fails if a skill is unregistered, registered twice, or shares a number.
 Three former prompts are now skills: `setup-project`, `standardize-project`, and
 `develop-design-md`.
 
+`work-next-issue` (`SKL-013`) is the one to reach for when the ask is "pick up
+the next thing". It executes `STD-002` and `STD-003` end to end — frontier,
+race-safe claim, branch, pull request — and stops at the merge gate. Which issue
+is worth the most is the agent's judgement, stated in the claim comment rather
+than derived from a priority scheme; `ADR-004` records why there is no scheme.
+
 ### Document kinds
 
 Every document this repository owns declares `kind` in its frontmatter, and the
