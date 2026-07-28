@@ -1,0 +1,80 @@
+# Publishes the rendered corpus to GitHub Pages.
+#
+# The site is built by CI and never from a workstation (STD-008 §3.10), so what
+# is published is always what is on main. The renderer is the conformance check
+# (STD-001 §4): a document that does not satisfy STD-001 or STD-006 makes
+# `standard:render` exit non-zero, the job fails, and nothing deploys. A
+# non-conforming standard cannot reach the site.
+name: Publish the standards site
+
+on:
+  push:
+    branches: [main]
+    # Path-filtered, per STD-008 §3.13 — a change to the Dockerfile or the
+    # skills lock does not rebuild the site.
+    paths:
+      - "standards/**"
+      - "best-practices/**"
+      - "reports/**"
+      - "architecture/**"
+      - "prompts/**"
+      - "skills/**"
+      - "DESIGN.md"
+      - "scripts/**"
+      - ".github/workflows/pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# STD-008 §3.7 — a half-finished deploy interrupted by the next one leaves the
+# site in a state neither deploy intended.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # The renderer is plain ESM over node: builtins — no dependencies to
+      # install. The version matches the one mise.toml pins.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24.18.0"
+
+      - name: Render the corpus
+        run: node scripts/render-standard.mjs
+
+      - name: Check every document against STD-006
+        run: node scripts/validate-documents.mjs
+
+      - name: Check DESIGN.md
+        run: node scripts/validate-design.mjs
+
+      - name: Check the skills and the SKL register
+        run: node scripts/check-skills.mjs
+
+      # Pages serves the artifact as-is, but a leading underscore in a future
+      # filename would be dropped by Jekyll if it ever ran.
+      - name: Mark as not Jekyll
+        run: touch out/standards/.nojekyll
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: out/standards
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    # STD-008 §3.1 — the target is named, not inherited from ambient state.
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

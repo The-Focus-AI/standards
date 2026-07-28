@@ -113,9 +113,29 @@ echo "==> Integration tests (docker build + smoke)..."
 '''
 
 [tasks.deploy]
-description = "Deploy standards"
+description = "Deploy the standards site (built by CI, never from a workstation)"
 run = '''
-echo "==> Deploy: Standards are reference-only, nothing to deploy."
+set -euo pipefail
+echo "==> The site is deployed by GitHub Actions, not from here (STD-008 3.10)."
+echo "    Push to main, or trigger it by hand:"
+echo ""
+echo "      gh workflow run pages.yml"
+echo ""
+echo "==> Building locally to confirm it would deploy..."
+node scripts/render-standard.mjs
+echo ""
+echo "  ok — this build would publish. Open it with: mise run standard:preview"
+'''
+
+[tasks."deploy:status"]
+description = "Which target the site deploys to, and the state of the last run"
+run = '''
+set -euo pipefail
+echo "target:  github-pages environment on The-Focus-AI/standards"
+echo "url:     https://the-focus-ai.github.io/standards/"
+echo ""
+gh run list --workflow pages.yml --limit 5 2>/dev/null \
+  || echo "(gh not available or not authenticated — see the Actions tab)"
 '''
 
 [tasks."standard:render"]

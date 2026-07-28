@@ -4,9 +4,9 @@ The issuing authority for a fleet of agents. This repository holds what The Focu
 currently believes about building software, written so that a person and a parser get
 the same answer from it, and distributed to every repository that runs an agent.
 
-Agents read these documents while planning work and writing tickets. The website at
-`standards.thefocus.ai` is not the artifact — the markdown is. The site is its citable
-rendering.
+Agents read these documents while planning work and writing tickets. The website is not
+the artifact — the markdown is. The site is its citable rendering, published from `main`
+by CI at **<https://the-focus-ai.github.io/standards/>**.
 
 ## The corpus
 
@@ -61,6 +61,10 @@ The renderer refuses to emit a page for a document that does not conform — mis
 frontmatter, a clause with no requirement level, a filename that disagrees with its
 number. Conformance is not a separate audit: if it renders, it conforms. `out/standards/`
 also carries `standards.html`, the entire corpus as one self-contained file for sharing.
+
+The same command runs in CI. A push to `main` that touches a document rebuilds the site
+and publishes it; a document that does not conform fails the job and nothing deploys, so
+the published corpus is always a conforming one.
 
 ## Quick start
 

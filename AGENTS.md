@@ -35,6 +35,12 @@ rules, the rules move to a standard and the guide keeps the explanation.
 | `STD-010` | Agent services — the seven required patterns. |
 | `STD-011` | Agent skills: installation, pinning, and updates. |
 
+**Deployment pattern:** GitHub Pages, built by GitHub Actions from `main`
+(`.github/workflows/pages.yml`), published at
+<https://the-focus-ai.github.io/standards/>. No platform guide: the workflow is a
+checkout, a node, the renderer, the three validators, and the Pages deploy
+action. `mise run deploy:status` says where it goes and how the last run went.
+
 `mise run standard:render` renders the standards *and* the guides into
 `out/standards/`, and refuses to emit a page for a document that does not
 conform, so rendering *is* the conformance check. `mise run standard:preview`
