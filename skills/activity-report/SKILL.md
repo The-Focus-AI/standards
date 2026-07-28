@@ -41,8 +41,9 @@ product can even record, and they stop you inventing metrics that don't exist.
 
 Prefer the project's own MCP connection (Neon, Postgres, Supabase) over shelling out
 with a connection string — no secrets in your context, no `.env` reads. If a connection
-string is genuinely required, resolve it through `fnox` (see `best-practices/security.md`)
-and keep it out of the transcript.
+string is genuinely required, resolve it through `fnox` (see `STD-007`, and
+`best-practices/GDE-003-fnox-secrets.md` for the playbook) and keep it out of the
+transcript.
 
 Read-only always. `SELECT` only. Never `UPDATE`/`DELETE`/`DROP` against prod, and never
 "just to test." If a query would write, stop and ask.

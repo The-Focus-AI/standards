@@ -90,9 +90,9 @@ persist project work.
 | `standards/`        | The binding corpus — `STD-001`–`STD-011`, one file per standard                                                        |
 | `best-practices/`   | Guides `GDE-001`–`GDE-010` — deployment, Vercel, GCP, GCE Gaia, Clerk, secrets, skills, pi extensions                  |
 | `reports/`          | Research notes `NOTE-001`–`NOTE-006` — fnox secrets, the skills CLI guide, the standards gap register                  |
-| `architecture/`     | Decision records `ADR-001`–`ADR-003` — PRDs and settled questions                                                      |
+| `architecture/`     | Decision records `ADR-001`–`ADR-004` — PRDs and settled questions                                                      |
 | `prompts/`          | Pi prompts — `PRM-001` regenerates this Dockerfile (the rest became skills)                                            |
-| `skills/`           | Every skill we own, numbered `SKL-nnn` in `skills/VENDORED.md` — brand, research, reporting, docs/decks, project setup |
+| `skills/`           | Every skill we own, numbered `SKL-nnn` in `skills/VENDORED.md`. `work-next-issue` runs the ticket loop end to end.     |
 | `DESIGN.md`         | The design system for the published site: tokens, components, voice                                                    |
 | `AGENTS.md`         | Mandatory tools, constraints, task structure for agents working here                                                   |
 | `scripts/`          | The renderer, the design/document/skill validators, the bootstrap script                                               |
@@ -122,6 +122,7 @@ mise run skills:check       # Every skill under skills/, and the SKL register
 mise run generate:dockerfile                        # Regenerate the Dockerfile via pi
 ./scripts/setup-default-project.sh ../my-project    # New/empty project bootstrap
 pi @skills/standardize-project/SKILL.md "Target project: ../qbsync"   # Audit a project
+pi @skills/standards-map/SKILL.md "Target project: ../local-library"  # Map a project against the corpus
 ```
 
 ## Design philosophy

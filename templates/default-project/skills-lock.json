@@ -217,6 +217,12 @@
       "skillPath": "skills/standardize-project/SKILL.md",
       "computedHash": "122d9b0968742f3c73c3d80f8105ea65e76d9ce70a1c6f418bf0fd8b314da67c"
     },
+    "standards-map": {
+      "source": "The-Focus-AI/standards",
+      "sourceType": "github",
+      "skillPath": "skills/standards-map/SKILL.md",
+      "computedHash": "a902159aa6f2c07724370bf5154890bd00890a2b6b5f798344ed090fc2e42679"
+    },
     "swiss-design": {
       "source": "zeke/swiss-design-skill",
       "sourceType": "github",

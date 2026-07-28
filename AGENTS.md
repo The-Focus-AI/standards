@@ -69,8 +69,8 @@ CLI owns `SKILL.md`'s frontmatter (`STD-006 §3.12`). `mise run skills:check`
 fails if a skill is unregistered, registered twice, or shares a number.
 `STD-011` governs how skills are installed and pinned in consuming repositories.
 
-Three former prompts are now skills: `setup-project`, `standardize-project`, and
-`develop-design-md`.
+Four former prompts are now skills: `setup-project`, `standardize-project`,
+`standards-map`, and `develop-design-md`.
 
 `work-next-issue` (`SKL-013`) is the one to reach for when the ask is "pick up
 the next thing". It executes `STD-002` and `STD-003` end to end — frontier,
@@ -105,7 +105,7 @@ of a class rather than a member of it.
 ### Everything else
 
 - `DESIGN.md` — the design system for standards.thefocus.ai. Validate edits with `mise run design:validate`.
-- `architecture/` — decision records (`ADR-001`–`ADR-003`).
+- `architecture/` — decision records (`ADR-001`–`ADR-004`).
 - `reports/` — research notes (`NOTE-001`–`NOTE-006`), including the standards gap register and the `best-practices/` inventory.
 - `skills-lock.json`, `mise.toml`, `.pi/settings.json` — the repo's own configuration.
 - `scripts/` — the bootstrap script, the standards renderer, and the design, document, and skill validators.

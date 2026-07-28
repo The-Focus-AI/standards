@@ -72,6 +72,7 @@ skills add The-Focus-AI/standards --skill <name> -y
 | `pptx-decks` | Markdown → branded `.pptx` via PptxGenJS, with visual QA |
 | `setup-project` | Scaffold a new project to these standards |
 | `standardize-project` | Audit an existing project against these standards, plan the migration |
+| `standards-map` | Look up latest standards → dated mapping report (guide applicability, exceptions, gaps) |
 | `develop-design-md` | Take a project from no identity to a validated `DESIGN.md` |
 
 `skills/VENDORED.md` records where each one came from and at which commit.

@@ -53,7 +53,7 @@
       "source": "vercel-labs/skills",
       "sourceType": "github",
       "skillPath": "skills/find-skills/SKILL.md",
-      "computedHash": "781bd6d3f9b19f8c9af6b53d8d0e4876d0183841b565db34ca7092ffa412d111"
+      "computedHash": "b146008599c31057cef1c145774cea5d5afb30e8f43fa802e47a4b461419aaaf"
     },
     "firecrawl": {
       "source": "firecrawl/cli",
@@ -217,6 +217,12 @@
       "skillPath": "skills/standardize-project/SKILL.md",
       "computedHash": "122d9b0968742f3c73c3d80f8105ea65e76d9ce70a1c6f418bf0fd8b314da67c"
     },
+    "standards-map": {
+      "source": "The-Focus-AI/standards",
+      "sourceType": "github",
+      "skillPath": "skills/standards-map/SKILL.md",
+      "computedHash": "a902159aa6f2c07724370bf5154890bd00890a2b6b5f798344ed090fc2e42679"
+    },
     "swiss-design": {
       "source": "zeke/swiss-design-skill",
       "sourceType": "github",
@@ -251,7 +257,7 @@
       "source": "mattpocock/skills",
       "sourceType": "github",
       "skillPath": "skills/engineering/to-tickets/SKILL.md",
-      "computedHash": "5d79577541b5cf6dade61c69844432ea20ce7b12527cdda1dd4d6fe8d59a135d"
+      "computedHash": "0349eee265e7005e667b4543de849672106c46d545e998f37d3319300bb07751"
     },
     "triage": {
       "source": "mattpocock/skills",

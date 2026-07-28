@@ -18,10 +18,11 @@ configuration, and tooling only — **do not write application source code**.
 ## Where the standards live
 
 The normative rules are in the standards repository, `The-Focus-AI/standards`:
-`best-practices/deployment.md` (mise + fnox + pi), `best-practices/security.md`
-(secrets), `best-practices/GDE-008-skills.md` (the locked skill set),
-`best-practices/GDE-007-pi-extensions.md`, and `best-practices/GDE-003-fnox-secrets.md` for the full secrets
-reference. If you are running inside that repo, read them directly. If not, and you
+`STD-004` (tooling and tasks), `STD-007` (secrets), and `STD-011` (skills). The
+walkthroughs are `best-practices/GDE-006-local-environment.md` (mise + fnox + pi),
+`best-practices/GDE-003-fnox-secrets.md` (the full secrets reference),
+`best-practices/GDE-008-skills.md` (the locked skill set), and
+`best-practices/GDE-007-pi-extensions.md`. If you are running inside that repo, read them directly. If not, and you
 have `gh` access, fetch them. If neither, the sequence below is the minimum bar — say
 in your summary that you worked without the full standards.
 

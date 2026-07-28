@@ -17,6 +17,9 @@ Inspect first, propose a plan, then change. Never overwrite existing project
 configuration blindly — the goal is a repo that meets the standard *and* still works
 the way its team expects.
 
+For a **read-only mapping report** (which guides apply, exceptions vs gaps, no
+migration), use `standards-map` instead — or run it first, then return here to apply.
+
 ## Target
 
 Resolve the target repository before doing anything. If none was given, ask and stop.
@@ -27,7 +30,7 @@ accidentally edit another.
 
 The standards live in `The-Focus-AI/standards`. Read these before recommending anything:
 `AGENTS.md`, `best-practices/GDE-009-technology-defaults.md`, `best-practices/GDE-008-skills.md`,
-`best-practices/security.md`, `best-practices/deployment.md`, and whichever deployment
+`STD-007` and `STD-008` for secrets and deployment, and whichever deployment
 guide applies — `best-practices/GDE-010-vercel-deployment.md`, `best-practices/GDE-005-gcp-deployment.md`, or `best-practices/GDE-004-gce-gaia-runtime.md`.
 Also `best-practices/GDE-002-clerk.md`, `best-practices/GDE-007-pi-extensions.md`,
 `best-practices/GDE-003-fnox-secrets.md`, and the default-project template for missing-file examples
