@@ -64,6 +64,14 @@ jobs:
       - name: Mark as not Jekyll
         run: touch out/standards/.nojekyll
 
+      # The custom domain is configured in Pages settings; shipping it in the
+      # artifact too makes the binding deterministic rather than dependent on a
+      # setting that a redeploy can clear. Keep this in step with the DNS
+      # CNAME — standards → the-focus-ai.github.io, DNS-only through Cloudflare,
+      # since proxying blocks certificate issuance.
+      - name: Claim the custom domain
+        run: echo standards.thefocus.ai > out/standards/CNAME
+
       - uses: actions/upload-pages-artifact@v3
         with:
           path: out/standards
