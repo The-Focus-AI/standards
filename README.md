@@ -66,7 +66,27 @@ The same command runs in CI. A push to `main` that touches a document rebuilds t
 and publishes it; a document that does not conform fails the job and nothing deploys, so
 the published corpus is always a conforming one.
 
-## Quick start
+## Using the standards on a project
+
+Skills are installed from this repository, not from the website — the site is the
+readable rendering, the repo is what the `skills` CLI pulls from. It is public, so no
+authentication is needed.
+
+```bash
+# a new project: empty directory to `mise dev`          — see GDE-011
+skills add The-Focus-AI/standards --skill setup-project -y
+
+# an existing project: where does it stand?             — see GDE-012
+skills add The-Focus-AI/standards --skill standards-map -y
+
+# …then close the gaps
+skills add The-Focus-AI/standards --skill standardize-project -y
+```
+
+`standards-map` is read-only and produces a dated report; `standardize-project` changes
+files, after a plan you approve. Run the map first.
+
+## Quick start — this repository's container
 
 Build and run the container:
 
@@ -92,7 +112,7 @@ persist project work.
 | Path                | Purpose                                                                                                                |
 | ------------------- | ---------------------------------------------------------------------------------------------------------------------- |
 | `standards/`        | The binding corpus — `STD-001`–`STD-011`, one file per standard                                                        |
-| `best-practices/`   | Guides `GDE-001`–`GDE-010` — deployment, Vercel, GCP, GCE Gaia, Clerk, secrets, skills, pi extensions                  |
+| `best-practices/`   | Guides `GDE-001`–`GDE-012` — bootstrapping, auditing, deployment, Clerk, secrets, skills, pi extensions                |
 | `reports/`          | Research notes `NOTE-001`–`NOTE-006` — fnox secrets, the skills CLI guide, the standards gap register                  |
 | `architecture/`     | Decision records `ADR-001`–`ADR-004` — PRDs and settled questions                                                      |
 | `prompts/`          | Pi prompts — `PRM-001` regenerates this Dockerfile (the rest became skills)                                            |

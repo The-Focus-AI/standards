@@ -63,6 +63,8 @@ Guides live in `best-practices/`, named `GDE-nnn-slug.md`.
 | `GDE-008` | The standard skill set inventory. |
 | `GDE-009` | Default technology choices, and what is still undecided. |
 | `GDE-010` | Vercel deployment — previews, env sync, Neon, Blob. |
+| `GDE-011` | Bootstrapping a new project — empty directory to `mise dev`. |
+| `GDE-012` | Auditing an existing project — the gap report and what to do with it. |
 
 ### Skills — capabilities
 
