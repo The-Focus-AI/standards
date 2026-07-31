@@ -5,7 +5,7 @@ kind: guide
 issued: "2026-07-25"
 author: W. Schenk
 status: Current
-verified: "2026-07-25"
+verified: "2026-07-30"
 ---
 
 > Rules extracted to STD-010; this is the reference walkthrough.
@@ -55,8 +55,8 @@ Lock these unless you have a specific reason to swap one out:
 | Runtime | `nodejs` (Vercel Fluid Compute) | Edge can't import the MCP SDK; persistent state survives invocation reuse |
 | LLM | Vercel AI Gateway via `ai` SDK v6 | Plain `"provider/model"` strings, no provider-specific packages |
 | Default model | `anthropic/claude-opus-4-7` | Override with `AGENT_MODEL` env var |
-| A2A | `@a2a-js/sdk@1.0.0-alpha.0` | v1.0 protocol, supports custom extensions |
-| MCP server | `@modelcontextprotocol/sdk@1.29.0` | Web-standard HTTP transport |
+| A2A | `@a2a-js/sdk@1.0.1` | v1.0 protocol (stable since 2026-07-22); see §15 for 0.3 wire compat |
+| MCP server | `@modelcontextprotocol/sdk@1.30.0` | Web-standard HTTP transport |
 | MCP-UI | `@mcp-ui/server@6.x` (tools) + `@mcp-ui/client@7.x` (renderer) | `createUIResource` server-side, `AppRenderer` client-side |
 | Auth | `@clerk/nextjs@7.x` | Native Vercel Marketplace integration; supports M2M JWT for A2A clients |
 | Storage | Neon Postgres via `pg` | Vercel-native, SQL queries over `jsonb` tool args |
@@ -755,6 +755,51 @@ Items not yet in the template but planned:
   verifying agent authenticity.
 
 ---
+
+## 15. Field notes: SDK 1.x and 0.3 wire compatibility
+
+The umwelten fleet executed the full `@a2a-js/sdk` 0.3 → 1.0.1 migration on
+2026-07-30 (`umwelten/reports/2026-07-29-a2a-v1-assessment.md` is the map;
+The-Focus-AI/umwelten#334 the implementation). Five findings that belong in
+every new agent build, because each one bit during a real migration:
+
+**Serve both wire dialects.** Every 0.3-era peer — and any client that omits
+the `A2A-Version` header, which the spec defaults to 0.3 — still speaks the
+legacy JSON-RPC method names and `kind`-discriminated shapes. The SDK ships
+`LegacyJsonRpcTransportHandler` (`@a2a-js/sdk/compat/v0_3/server`); wrap it and
+the v1 `JsonRpcTransportHandler` around one `DefaultRequestHandler` and
+dispatch per request by method name (`isLegacyJsonRpcMethod`). One endpoint,
+both dialects, one task store.
+
+**The v1 event model is stricter than it looks.** There is no `final` flag.
+The stream terminates on a Message event, a terminal task status, or
+INPUT_REQUIRED — so the reply must ride the terminal status update's
+`status.message`, artifacts must be published *before* that terminator, and
+the first event of every `execute()` MUST be a `task` or `message` event
+(the server rejects streams that open with a status or artifact update).
+Blocking `message/send` consequently returns a Task, not a Message; read the
+answer from `task.status.message`.
+
+**Bridge the error classes.** SDK 1.0.1's server, compat, and errors bundles
+each define their own copy of the error hierarchy, so the compat layer's
+`instanceof` check fails on errors thrown by the v1 request handler and every
+semantic error degrades to `-32603` on the legacy wire. Until fixed upstream,
+re-throw by class name into the compat hierarchy (`LegacyA2AError`) so
+`-32001 TaskNotFound` and friends survive; umwelten's
+`packages/protocols/src/a2a/server.ts` has the ~40-line bridge.
+
+**Webhook bodies are part of the contract.** The 0.3-era push sender POSTed
+the full Task JSON; the v1 default sends event-shaped bodies. Callers
+registered on the 0.3 wire read `task.id` / `task.status.state` from the
+body — resolve status updates back into full-Task payloads before dispatch
+(a task-cased `StreamResponse` is legal on both wires).
+
+**Old state on disk outlives the migration.** Task stores written by the 0.3
+SDK hold legacy state strings ("completed") and `kind`-discriminated parts;
+the proto-JSON converters map them to `UNRECOGNIZED` and drop file parts.
+Normalize on the read path (legacy → proto-JSON, then `Task.fromJSON`) and
+write proto-JSON going forward; umwelten's
+`packages/protocols/src/a2a/v1-compat.ts` is a lift-able reference.
 
 ## See also
 
