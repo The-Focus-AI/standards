@@ -22,6 +22,7 @@ import { splitFrontmatter, parseYaml } from "./lib/yaml.mjs";
 import { tokensToCss, ROOT } from "./lib/design-tokens.mjs";
 import { pageCss } from "./lib/page-css.mjs";
 import { blocks, renderBlock, inline, esc } from "./lib/markdown.mjs";
+import { renderLlmsTxt } from "./lib/llms-txt.mjs";
 
 const STD_DIR = join(ROOT, "standards");
 const SKILLS_DIR = join(ROOT, "skills");
@@ -822,9 +823,21 @@ function main() {
   const registerHtml = wire(renderRegister(standards, docs, skills, cssVars), "index.html");
   writeFileSync(join(OUT_DIR, "index.html"), registerHtml);
   writeFileSync(join(OUT_DIR, "standards.html"), renderBundle(standards, docs, skills, cssVars, registerHtml));
+
+  // llms.txt — the same corpus addressed to a machine, plus the skill inventory
+  // and the procedure for installing and updating it. Generated from the lock so
+  // the inventory cannot be partial; a partial one reads as authoritative and
+  // tells an agent the skills it omits do not exist.
+  if (!args.length) {
+    const lockFile = join(ROOT, "skills-lock.json");
+    const lock = existsSync(lockFile) ? JSON.parse(readFileSync(lockFile, "utf8")) : { skills: {} };
+    writeFileSync(join(OUT_DIR, "llms.txt"), renderLlmsTxt({ standards, docs, skills, lock }));
+  }
+
   console.log(
     `\n  rendered to out/standards/ — index.html lists ${standards.length} standard(s), ` +
-    `${docs.length} document(s) and ${skills.length} skill(s); standards.html bundles them`
+    `${docs.length} document(s) and ${skills.length} skill(s); standards.html bundles them, ` +
+    `llms.txt addresses them to a machine`
   );
   if (failed) {
     console.log(`  ${failed} document(s) did not conform.`);

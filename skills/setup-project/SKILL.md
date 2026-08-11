@@ -77,10 +77,18 @@ values** — only the mappings to 1Password items.
 
 ### 9. Install skills
 
-Copy the locked `skills-lock.json` from the standards repo's default-project template, then `mise install`
-(which runs `skills experimental_install`). To add one later:
-`skills add <owner>/<repo> --skill <folder> -y`. Do not run `skills add mattpocock/skills -y`
-bare — it pulls course and writing extras that are not part of the standard set.
+Copy the locked `skills-lock.json` from the standards repo's default-project template,
+then `mise run install`, which replays the lock as one `skills add … --agent claude-code`
+per source. Do not substitute `skills experimental_install`: it writes only to
+`.agents/skills/`, which Claude Code does not read, so it succeeds and installs nothing
+usable (`STD-011 §3.3`).
+
+Check the count it reports against the number of entries in the lock — a shortfall means
+a skill vanished upstream and the install swallowed it (`STD-011 §3.8`).
+
+To add one later: `skills add <owner>/<repo> --skill <folder> --agent claude-code -y`. Do
+not run `skills add mattpocock/skills -y` bare — it pulls course and writing extras that
+are not part of the standard set.
 
 ### 10. Write AGENTS.md
 
@@ -89,9 +97,14 @@ tasks, fnox for secrets, the skill set, and TypeScript + pnpm. Add the project's
 
 ### 11. Write .gitignore
 
-`node_modules/`, `out/`, `dist/`, `dist-installer/`, `.agents`, `agent/skills/`,
-`.fnox/`, `*.env`, `*.env.local`, `.pi/sessions/`, `.pi/npm/`, `.pi/git/`, `.pi/skills/`,
-`.DS_Store`, `*.log`
+`node_modules/`, `out/`, `dist/`, `dist-installer/`, `.agents`, `.claude/skills/`,
+`agent/skills/`, `.fnox/`, `*.env`, `*.env.local`, `.pi/sessions/`, `.pi/npm/`,
+`.pi/git/`, `.pi/skills/`, `.DS_Store`, `*.log`
+
+`.claude/skills/` is install output restored from `skills-lock.json`, so it is ignored
+like `node_modules/`. Ignore the skills directory, not `.claude/` itself — settings and
+commands under it are committed. A skill written for this one repository and installed
+from nowhere is the exception: commit that, and record it in `AGENTS.md`.
 
 ### 12. Write project configs
 
@@ -103,7 +116,7 @@ framework-specific config (electron-vite, next.config).
 - [ ] `mise ls --current` shows all tools
 - [ ] `mise tasks` shows install/dev/lint/test/deploy
 - [ ] `.pi/settings.json` lists both extensions in `packages`
-- [ ] `.agents/skills/` has the locked skills
+- [ ] `.claude/skills/` has every skill in `skills-lock.json` — count both, they must match
 - [ ] `AGENTS.md` exists and is adapted for this project
 - [ ] `fnox.toml` declares provider and secrets, with no values
 - [ ] `.gitignore` covers generated and secret paths

@@ -22,7 +22,7 @@ something nobody decided. An exception is something somebody did.
 
 ```sh
 cd my-existing-project
-skills add The-Focus-AI/standards --skill standards-map -y
+skills add The-Focus-AI/standards --skill standards-map --agent claude-code -y
 ```
 
 Then: **"map this project against the standards"**. You get a dated report and
@@ -46,7 +46,7 @@ deliverable — it tells you whether the work is an afternoon or a fortnight.
 ## Running the map
 
 ```sh
-skills add The-Focus-AI/standards --skill standards-map -y
+skills add The-Focus-AI/standards --skill standards-map --agent claude-code -y
 ```
 
 Then ask your agent to map the project. It will:
@@ -111,7 +111,7 @@ Fix in this order, which is blast radius rather than effort:
 Once the gaps are agreed, `standardize-project` does the work:
 
 ```sh
-skills add The-Focus-AI/standards --skill standardize-project -y
+skills add The-Focus-AI/standards --skill standardize-project --agent claude-code -y
 ```
 
 It inspects, proposes a plan, and only then changes anything. Two things it is

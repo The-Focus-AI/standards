@@ -70,7 +70,8 @@ Guides live in `best-practices/`, named `GDE-nnn-slug.md`.
 
 `skills/` holds every skill The Focus AI owns, one folder per skill
 (`skills/<name>/SKILL.md`), installable with
-`skills add The-Focus-AI/standards --skill <name>`. A skill is installed and
+`skills add The-Focus-AI/standards --skill <name> --agent claude-code -y`. The
+`--agent` flag is load-bearing — see `GDE-008`. A skill is installed and
 cited by **name**; `SKL-nnn` is its number on the site. Both the number and the
 provenance live in `skills/VENDORED.md`, the skill register, because the skills
 CLI owns `SKILL.md`'s frontmatter (`STD-006 §3.12`). `mise run skills:check`
@@ -143,7 +144,8 @@ When auditing or changing another repository, look in this order:
 - A rule goes in a standard, not a guide. If you find yourself writing MUST in `best-practices/`, it
   belongs in `standards/`.
 - Standards are drafted by anyone and ratified only by a person — `STD-001 §3.14`.
-- Use `skills add` for skills, not manual copying.
+- Use `skills add … --agent claude-code` for skills, not manual copying and not
+  `skills experimental_install` — it writes where Claude Code does not read (`STD-011 §3.3`).
 - Use mise for tools and runtimes. Do not recommend global `npm install -g`, `pip install`, or `brew
   install` workflows for project tooling.
 - If a standard is ambiguous or missing, call it out and propose the smallest durable addition to this repository.

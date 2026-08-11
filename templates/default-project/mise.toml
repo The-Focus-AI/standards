@@ -34,7 +34,21 @@ set -euo pipefail
 if [ -f package.json ]; then
   pnpm install --frozen-lockfile || pnpm install
 fi
-skills experimental_install
+# Not `skills experimental_install`. That command restores the lock but hardcodes
+# its targets to the agents sharing .agents/skills/, and Claude Code reads project
+# skills from .claude/skills/ only — so it reports success and leaves the agent
+# with nothing. Install per source instead, naming the agent. See GDE-008.
+# Each `skills add` gets its stdin from /dev/null. Piping the commands into `sh`
+# instead looks tidier and silently installs only the first source: the CLI reads
+# stdin, so it swallows the remaining commands off the pipe.
+node -e '
+  const { execFileSync } = require("node:child_process");
+  const l = require("./skills-lock.json").skills, by = {};
+  for (const [name, e] of Object.entries(l)) (by[e.source] ??= []).push(name);
+  for (const [source, names] of Object.entries(by))
+    execFileSync("skills", ["add", source, ...names.flatMap((n) => ["--skill", n]), "--agent", "claude-code", "-y"],
+      { stdio: ["ignore", "inherit", "inherit"] });
+'
 '''
 
 [tasks.dev]

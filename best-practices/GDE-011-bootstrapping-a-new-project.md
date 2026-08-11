@@ -21,7 +21,7 @@ secrets and agent environment the standards require.
 
 ```sh
 mkdir my-project && cd my-project && git init
-skills add The-Focus-AI/standards --skill setup-project -y
+skills add The-Focus-AI/standards --skill setup-project --agent claude-code -y
 ```
 
 Then tell your agent: **"set up this project"**. It loads `setup-project`
@@ -34,7 +34,7 @@ the corpus; the machine-readable source is the GitHub repository, and the
 `skills` CLI pulls from there:
 
 ```sh
-skills add The-Focus-AI/standards --skill <name> -y
+skills add The-Focus-AI/standards --skill <name> --agent claude-code -y
 ```
 
 The repository is public, so this needs no authentication. The install writes the
@@ -68,7 +68,7 @@ and makes the choices that depend on the answer — which runtimes, which secret
 which deployment target.
 
 ```sh
-skills add The-Focus-AI/standards --skill setup-project -y
+skills add The-Focus-AI/standards --skill setup-project --agent claude-code -y
 ```
 
 Then ask your agent to set up the project. It will ask you for:

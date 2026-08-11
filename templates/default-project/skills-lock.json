@@ -53,7 +53,7 @@
       "source": "vercel-labs/skills",
       "sourceType": "github",
       "skillPath": "skills/find-skills/SKILL.md",
-      "computedHash": "781bd6d3f9b19f8c9af6b53d8d0e4876d0183841b565db34ca7092ffa412d111"
+      "computedHash": "b146008599c31057cef1c145774cea5d5afb30e8f43fa802e47a4b461419aaaf"
     },
     "firecrawl": {
       "source": "firecrawl/cli",
@@ -257,7 +257,7 @@
       "source": "mattpocock/skills",
       "sourceType": "github",
       "skillPath": "skills/engineering/to-tickets/SKILL.md",
-      "computedHash": "5d79577541b5cf6dade61c69844432ea20ce7b12527cdda1dd4d6fe8d59a135d"
+      "computedHash": "0349eee265e7005e667b4543de849672106c46d545e998f37d3319300bb07751"
     },
     "triage": {
       "source": "mattpocock/skills",
@@ -271,11 +271,11 @@
       "skillPath": "skills/engineering/wayfinder/SKILL.md",
       "computedHash": "c9e18cefd77b6b5b0ee35f59ce2fd96359aa2d2f02e3479e12c873c5402d9d43"
     },
-    "writing-great-skills": {
-      "source": "mattpocock/skills",
+    "work-next-issue": {
+      "source": "The-Focus-AI/standards",
       "sourceType": "github",
-      "skillPath": "skills/productivity/writing-great-skills/SKILL.md",
-      "computedHash": "4deb21855fb4deeeb1b8217b041faff003fd0c915d24a22f636851c520bc9c5c"
+      "skillPath": "skills/work-next-issue/SKILL.md",
+      "computedHash": "753adaca58d1f8f9fdec101d3f4788027b89aba5e69bb18fcc21bdb7f6da5ba9"
     }
   }
 }

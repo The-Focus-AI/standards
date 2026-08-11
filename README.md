@@ -74,17 +74,54 @@ authentication is needed.
 
 ```bash
 # a new project: empty directory to `mise dev`          — see GDE-011
-skills add The-Focus-AI/standards --skill setup-project -y
+skills add The-Focus-AI/standards --skill setup-project --agent claude-code -y
 
 # an existing project: where does it stand?             — see GDE-012
-skills add The-Focus-AI/standards --skill standards-map -y
+skills add The-Focus-AI/standards --skill standards-map --agent claude-code -y
 
 # …then close the gaps
-skills add The-Focus-AI/standards --skill standardize-project -y
+skills add The-Focus-AI/standards --skill standardize-project --agent claude-code -y
 ```
 
 `standards-map` is read-only and produces a dated report; `standardize-project` changes
 files, after a plan you approve. Run the map first.
+
+**`--agent claude-code` is load-bearing.** Claude Code reads project skills from
+`.claude/skills/`; the CLI's own `skills experimental_install` writes only to
+`.agents/skills/` and ignores `--agent`, so it reports success and leaves the agent with
+nothing. `GDE-008` has the detail and `STD-011 §3.3` binds it.
+
+## The skills
+
+Fourteen skills are maintained here. Every one installs the same way —
+`skills add The-Focus-AI/standards --skill <name> --agent claude-code -y`.
+
+| Skill | What it does |
+| --- | --- |
+| `activity-report` | Live production usage joined against git history → client-ready report |
+| `browser-automation` | Drive Chrome: navigate, extract, screenshot, fill forms, print PDFs |
+| `develop-design-md` | Take a project from no identity to a validated `DESIGN.md` |
+| `focus-ai-brand` | The Focus.AI brand: palettes, type, grid, components, voice |
+| `nano-banana-imagegen` | Generate images — icons, headers, illustrations, photo edits |
+| `nano-banana-videogen` | Generate video — image-to-video, scene extension, dialogue |
+| `paged-reports` | Markdown → paged HTML → PDF, with page-break control and magazine mode |
+| `pptx-decks` | Markdown → branded `.pptx` via PptxGenJS, with visual QA |
+| `research-methodology` | Research method and report templates — literature review, comparative, exec summary |
+| `setup-project` | Scaffold a new project to these standards |
+| `standardize-project` | Audit an existing project against these standards, plan the migration |
+| `standards-map` | Latest standards → dated mapping report (applicability, exceptions, gaps) |
+| `tech-research` | Pick the best library/tool for a need; write a dated, cited report into `reports/` |
+| `work-next-issue` | Take the next issue off the frontier and carry it to an open pull request |
+
+A project installs those alongside thirty-two third-party skills — the Matt Pocock
+planning and implementation set, the firecrawl scraping set, `find-skills` and
+`swiss-design`. All forty-six are pinned in `skills-lock.json`, listed with their
+sources in `GDE-008`, and published for agents at
+**<https://standards.thefocus.ai/llms.txt>**, which is generated from the lock and is
+the one inventory that cannot go stale.
+
+To install or update the whole set, see
+[GDE-008 § Installing every locked skill](best-practices/GDE-008-skills.md).
 
 ## Quick start — this repository's container
 
@@ -116,18 +153,18 @@ persist project work.
 | `reports/`          | Research notes `NOTE-001`–`NOTE-006` — fnox secrets, the skills CLI guide, the standards gap register                  |
 | `architecture/`     | Decision records `ADR-001`–`ADR-004` — PRDs and settled questions                                                      |
 | `prompts/`          | Pi prompts — `PRM-001` regenerates this Dockerfile (the rest became skills)                                            |
-| `skills/`           | Every skill we own, numbered `SKL-nnn` in `skills/VENDORED.md`. `work-next-issue` runs the ticket loop end to end.     |
+| `skills/`           | The fourteen skills we own, numbered `SKL-nnn` in `skills/VENDORED.md`                                                 |
 | `DESIGN.md`         | The design system for the published site: tokens, components, voice                                                    |
 | `AGENTS.md`         | Mandatory tools, constraints, task structure for agents working here                                                   |
 | `scripts/`          | The renderer, the design/document/skill validators, the bootstrap script                                               |
 | `mise.toml`         | Tool declarations (mise is the only dependency — everything else flows from here)                                      |
 | `Dockerfile`        | Minimal container: `debian:stable-slim`, mise, bash, tmux, git, gh. `/app` is left empty for your project.             |
-| `skills-lock.json`  | Company-approved skills (locked hashes for reproducibility)                                                            |
+| `skills-lock.json`  | All 46 company-approved skills, pinned by hash. Kept identical to the copy in `templates/`                             |
 | `templates/`        | Source templates used by the bootstrap script                                                                          |
 | `tests/`            | Dockerfile integration tests — `mise test` validates the image                                                         |
 | `out/`              | Generated site. Not committed; rebuild with `mise run standard:render`                                                 |
 | `.pi/settings.json` | Project-local pi config (npmCommand routes through mise, sessionDir keeps sessions local)                              |
-| `.agents/skills/`   | Installed skill files (managed by `skills experimental_install`)                                                       |
+| `.claude/skills/`   | Installed skill files, where Claude Code reads them (managed by `mise run install`; not committed)                     |
 
 ## Tasks
 

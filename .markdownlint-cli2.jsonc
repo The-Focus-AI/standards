@@ -17,6 +17,10 @@
     "node_modules/**",
     ".pi/**",
     ".agents/skills/**",
+    // Restored from skills-lock.json by `mise run install`. Install output, and
+    // mostly somebody else's prose — linting it would fail CI on upstream's line
+    // lengths. `mise run skills:check` validates skills/ instead, which is ours.
+    ".claude/skills/**",
     "out/**",
 
     // Vendored skills — copied in from other repositories, listed under

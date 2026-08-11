@@ -271,11 +271,11 @@
       "skillPath": "skills/engineering/wayfinder/SKILL.md",
       "computedHash": "c9e18cefd77b6b5b0ee35f59ce2fd96359aa2d2f02e3479e12c873c5402d9d43"
     },
-    "writing-great-skills": {
-      "source": "mattpocock/skills",
+    "work-next-issue": {
+      "source": "The-Focus-AI/standards",
       "sourceType": "github",
-      "skillPath": "skills/productivity/writing-great-skills/SKILL.md",
-      "computedHash": "4deb21855fb4deeeb1b8217b041faff003fd0c915d24a22f636851c520bc9c5c"
+      "skillPath": "skills/work-next-issue/SKILL.md",
+      "computedHash": "753adaca58d1f8f9fdec101d3f4788027b89aba5e69bb18fcc21bdb7f6da5ba9"
     }
   }
 }

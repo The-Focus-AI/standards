@@ -11,7 +11,8 @@ This file is also the **skill register**: it assigns each skill its `SKL-nnn` nu
 The number lives here rather than in `SKILL.md` because the skills CLI owns that
 frontmatter (`name`, `description`) and a second schema in it would break installation.
 A skill is still installed and cited by name — `skills add The-Focus-AI/standards --skill
-tech-research` — and the number is what the register and the published site address it by.
+tech-research --agent claude-code -y` — and the number is what the register and the
+published site address it by.
 `mise run skills:check` fails if a skill is missing from these tables, listed twice, or
 carrying a duplicate number.
 

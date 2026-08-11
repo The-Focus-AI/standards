@@ -29,27 +29,33 @@ If this repository also links to TheFocus.AI standards repository, read its `AGE
 - Keep these mise tasks available whenever applicable: `mise install`, `mise dev`, `mise lint`,
   `mise test`, and `mise deploy`.
 - Use fnox and 1Password-backed secrets. Do not commit `.env` files or secret values.
-- Install or update skills with `skills add ...` (mise-pinned CLI); do not manually copy skill directories.
+- Install or update skills with `mise run install` / `skills add ... --agent claude-code`
+  (mise-pinned CLI); do not manually copy skill directories, and do not use
+  `skills experimental_install` — it writes to `.agents/skills/`, which Claude Code does
+  not read. See `GDE-008` in the standards repo.
 - Prefer TypeScript for application code unless the project states otherwise.
 - Before major edits, inspect existing conventions and preserve them unless changing them is the point of the task.
 
 ## Planning and issue workflow
 
-This project uses the Matt Pocock skill set recorded in `skills-lock.json`
-(see `best-practices/GDE-008-skills.md` in the standards repo for the full table).
+This project uses the Matt Pocock skill set recorded in `skills-lock.json` — 21 skills.
+The complete inventory, ours and third-party, is `best-practices/GDE-008-skills.md` in
+the standards repo, and the generated copy at <https://standards.thefocus.ai/llms.txt>.
 Run `setup-matt-pocock-skills` once if tracker/label/domain layout is not set up.
 Use `ask-matt` when unsure which skill fits.
 
-Core planning skills:
+All 21, by role:
 
 - `grill-me` / `grilling` / `grill-with-docs` — stress-test a plan; docs-aware grilling updates ADRs/glossary.
 - `wayfinder` — multi-session map for large or foggy work.
 - `research` — primary-source investigation into a Markdown note.
 - `to-spec` / `to-tickets` / `triage` — spec, blocked tickets, and triage to agent-ready briefs.
+  There is one of each, not two: `to-prd` became `to-spec`, and `to-plan` / `to-issues` merged into `to-tickets`.
 - `prototype` — throwaway validation before committing.
 - `implement` / `tdd` / `code-review` — implement one ticket, then review against standards and spec.
 - `domain-modeling` / `codebase-design` / `improve-codebase-architecture` — ubiquitous language and deep modules.
 - `diagnosing-bugs` / `resolving-merge-conflicts` / `handoff` / `teach` — debug, merge, hand off, teach.
+- `setup-matt-pocock-skills` / `ask-matt` — one-time repo setup, and the router.
 
 Default planning flow:
 

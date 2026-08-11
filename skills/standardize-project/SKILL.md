@@ -94,9 +94,15 @@ conversation.
 
 ### Skills
 
-Install missing skills with `skills add` (mise-pinned); never copy skill directories by
-hand. Prefer `--skill <folder>` over adding a whole upstream repo. The canonical set is
-`best-practices/GDE-008-skills.md` and the locked `skills-lock.json`.
+Install missing skills with `skills add … --agent claude-code -y` (mise-pinned); never
+copy skill directories by hand, and never use `skills experimental_install` — it writes
+to `.agents/skills/`, which Claude Code does not read. Prefer `--skill <folder>` over
+adding a whole upstream repo. The canonical set is `best-practices/GDE-008-skills.md`
+and the locked `skills-lock.json`.
+
+Check the result: every entry in `skills-lock.json` should have a directory in
+`.claude/skills/`. A shortfall means a skill vanished upstream and the install swallowed
+it (`STD-011 §3.8`).
 
 Remove deprecated `to-prd` and `to-issues` entries when migrating. Replace title-case
 lock keys with kebab-case. Ensure the planning workflow skills are present and referenced

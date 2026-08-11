@@ -3,6 +3,9 @@ out/
 dist/
 dist-installer/
 .agents
+# Restored from skills-lock.json by `mise run install` — build output, like node_modules/.
+# Ignore the skills directory, not .claude/ itself: settings and commands are committed.
+.claude/skills/
 agent/skills/
 .antigravitycli/
 .firecrawl/
