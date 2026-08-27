@@ -112,7 +112,7 @@ persist project work.
 | Path                | Purpose                                                                                                                |
 | ------------------- | ---------------------------------------------------------------------------------------------------------------------- |
 | `standards/`        | The binding corpus — `STD-001`–`STD-011`, one file per standard                                                        |
-| `best-practices/`   | Guides `GDE-001`–`GDE-012` — bootstrapping, auditing, deployment, Clerk, secrets, skills, pi extensions                |
+| `best-practices/`   | Guides `GDE-001`–`GDE-013` — project operations, agent services, pluggable components, and hot reloading               |
 | `reports/`          | Research notes `NOTE-001`–`NOTE-006` — fnox secrets, the skills CLI guide, the standards gap register                  |
 | `architecture/`     | Decision records `ADR-001`–`ADR-004` — PRDs and settled questions                                                      |
 | `prompts/`          | Pi prompts — `PRM-001` regenerates this Dockerfile (the rest became skills)                                            |

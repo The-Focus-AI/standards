@@ -65,6 +65,7 @@ Guides live in `best-practices/`, named `GDE-nnn-slug.md`.
 | `GDE-010` | Vercel deployment — previews, env sync, Neon, Blob. |
 | `GDE-011` | Bootstrapping a new project — empty directory to `mise dev`. |
 | `GDE-012` | Auditing an existing project — the gap report and what to do with it. |
+| `GDE-013` | Pluggable component systems, lifecycle isolation, and hot reloading. |
 
 ### Skills — capabilities
 

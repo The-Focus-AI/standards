@@ -5,7 +5,7 @@ kind: guide
 issued: "2026-07-25"
 author: W. Schenk
 status: Current
-verified: "2026-07-30"
+verified: "2026-08-27"
 ---
 
 > Rules extracted to STD-010; this is the reference walkthrough.
@@ -573,6 +573,11 @@ iframe can forward UI actions (`tools/call`, `resources/read`) back into the too
 JSON-RPC envelope doesn't expose that sandbox-proxy protocol.
 
 For a pure-A2A agent (no MCP-UI rendering), you can skip this route. **If your tools emit UI resources, you need it.**
+
+Component mounting, dependency lifecycles and hot replacement belong to the local runtime, not to
+A2A or MCP. See [`GDE-013`](./GDE-013-pluggable-component-systems.md) for the pluggable component
+pattern and for how a trusted host projects local components to MCP-UI resources across a process or
+trust boundary. A2A and MCP carry those projections; they do not own the component lifecycle.
 
 ---
 
