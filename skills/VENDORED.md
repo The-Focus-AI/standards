@@ -28,6 +28,7 @@ carrying a duplicate number.
 | SKL-012 | `tech-research` | Adapted from the `tech-research` agent in `The-Focus-AI/focus-agents` |
 | SKL-013 | `work-next-issue` | Executes `STD-002` and `STD-003`: frontier → claim → branch → pull request |
 | SKL-014 | `standards-map` | Read-only mapping report: which guides apply to a project, exceptions vs gaps |
+| SKL-015 | `build-focus-course` | Adapted from W. Schenk’s local Codex course-authoring skill, 2026-10-12; maintained here |
 
 ## Vendored
 

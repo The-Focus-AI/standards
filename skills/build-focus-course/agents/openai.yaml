@@ -1,0 +1,4 @@
+interface:
+  display_name: "Build a Focus Course"
+  short_description: "Design, build, and verify a hands-on Focus course"
+  default_prompt: "Use $build-focus-course to design and build a course on [topic] for [audience] at courses.thefocus.ai, following its existing conventions."
