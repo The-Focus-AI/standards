@@ -12,15 +12,13 @@ author: W. Schenk
 
 ## 1. Introduction
 
-`best-practices/GDE-001-a2a-agent.md` documents the pattern proven in the first
-production agent deployment. Section 4 of that document is headed "The seven
-required patterns" and opens by saying everything in it is load-bearing rather
-than stylistic — which makes it a set of requirements sitting at line 100 of a
-694-line walkthrough, where nobody looking for rules will find it.
+`GDE-001` originally documented seven required patterns inside the walkthrough
+of the first production agent. This standard owns those requirements so they
+can be found and cited without searching an implementation guide.
 
-This standard extracts those seven. The walkthrough keeps everything else: the
-reference stack, the directory layout, the AgentCard, auth, local development,
-and the deployment steps.
+`GDE-001` remains the server-setup walkthrough: service boundaries, reference
+stack, persistence, discovery, authentication and deployment verification.
+It links these clauses rather than duplicating them.
 
 **Out of scope.** The reference implementation itself. Which model an agent
 uses. Deployment, which is `STD-008`.
