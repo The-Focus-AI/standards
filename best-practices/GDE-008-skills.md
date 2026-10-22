@@ -92,6 +92,47 @@ Not ours; installed from upstream so `skills update` keeps giving us their fixes
 | `find-skills` | vercel-labs/skills | `skills/find-skills` |
 | `swiss-design` | zeke/swiss-design-skill | `swiss-design` |
 
+### pstack (Lauren Tan / @poteto)
+
+[pstack](https://github.com/cursor/plugins/tree/main/pstack) is Lauren Tan's
+(@poteto) set of engineering workflow and principle skills, published in
+`cursor/plugins` under the MIT license (`pstack/LICENSE`, Copyright (c) 2026
+Lauren Tan). It is installed skill by skill, never wholesale: `cursor/plugins`
+also carries unrelated plugins, so `STD-011 §3.7` applies.
+
+```sh
+skills add https://github.com/cursor/plugins/tree/main/pstack/skills \
+  -s poteto-mode -s how -s why ... -a cursor -y
+```
+
+Lock entries carry `source: cursor/plugins` and
+`skillPath: pstack/skills/<name>/SKILL.md`, which is the Cursor-native copy. The
+repository also contains a generated Claude Code copy under `harness/pstack/`;
+a bare `skills add cursor/plugins` resolves to that one, so install from the
+`pstack/skills` tree URL.
+
+| Group | Skills |
+| --- | --- |
+| Entry and help | `poteto-mode`, `poteto-help`, `setup-pstack` |
+| Understanding | `how`, `why`, `in-your-own-words`, `bro`, `ketchup`, `recall`, `show-me-your-work` |
+| Design and review | `architect`, `arena`, `interrogate`, `blast-radius`, `sharpen`, `statechart`, `swarm`, `figure-it-out` |
+| Verification | `create-verification-skill`, `maintain-verification-skill`, `create-formal-verification-skill`, `maintain-formal-verification-skill`, `benchmark-checklist` |
+| Code and prose quality | `unslop`, `no-comments`, `correct`, `reflect`, `automate-me`, `technical-writing`, `typescript-best-practices`, `make-bot-ui` |
+| Principles | the 24 `principle-*` skills |
+
+**Not installed: `tdd` and `teach`.** Their names collide with the
+`mattpocock/skills` entries already in the lock. A lock is keyed by name
+(`STD-011 §3.4`), so installing them would replace Matt Pocock's versions. Which
+one wins is a human decision. `poteto-help` links to `../tdd/SKILL.md` and
+`../teach/SKILL.md` and will resolve to the mattpocock copies until it is made.
+
+**Dependencies outside the lock.** Several skills (`poteto-mode` and its
+playbooks, `poteto-help`, `reflect`) refer to things that are not skills in this
+set: the `cursor-team-kit` plugin (`deslop`, `control-cli`, `control-ui`), the
+`poteto-agent` subagent (`pstack/agents/`), Cursor Bugbot and Automations, and
+`../../docs/guide/*` in the plugin. None of these are installed by the `skills` CLI.
+Those steps degrade or are skipped outside a full Cursor plugin install.
+
 ### Product / planning / architecture workflow
 
 All from `mattpocock/skills`. Canonical set matches the full engineering/productivity
