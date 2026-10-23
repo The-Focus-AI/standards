@@ -18,7 +18,9 @@ repo (`mise.toml` `vercel:sync`, `fnox.toml`, Neon + Blob + Clerk).
 
 For remote-server / pi / tmux setup see `best-practices/GDE-006-local-environment.md`. For Clerk domain and
 OAuth rules see `best-practices/GDE-002-clerk.md`. For the full fnox playbook see
-`best-practices/GDE-003-fnox-secrets.md`.
+`best-practices/GDE-003-fnox-secrets.md`. For CI, testing against previews, and
+failure notification see `standards/STD-012-testing-and-deployment.md` and
+`best-practices/GDE-014-testing-and-preview-pipeline.md`.
 
 ## Defaults
 

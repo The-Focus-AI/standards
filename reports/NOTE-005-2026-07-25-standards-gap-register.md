@@ -5,7 +5,7 @@ kind: note
 issued: "2026-07-25"
 author: W. Schenk
 status: Current
-verified: "2026-07-26"
+verified: "2026-10-22"
 ---
 
 # Standards gap register
@@ -42,6 +42,11 @@ prompts into skills, which resolves two category A rows and changes a third:
   `kind: prompt`. The gap is closed by main's work rather than by a standard.
 - **pi extension set** — still a 260-byte guide that does not list the five
   packages actually pinned. Unchanged.
+- **Testing and deployment** — `STD-012` (Draft) and
+  `best-practices/GDE-014-testing-and-preview-pipeline.md`, written 2026-10-22
+  from practice in the UpperHand repositories and the A+E data-QA work.
+  Incident response stays in category C: `STD-012` covers detection and
+  routing, not rollback.
 - **Skills themselves** became a document class with a validator, so "how a
   skill is authored" is now a live question rather than a hypothetical one.
 
@@ -53,7 +58,7 @@ prompts into skills, which resolves two category A rows and changes a third:
 | Commit messages | Agents author nearly all of them. A consistent shape is in use — imperative subject, body explaining why rather than restating the diff, trailers — but nothing specifies it. `git log` is the only record of intent that outlives a tracker. |
 | Prompt files | **Largely resolved.** Three of four became skills under `skills/`, validated by `mise run skills:check`; the remainder carries `kind: prompt`. What a *skill* must contain is now the open question. |
 | pi extension set | `.pi/settings.json` pins five packages. `best-practices/GDE-007-pi-extensions.md` is 260 bytes and does not list them. Belongs in `STD-005`. |
-| Test entry point | `mise test` is required by `STD-004`; `tests/test-dockerfile.sh` is the only implementation. Where tests live and what they must cover is unstated. |
+| Test entry point | **Addressed in draft.** `STD-012` (Draft) specifies when tests run, blocking vs advisory checks, preview verification, benchmarks, release gates and the failure → issue → Slack loop; `best-practices/GDE-014-testing-and-preview-pipeline.md` is the walkthrough. Where tests live inside a repository is still left to `STD-004`. |
 | Lint configuration | `.markdownlint-cli2.jsonc` pins line length 120, disables MD025 and MD033. Covered by `STD-004 §3.9`; no separate standard needed. |
 
 ## B — Needs a decision before it can be written
