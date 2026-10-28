@@ -24,6 +24,14 @@ the way its team expects.
 For a **read-only mapping report** (which guides apply, exceptions vs gaps, no
 migration), use `standards-map` instead — or run it first, then return here to apply.
 
+When the user wants the full "bring this project up to current Focus standards"
+loop — skills-lock diff (including the `tdd`/`teach` rule), every In force/Draft
+STD and Current/Draft GDE checked, a conformance gap report, then fix branches
+and draft PRs per `STD-003` with **no merges and no ratification** — follow
+`PRM-002` (`prompts/PRM-002-bring-project-up-to-standards.md`) end to end. This
+skill still owns the mechanical mise/fnox/pi/AGENTS migration steps inside that
+loop once a batch is approved.
+
 ## Target
 
 Resolve the target repository before doing anything. If none was given, ask and stop.
