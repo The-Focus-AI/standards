@@ -95,8 +95,8 @@ git clone https://github.com/The-Focus-AI/standards
 ./standards/scripts/setup-default-project.sh ../my-project
 ```
 
-That copies `mise.toml`, `.pi/settings.json`, `skills-lock.json` and `AGENTS.md`
-from `templates/default-project/`, then runs `mise trust`, `mise install`,
+That copies `mise.toml`, `.pi/settings.json`, `skills-lock.json`, `AGENTS.md`,
+`docs/testing.md`, and `.github/workflows/ci.yml` from `templates/default-project/`, then runs `mise trust`, `mise install`,
 `mise run setup` and `mise run install`. Existing files are left alone unless you
 pass `--force`; pass `--no-install` to copy and stop.
 

@@ -362,6 +362,18 @@ Current state surveyed 2026-10-22 across `The-Focus-AI/upperhand*`:
 | 5 | `upperhandai-workbench` | Has `ci.yml` (Postgres 15 service, `typecheck`, `test`, `build`, disposable DB migration) | `Preview`, `Production` | Add `docs/testing.md`, `preview.yml` (`preview/e2e` Playwright run against preview), and issue + Slack failure steps |
 | 6 | `upperhandai-standards` | Has `ci.yml` (`npm run lint`) | `Preview`, `Production` | Add `docs/testing.md` and `preview/e2e` link/conformance check |
 
+## Default-project template
+
+New repositories scaffolded from `templates/default-project/` (via
+`scripts/setup-default-project.sh` or `setup-project`) receive:
+
+- `docs/testing.md` — the five required headings, with preview / benchmarks /
+  gates / alerting marked `N/A` until enabled.
+- `.github/workflows/ci.yml` — `mise run install`, `mise run lint`, `mise run test`
+  on pull requests and pushes to `main`.
+
+Fill in the `N/A` sections as the project grows; do not delete the headings.
+
 ## 6. Agent execution checklist
 
 When bringing a repository into conformance with `STD-012`, execute in order:

@@ -86,23 +86,37 @@ Focus-owned skills, Matt Pocock's planning workflow, firecrawl, and pstack from
 collisions, keep the mattpocock lock entries and invoke pstack's via `skills use … --skill tdd|teach`
 (`STD-011 §3.9`).
 
-### 10. Write AGENTS.md
+### 10. Testing record and CI (`STD-012`)
+
+Copy from the standards default-project template (or write them by hand):
+
+- `docs/testing.md` — five required headings (`## Checks`, `## Preview verification`,
+  `## Benchmarks and thresholds`, `## Sign-off gates`, `## Alerting`). Mark unused
+  sections `N/A`; never delete a heading.
+- `.github/workflows/ci.yml` — on `pull_request` and `push` to `main`, run
+  `mise run install`, `mise run lint`, and `mise run test`.
+
+When the project later adds a web preview or data/model evals, fill those sections
+and add `preview.yml` / eval workflows per
+`best-practices/GDE-014-testing-and-preview-pipeline.md`.
+
+### 11. Write AGENTS.md
 
 Adapt from the standards `AGENTS.md`. Keep the mise-only tooling constraint, the required
 tasks, fnox for secrets, the skill set, and TypeScript + pnpm. Add the project's stack.
 
-### 11. Write .gitignore
+### 12. Write .gitignore
 
 `node_modules/`, `out/`, `dist/`, `dist-installer/`, `.agents`, `agent/skills/`,
 `.fnox/`, `*.env`, `*.env.local`, `.pi/sessions/`, `.pi/npm/`, `.pi/git/`, `.pi/skills/`,
 `.DS_Store`, `*.log`
 
-### 12. Write project configs
+### 13. Write project configs
 
 `tsconfig.json` — strict, ES2022, bundler resolution, path aliases. Then any
 framework-specific config (electron-vite, next.config).
 
-### 13. Verify
+### 14. Verify
 
 - [ ] `mise ls --current` shows all tools
 - [ ] `mise tasks` shows install/dev/lint/test/deploy

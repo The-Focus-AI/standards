@@ -123,7 +123,7 @@
       "source": "vercel-labs/skills",
       "sourceType": "github",
       "skillPath": "skills/find-skills/SKILL.md",
-      "computedHash": "781bd6d3f9b19f8c9af6b53d8d0e4876d0183841b565db34ca7092ffa412d111"
+      "computedHash": "b146008599c31057cef1c145774cea5d5afb30e8f43fa802e47a4b461419aaaf"
     },
     "firecrawl": {
       "source": "firecrawl/cli",
@@ -531,7 +531,7 @@
       "source": "The-Focus-AI/standards",
       "sourceType": "github",
       "skillPath": "skills/setup-project/SKILL.md",
-      "computedHash": "d035b5039c8249c8cd8fc7eafde020d39966b6a59f2fa2cd8222894dd8e39e11"
+      "computedHash": "ebfe42305206b1308b27f463e48b20538479f283d7ec02f9c15beccf9748a2c3"
     },
     "setup-pstack": {
       "source": "cursor/plugins",
@@ -621,7 +621,7 @@
       "source": "mattpocock/skills",
       "sourceType": "github",
       "skillPath": "skills/engineering/to-tickets/SKILL.md",
-      "computedHash": "5d79577541b5cf6dade61c69844432ea20ce7b12527cdda1dd4d6fe8d59a135d"
+      "computedHash": "0349eee265e7005e667b4543de849672106c46d545e998f37d3319300bb07751"
     },
     "triage": {
       "source": "mattpocock/skills",
