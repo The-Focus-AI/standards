@@ -531,7 +531,7 @@
       "source": "The-Focus-AI/standards",
       "sourceType": "github",
       "skillPath": "skills/setup-project/SKILL.md",
-      "computedHash": ""
+      "computedHash": "d035b5039c8249c8cd8fc7eafde020d39966b6a59f2fa2cd8222894dd8e39e11"
     },
     "setup-pstack": {
       "source": "cursor/plugins",

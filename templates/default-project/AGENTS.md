@@ -63,7 +63,6 @@ Default planning flow:
 7. Use `implement` for one ticket at a time, then `code-review` before declaring the ticket complete.
 8. Keep GitHub Issues, specs, tickets, ADRs, and `CONTEXT.md` in sync with the final decisions.
 
-
 ## pstack skills (Lauren Tan / @poteto)
 
 This project's `skills-lock.json` also pins the pstack engineering workflow and
