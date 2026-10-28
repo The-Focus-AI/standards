@@ -79,8 +79,7 @@ values** — only the mappings to 1Password items.
 
 Copy the locked `skills-lock.json` from the standards repo's default-project template, then `mise install`
 (which runs `skills experimental_install`). To add one later:
-`skills add <owner>/<repo> --skill <folder> -y`. Do not run `skills add mattpocock/skills -y`
-bare — it pulls course and writing extras that are not part of the standard set.
+`skills add <owner>/<repo> --skill <folder> -y`. Do not run `skills add mattpocock/skills -y` or `skills add cursor/plugins -y` bare — both pull extras outside the standard set (`STD-011 §3.7`). The locked set includes Focus-owned skills, Matt Pocock's planning workflow, firecrawl, and pstack from `https://github.com/cursor/plugins/tree/main/pstack/skills` (see `GDE-008`). For `tdd`/`teach` name collisions, keep the mattpocock lock entries and invoke pstack's via `skills use … --skill tdd|teach` (`STD-011 §3.9`).
 
 ### 10. Write AGENTS.md
 

@@ -63,6 +63,25 @@ Default planning flow:
 7. Use `implement` for one ticket at a time, then `code-review` before declaring the ticket complete.
 8. Keep GitHub Issues, specs, tickets, ADRs, and `CONTEXT.md` in sync with the final decisions.
 
+
+## pstack skills (Lauren Tan / @poteto)
+
+This project's `skills-lock.json` also pins the pstack engineering workflow and
+principle skills from `cursor/plugins` (`pstack/skills/…`, MIT). Inventory,
+canonical install URL, and update verification live in
+`best-practices/GDE-008-skills.md` and `STD-011 §3.8–3.9` in The-Focus-AI/standards.
+
+**Same-name skills (`tdd`, `teach`):** both `mattpocock/skills` and pstack define
+these names. The lock can hold only one entry per name. Defaults:
+
+| Name | Locked default | Use the other when |
+| --- | --- | --- |
+| `tdd` | `mattpocock/skills` (feature / vertical-slice red-green) | Bug fix with a cheap local test under `/poteto-mode` → `skills use https://github.com/cursor/plugins/tree/main/pstack/skills --skill tdd` |
+| `teach` | `mattpocock/skills` (multi-session teaching workspace) | Explain a subsystem/diff via how+why → `skills use https://github.com/cursor/plugins/tree/main/pstack/skills --skill teach` |
+
+Do not run `skills add cursor/plugins -y` or `skills add mattpocock/skills -y` bare —
+both repos carry skills outside the standard set (`STD-011 §3.7`).
+
 ## GitHub Issues / tracker expectations
 
 - Prefer GitHub Issues when this repo has a GitHub remote and `gh` is authenticated.
