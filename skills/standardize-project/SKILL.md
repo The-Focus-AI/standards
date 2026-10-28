@@ -9,6 +9,10 @@ description: >
   Triggers on: "standardize", "audit this project", "bring up to standard",
   "compliance check", "does this follow our standards", "migrate to fnox",
   "migrate to mise", "clean up this repo's setup".
+  For a pasteable end-to-end prompt that diffs skills-lock, checks every STD/GDE,
+  writes a gap report, and opens fix PRs without merging, see PRM-002
+  (prompts/PRM-002-bring-project-up-to-standards.md) — load or paste that when
+  the user wants the full bring-up-to-current-standards loop.
 ---
 
 # Audit and Standardize a Project

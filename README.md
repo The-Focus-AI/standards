@@ -81,10 +81,16 @@ skills add The-Focus-AI/standards --skill standards-map -y
 
 # …then close the gaps
 skills add The-Focus-AI/standards --skill standardize-project -y
+
+# …or paste PRM-002 for the full bring-up-to-current-standards loop
+# (skills-lock diff, every STD/GDE, gap report, draft PRs — no merge)
+# prompts/PRM-002-bring-project-up-to-standards.md  — see GDE-012
 ```
 
 `standards-map` is read-only and produces a dated report; `standardize-project` changes
-files, after a plan you approve. Run the map first.
+files, after a plan you approve. Run the map first. For a copy-pasteable agent
+prompt that diffs the canonical `skills-lock.json`, checks each standard and
+guide, writes a gap report, then opens fix PRs without merging, use `PRM-002`.
 
 ## Quick start — this repository's container
 
@@ -115,7 +121,7 @@ persist project work.
 | `best-practices/`   | Guides `GDE-001`–`GDE-013` — project operations, agent services, pluggable components, and hot reloading               |
 | `reports/`          | Research notes `NOTE-001`–`NOTE-006` — fnox secrets, the skills CLI guide, the standards gap register                  |
 | `architecture/`     | Decision records `ADR-001`–`ADR-004` — PRDs and settled questions                                                      |
-| `prompts/`          | Pi prompts — `PRM-001` regenerates this Dockerfile (the rest became skills)                                            |
+| `prompts/`          | Agent prompts — `PRM-001` regenerates this Dockerfile; `PRM-002` brings an existing project up to current standards    |
 | `skills/`           | Every skill we own, numbered `SKL-nnn` in `skills/VENDORED.md`. `work-next-issue` runs the ticket loop end to end.     |
 | `DESIGN.md`         | The design system for the published site: tokens, components, voice                                                    |
 | `AGENTS.md`         | Mandatory tools, constraints, task structure for agents working here                                                   |

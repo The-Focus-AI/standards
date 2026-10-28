@@ -32,12 +32,12 @@ nothing changes on disk.
 
 Pick by what you want to happen to the repository.
 
-| | `standards-map` (`SKL-014`) | `standardize-project` (`SKL-011`) |
-| --- | --- | --- |
-| Changes files | **No.** Read-only. | Yes, after a plan you approve. |
-| Produces | A dated mapping report | A migration, applied |
-| Use when | You want to know where you stand | You have decided to close the gaps |
-| Safe on a client repo | Yes | Only with the plan reviewed first |
+| | `standards-map` (`SKL-014`) | `standardize-project` (`SKL-011`) | `PRM-002` |
+| --- | --- | --- | --- |
+| Changes files | **No.** Read-only. | Yes, after a plan you approve. | Yes — opens draft PRs only |
+| Produces | A dated mapping report | A migration, applied | Gap report + issues/PRs |
+| Use when | You want to know where you stand | You have decided to close tooling gaps | Bring a repo up to the current corpus |
+| Safe on a client repo | Yes | Only with the plan reviewed first | Yes if PRs stay unmerged |
 
 Run `standards-map` first, always. An audit that starts by editing is an audit
 nobody can check, and on a repository you did not write, the report *is* the

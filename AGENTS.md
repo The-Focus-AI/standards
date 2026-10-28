@@ -119,7 +119,7 @@ of a class rather than a member of it.
 - `skills-lock.json`, `mise.toml`, `.pi/settings.json` — the repo's own configuration.
 - `scripts/` — the bootstrap script, the standards renderer, and the design, document, and skill validators.
 - `templates/default-project/` — source templates used by the bootstrap script.
-- `prompts/` — `PRM-001` (`prompts/PRM-001-generate-dockerfile.md`) only; the rest became skills.
+- `prompts/` — `PRM-001` (Dockerfile) and `PRM-002` (bring a project up to current standards); the rest became skills.
 - `tests/` — validation scripts for this repository.
 
 ## How to inspect a project
