@@ -4,8 +4,8 @@ kind: standard
 title: Agent skills
 category: Practice
 status: Draft
-issued: "2026-07-25"
-revision: R1
+issued: "2026-10-23"
+revision: R2
 applies-to: Every repository worked by an agent
 author: W. Schenk
 ---
@@ -93,6 +93,33 @@ unrelated skills.
 
 Adding a whole upstream collection pulls in whatever else lives there. Install
 the named skills the standard set calls for, and nothing else.
+
+### 3.8
+
+When an upstream repository contains multiple copies or harness adaptations of a
+skill, `skills add` MUST be invoked with the subpath URL of the canonical source
+directory, and `skillPath` in `skills-lock.json` MUST point to that directory.
+
+A repository that ships both a canonical skill tree and a generated adapter tree
+(for example `pstack/skills/` alongside `harness/pstack/claude-code/skills/` in
+`cursor/plugins`) resolves to whichever manifest the CLI reads first when cloned
+from the root. Passing the subpath tree URL pins `skillPath` to the canonical
+source and is checkable with `jq` against `skills-lock.json`.
+
+### 3.9
+
+When two upstream sources define skills with the same `SKILL.md` frontmatter
+`name`, the inventory guide MUST state which source owns the lock entry, when an
+agent should use each one, and the exact commands to invoke or switch to the
+other.
+
+`skills-lock.json` (version 1) is a flat map keyed by `SKILL.md` frontmatter
+`name`, and `.agents/skills/<name>/` has one directory per name. Two upstream
+skills with the same `name` cannot both hold lock entries at once without one
+overwriting the other. Recording both in `best-practices/GDE-008-skills.md` with
+the locked default, the one-shot `skills use <source> --skill <name>` command,
+and the `skills add <source> -s <name>` switch command lets an agent choose
+deterministically instead of guessing what is on disk.
 
 ## 4. References
 
