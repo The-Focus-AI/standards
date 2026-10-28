@@ -32,12 +32,12 @@ nothing changes on disk.
 
 Pick by what you want to happen to the repository.
 
-| | `standards-map` (`SKL-014`) | `standardize-project` (`SKL-011`) |
-| --- | --- | --- |
-| Changes files | **No.** Read-only. | Yes, after a plan you approve. |
-| Produces | A dated mapping report | A migration, applied |
-| Use when | You want to know where you stand | You have decided to close the gaps |
-| Safe on a client repo | Yes | Only with the plan reviewed first |
+| | `standards-map` (`SKL-014`) | `standardize-project` (`SKL-011`) | `PRM-002` |
+| --- | --- | --- | --- |
+| Changes files | **No.** Read-only. | Yes, after a plan you approve. | Yes — opens draft PRs only |
+| Produces | A dated mapping report | A migration, applied | Gap report + issues/PRs |
+| Use when | You want to know where you stand | You have decided to close tooling gaps | Bring a repo up to the current corpus |
+| Safe on a client repo | Yes | Only with the plan reviewed first | Yes if PRs stay unmerged |
 
 Run `standards-map` first, always. An audit that starts by editing is an audit
 nobody can check, and on a repository you did not write, the report *is* the
@@ -105,6 +105,23 @@ Fix in this order, which is blast radius rather than effort:
    re-deriving all of this.
 4. **Deployment** (`STD-008`), then whatever is specific to the platform.
 5. **Everything else.**
+
+## Pasteable bring-up prompt (`PRM-002`)
+
+When you want an agent to do the whole loop against the live corpus — diff
+`skills-lock.json` (including the `tdd`/`teach` selection rule in `GDE-008` /
+`STD-011` §3.9), check every In force/Draft standard and Current/Draft guide,
+write a conformance gap report, then open fix branches and draft pull requests
+per `STD-003` **without merging or ratifying** — paste
+`prompts/PRM-002-bring-project-up-to-standards.md` (from the heading "Agent
+prompt" through the end of the file) into the agent.
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/The-Focus-AI/standards/main/prompts/PRM-002-bring-project-up-to-standards.md
+```
+
+Or open the rendered page on the standards site (`prm-002`). `standardize-project`
+cross-links the same flow for the mechanical mise/fnox steps inside a batch.
 
 ## Applying the migration
 
