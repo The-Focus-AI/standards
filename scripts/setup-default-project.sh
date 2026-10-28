@@ -84,6 +84,11 @@ copy_file "$TEMPLATE_DIR/mise.toml" "$TARGET_DIR/mise.toml"
 copy_file "$TEMPLATE_DIR/.pi/settings.json" "$TARGET_DIR/.pi/settings.json"
 copy_file "$TEMPLATE_DIR/skills-lock.json" "$TARGET_DIR/skills-lock.json"
 copy_file "$TEMPLATE_DIR/AGENTS.md" "$TARGET_DIR/AGENTS.md"
+copy_file "$TEMPLATE_DIR/docs/testing.md" "$TARGET_DIR/docs/testing.md"
+copy_file "$TEMPLATE_DIR/.github/workflows/ci.yml" "$TARGET_DIR/.github/workflows/ci.yml"
+if [[ -f "$TEMPLATE_DIR/.gitignore" ]]; then
+	copy_file "$TEMPLATE_DIR/.gitignore" "$TARGET_DIR/.gitignore"
+fi
 
 mkdir -p "$TARGET_DIR/.pi/sessions"
 

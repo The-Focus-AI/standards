@@ -91,6 +91,18 @@ both repos carry skills outside the standard set (`STD-011 §3.7`).
   blocking edges, and links to the spec or parent issue.
 - Before creating issues, check existing open issues to avoid duplicates.
 
+## Testing and release (`STD-012`)
+
+- Keep `docs/testing.md` current: checks (blocking vs advisory), preview verification,
+  benchmarks/thresholds, sign-off gates, and alerting. Required headings must stay even
+  when a section is `N/A`.
+- PR CI is `.github/workflows/ci.yml` and runs `mise run install`, `mise run lint`, and
+  `mise run test`. Only blocking checks are required in branch protection.
+- When this project has a web preview, publish the preview URL as a commit status
+  (`preview/e2e`) and run smoke/e2e against it before marking a PR ready (`STD-012 §3.5–3.7`).
+- Walkthrough and templates: `best-practices/GDE-014-testing-and-preview-pipeline.md` in
+  The-Focus-AI/standards.
+
 ## Quality bar
 
 - Run the relevant lint/test/typecheck commands before declaring work complete.

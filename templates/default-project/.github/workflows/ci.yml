@@ -1,0 +1,19 @@
+# Default Focus.AI CI — runs the same mise tasks a developer runs (STD-012 §3.1, STD-004).
+# Mark the `check` job as required in branch protection. Advisory jobs stay optional.
+name: ci
+on:
+  pull_request:
+  push:
+    branches: [main]
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: jdx/mise-action@v2
+      - run: mise run install
+      - run: mise run lint
+      - run: mise run test

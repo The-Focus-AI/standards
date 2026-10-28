@@ -25,6 +25,8 @@ the walkthroughs, the reference implementations, and the checklists.
 the four required tasks do, which is `STD-004`. Platform-specific mechanics,
 which stay in `best-practices/GDE-010-vercel-deployment.md`,
 `best-practices/GDE-005-gcp-deployment.md`, and `best-practices/GDE-004-gce-gaia-runtime.md`.
+What must pass before and after a deployment — CI, preview verification,
+release gates, and failure notification — is `STD-012`.
 
 ## 2. Requirements language
 
@@ -174,3 +176,5 @@ BCP 14, RFC 2119, March 1997.
 [2] The Focus AI, `STD-004` — Repository tooling and tasks. Draft.
 
 [3] The Focus AI, `STD-007` — Secrets and credentials. Draft.
+
+[4] The Focus AI, `STD-012` — Testing and deployment. Draft.
