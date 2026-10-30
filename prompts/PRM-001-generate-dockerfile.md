@@ -12,7 +12,7 @@ status: Current
 Produce a `Dockerfile` that packages this standards repo into a containerized
 development environment. The image provides a ready-to-use `/standards` with
 all tooling available after `mise install`. `/app` is left empty as a sandbox
-for whatever project the user scaffolds with `setup-project.md`.
+for whatever project the user scaffolds with `skills/setup-project/SKILL.md`.
 
 The Dockerfile is the only artifact — write the file, do not explain.
 
@@ -99,19 +99,29 @@ CMD ["/bin/bash", "-l"]
 
 The generated Dockerfile must include comments at the top documenting:
 
-1. **Build:** `docker build -t focus-ai-standards-agent .`
-2. **Run (interactive shell with LLM keys):**
-   `docker run -it --rm -v ~/.pi:/home/agent/.pi focus-ai-standards-agent`
-3. **First steps inside the container:**
+1. **Provenance:** `Generated from prompts/PRM-001-generate-dockerfile.md.`
+   `Do not hand-edit; edit the prompt and regenerate with mise run generate:dockerfile.`
+2. **Build:** `docker build -t focus-ai-standards-agent .`
+3. **Run in a cloud workspace:**
+   `docker run -it --rm --env OPENAI_API_KEY --env OP_SERVICE_ACCOUNT_TOKEN focus-ai-standards-agent`
+   These names forward already-injected, project-scoped credentials only when needed.
+   Use the selected model provider's variable instead of `OPENAI_API_KEY` if different.
+4. **First steps inside the container:**
 
    ```bash
    cd /standards
    mise install
-   pi -p skills/setup-project/SKILL.md   # follow the skill to scaffold /app
+   mise run install
+   pi -p "$(cat skills/setup-project/SKILL.md)"   # supply a project brief; target /app
    ```
 
-4. Explanation that `~/.pi` is mounted to give pi access to the host's LLM
-   API keys, and that sessions are ephemeral (lost when the container exits).
+5. A person retrieves the project-scoped bootstrap token using their own
+   1Password account and injects it through cloud secret settings. Do not mount
+   personal authentication directories (`~/.pi`, `~/.config`, `~/.ssh`, or a
+   1Password session), persist tokens, or bake credentials into the image.
+   Installation and offline checks do not need those runtime credentials.
+6. Sessions are ephemeral (lost when the container exits). Store durable project
+   work in an approved workspace, not a personal auth-directory mount.
 
 ## What NOT to do
 

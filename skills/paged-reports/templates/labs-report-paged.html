@@ -657,14 +657,23 @@
     }
   </style>
 
-  <!-- Paged.js: defer pagination until fonts are ready -->
+  <!-- Approve/pin external assets before use. Signal readiness after pagination. -->
   <script>
     window.PagedConfig = { auto: false };
+    window.__reportReady = false;
   </script>
   <script src="https://unpkg.com/pagedjs/dist/paged.polyfill.js"></script>
   <script>
-    document.fonts.ready.then(function() {
-      window.PagedPolyfill.preview();
+    document.addEventListener('DOMContentLoaded', async function() {
+      try {
+        await document.fonts.ready;
+        await Promise.all(Array.from(document.images, image => image.decode()));
+        await window.PagedPolyfill.preview();
+        window.__reportReady = true;
+      } catch (error) {
+        window.__reportError = String(error);
+        console.error('Report pagination failed', error);
+      }
     });
   </script>
 </head>

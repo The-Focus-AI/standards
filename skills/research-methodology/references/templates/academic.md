@@ -8,6 +8,16 @@ For comprehensive topic analysis requiring thorough coverage.
 ---
 
 ```markdown
+---
+number: "<next free number>"
+title: "[Topic Title]"
+kind: note
+issued: "YYYY-MM-DD"
+author: "<actual author or agent identity>"
+status: Current
+verified: "YYYY-MM-DD"
+---
+
 # [Topic Title]
 
 *Research conducted: [YYYY-MM-DD]*
@@ -100,5 +110,5 @@ According to [Organization](URL), [finding with specific details].
 
 ---
 
-*Report generated with tech-researcher*
+*Research method and tools: [actual method/tools used; note agent-made recommendations]*
 ```

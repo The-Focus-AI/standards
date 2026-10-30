@@ -7,10 +7,15 @@ For documenting library, tool, or technique recommendations with implementation 
 
 ---
 
-```markdown
+````markdown
 ---
+number: "<next free number>"
 title: "[Topic]: [Recommendation Name]"
-date: YYYY-MM-DD
+kind: note
+issued: "YYYY-MM-DD"
+author: "<actual author or agent identity>"
+status: Current
+verified: "YYYY-MM-DD"
 topic: [short topic slug]
 recommendation: [library/tool name]
 version_researched: [version number if applicable]
@@ -152,4 +157,4 @@ project_context:
 [2] [Source title](URL) - [brief description]
 [Continue numbering all sources used]
 
-```
+````

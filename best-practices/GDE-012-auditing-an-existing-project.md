@@ -99,7 +99,7 @@ Fix in this order, which is blast radius rather than effort:
 1. **Secrets** (`STD-007`). A committed credential or a production instance
    serving previews is the only category where the cost of waiting keeps rising.
 2. **Tooling and tasks** (`STD-004`). Everything else is easier once
-   `mise install` and `mise dev` work, and it is what makes the repository
+   `mise run install` and `mise dev` work, and it is what makes the repository
    legible to an agent.
 3. **Agent environment** (`STD-005`). `AGENTS.md` is what stops the next agent
    re-deriving all of this.
@@ -110,7 +110,7 @@ Fix in this order, which is blast radius rather than effort:
 
 When you want an agent to do the whole loop against the live corpus — diff
 `skills-lock.json` (including the `tdd`/`teach` selection rule in `GDE-008` /
-`STD-011` §3.9), check every In force/Draft standard and Current/Draft guide,
+`STD-011` §3.9), check every In force/Draft standard and Current guide,
 write a conformance gap report, then open fix branches and draft pull requests
 per `STD-003` **without merging or ratifying** — paste
 `prompts/PRM-002-bring-project-up-to-standards.md` (from the heading "Agent
@@ -145,10 +145,11 @@ strict about, both learned the hard way:
 Re-run the map. The scorecard should move, and every remaining item should be an
 exception with a reason rather than a gap.
 
-Then the same four commands as a new project:
+Install tools, then run the same four tasks as a new project:
 
 ```sh
 mise install
+mise run install
 mise dev
 mise lint     # and it can fail
 mise test     # and it can fail

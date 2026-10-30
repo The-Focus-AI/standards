@@ -1,18 +1,26 @@
+# Generated from prompts/PRM-001-generate-dockerfile.md.
+# Do not hand-edit; edit the prompt and regenerate with mise run generate:dockerfile.
 # Dockerfile for Focus.AI Standards Agent
 #
 # Build:
 #   docker build -t focus-ai-standards-agent .
 #
-# Run (interactive shell with LLM keys):
-#   docker run -it --rm -v ~/.pi:/home/agent/.pi focus-ai-standards-agent
+# Run in a cloud workspace (forward scoped credentials only when needed):
+#   docker run -it --rm --env OPENAI_API_KEY --env OP_SERVICE_ACCOUNT_TOKEN focus-ai-standards-agent
+# Use the selected model provider's variable instead of OPENAI_API_KEY if different.
 #
 # First steps inside the container:
 #   cd /standards
 #   mise install
-#   pi -p prompts/setup-project.md   # follow the prompt to scaffold /app
+#   mise run install
+#   pi -p "$(cat skills/setup-project/SKILL.md)"   # supply a project brief; target /app
 #
-# ~/.pi is mounted to give pi access to the host's LLM API keys.
-# Sessions are ephemeral — all changes are lost when the container exits.
+# A person retrieves the project-scoped bootstrap token using their own 1Password
+# account and injects it through cloud secret settings. Never mount personal auth
+# directories (~/.pi, ~/.config, ~/.ssh, or a 1Password session), persist tokens,
+# or bake credentials into the image. Install and offline checks need no secrets.
+# Sessions are ephemeral: store durable work in an approved workspace, not an
+# auth-directory mount. Container-local changes are lost when it exits.
 
 FROM debian:stable-slim
 

@@ -5,7 +5,7 @@ title: Pull requests and branches
 category: Practice
 status: Draft
 issued: "2026-07-25"
-revision: R1
+revision: R3
 applies-to: Every repository worked by an agent
 author: W. Schenk
 ---
@@ -59,12 +59,13 @@ is running.
 
 ### 3.3
 
-An agent MUST open exactly one pull request per issue.
+An agent implementing an issue MUST open exactly one pull request for that issue.
 
 One issue, one branch, one pull request. Work that will not fit in one pull
 request is an issue that should have been split, and splitting it is cheaper
 before the code exists than after. This keeps the chain traceable in both
-directions without a join table.
+directions without a join table. Tracker-only duplicate closure under
+`STD-002 §3.18` does not require an implementation pull request.
 
 ### 3.4
 
@@ -72,7 +73,8 @@ A pull request MUST reference its issue with a closing keyword in the
 description.
 
 `Closes #142`. The keyword is what makes merging close the issue, which is the
-mechanism `STD-002 §3.18` depends on — an agent never closes an issue by hand.
+completion mechanism `STD-002 §3.18` depends on. Closing a linked duplicate under
+that clause is tracker cleanup, not completion of the original issue's work.
 A pull request with no linked issue is work nobody accepted.
 
 ### 3.5
@@ -140,10 +142,10 @@ how that happens without requesting attention nobody has time to give.
 
 An agent MUST NOT merge a pull request it authored.
 
-Two gates bound the autonomous stretch: a person accepts the work by labelling
-the issue `ready`, and a person accepts the result by approving the pull
-request. Everything between them is unattended. An agent that merges its own
-work removes the second gate and leaves the fleet grading its own homework.
+A person or agent can establish ticket readiness under `STD-002 §3.5`; that does
+not remove the independent merge gate. A person accepts the result by approving
+the pull request, except for the explicit prior delegation in §3.13. Marking a
+ticket `ready` is not permission to approve one's own result.
 
 ### 3.13
 
@@ -215,11 +217,14 @@ loser closes with a reference to the winner rather than lingering.
 
 ### 3.21
 
-An agent that abandons work MUST return the issue to the frontier.
+An agent that abandons work MUST release its claim and record the issue's
+resulting state.
 
-Close the pull request or leave it draft, remove the `active` label, unassign
-itself, and comment saying what was learned and what is left. Work an agent
-walked away from silently is work that looks claimed forever.
+Close the pull request or leave it draft, unassign itself, and replace `active`
+with `ready` if the ticket remains actionable under `STD-002 §3.4–3.5`. Use
+`blocked` when a person must answer; remove the state label for backlog when
+the specification needs more work. Comment saying what was learned and what is
+left. Releasing a claim does not make an unresolved decision disappear.
 
 ## 4. The description
 
@@ -232,7 +237,7 @@ reduce evidence to the check that proves it.
 
 - [ ] A reviewer can reach the preview from the pull request check list
 - [ ] The preview serves this branch's build, not the default branch's
-- [ ] Preview secrets resolve from the preview vault, not production
+- [ ] Preview uses the documented runtime-key mapping and cannot write the production database
 - [ ] The preview is gone within an hour of merge
 
 ## Why
@@ -244,8 +249,8 @@ review thread.
 ## What changed
 
 The preview URL is now published as a commit status rather than a comment,
-so it stays pinned to the head commit and appears in the check list. Secret
-resolution moved to the preview vault.
+so it stays pinned to the head commit and appears in the check list. Runtime
+keys follow the documented mapping; database writes target the preview branch.
 
 ## Evidence
 
@@ -253,7 +258,7 @@ resolution moved to the preview vault.
 | --- | --- |
 | Preview reachable from checks | ![check list](https://…/checks.png) |
 | Serves this branch's build | ![banner showing SHA](https://…/build.png) |
-| Secrets from preview vault | `fnox list --env preview` output below |
+| Runtime mapping and database protection | Key-name inventory and database-target test output below; no secret values |
 | Torn down after merge | [recording](https://…/teardown.mp4) |
 ````
 

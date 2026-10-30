@@ -6,19 +6,19 @@
 //
 // The whole corpus reaches the site, in six classes. **Standards**
 // (`standards/`) carry numbered clauses and requirement levels; rendering them
-// is also the conformance check, because the renderer refuses to emit a page for
-// a document that does not satisfy STD-001. **Guides**, **notes**, **decision
+// checks clause structure and required metadata. **Guides**, **notes**, **decision
 // records** and **prompts** carry prose and no clauses, and are rendered
 // visibly subordinate to the standards they name, per STD-001 §4. **Skills**
 // come from `skills/<name>/SKILL.md`, numbered by the register in
 // `skills/VENDORED.md` because the skills CLI owns their frontmatter.
 //
-// A document that fails STD-006 does not render either. Same rule, different
-// checklist: if it appears on the site, it conforms.
+// Run validate-documents.mjs, check-skills.mjs, and validate-design.mjs too.
+// These mechanical checks do not establish semantic conformance.
 
 import { readFileSync, writeFileSync, mkdirSync, readdirSync, existsSync, rmSync } from "node:fs";
 import { join, basename } from "node:path";
 import { splitFrontmatter, parseYaml } from "./lib/yaml.mjs";
+import { DOCUMENT_CLASSES, parseDocumentMetadata, duplicateIdentityErrors } from "./lib/document-metadata.mjs";
 import { tokensToCss, ROOT } from "./lib/design-tokens.mjs";
 import { pageCss } from "./lib/page-css.mjs";
 import { blocks, renderBlock, inline, esc } from "./lib/markdown.mjs";
@@ -33,9 +33,8 @@ const OUT_DIR = join(ROOT, "out", "standards");
 // document is, and what it does not do.
 const PROSE_CLASSES = [
   {
-    kind: "guide", prefix: "GDE", dir: "best-practices", label: "Guide",
+    ...DOCUMENT_CLASSES.guide, kind: "guide", label: "Guide",
     plural: "Guides", stamp: "Guide · not normative",
-    statuses: ["Current", "Superseded"],
     blurb: "Guides carry explanation, walkthroughs and reference implementations.",
     memo: "This is a <b>guide</b>: explanation, walkthrough and reference implementation. " +
           "It contains <b>no clauses and binds nothing</b> (<code>STD-001 §4</code>).",
@@ -43,20 +42,17 @@ const PROSE_CLASSES = [
           "where it can be cited and checked, and the guide keeps the explanation.",
   },
   {
-    kind: "note", prefix: "NOTE", dir: "reports", label: "Research note",
+    ...DOCUMENT_CLASSES.note, kind: "note", label: "Research note",
     plural: "Research notes", stamp: "Note · a capture in time",
-    statuses: ["Current", "Superseded"],
     blurb: "Notes record what was true when somebody checked, against sources they cite.",
     memo: "This is a <b>research note</b>: what was found, when it was checked, and " +
-          "against what. It binds nothing and is <b>not maintained</b> " +
-          "(<code>STD-006 §3.2</code>).",
-    tail: "Read the <code>verified</code> date before acting on it. A note that has not " +
-          "been rechecked is evidence about the past, not a claim about now.",
+          "against what. It binds nothing; read its <b>verified date</b> before " +
+          "acting on it (<code>STD-006 §3.3</code>).",
+    tail: "A note that has not been rechecked is evidence about the past, not a claim about now.",
   },
   {
-    kind: "decision", prefix: "ADR", dir: "architecture", label: "Decision record",
+    ...DOCUMENT_CLASSES.decision, kind: "decision", label: "Decision record",
     plural: "Decision records", stamp: "Decision · not a rule",
-    statuses: ["Proposed", "Accepted", "Superseded"],
     blurb: "Decision records settle a question for this repository and say what would reopen it.",
     memo: "This is a <b>decision record</b>: what was decided, what else was considered, " +
           "and what would change the answer. It binds nothing outside this repository " +
@@ -65,9 +61,8 @@ const PROSE_CLASSES = [
           "that names it, so the change of mind stays visible.",
   },
   {
-    kind: "prompt", prefix: "PRM", dir: "prompts", label: "Prompt",
+    ...DOCUMENT_CLASSES.prompt, kind: "prompt", label: "Prompt",
     plural: "Prompts", stamp: "Prompt · executed, not read",
-    statuses: ["Current", "Superseded"],
     blurb: "Prompts are instructions an agent runs. They are input to a tool, not guidance for a person.",
     memo: "This is a <b>prompt</b>: text an agent executes to produce something. " +
           "It binds nothing and is read by a machine first.",
@@ -76,12 +71,6 @@ const PROSE_CLASSES = [
 ];
 const CLASS_BY_KIND = new Map(PROSE_CLASSES.map((c) => [c.kind, c]));
 
-const REQUIRED = ["standard", "title", "category", "status", "issued", "revision", "applies-to", "author"];
-// Guide was removed as a category in STD-001 R2 — a guide is a document
-// kind under STD-006, not a weaker standard. (STD-001 §3.17)
-const CATEGORIES = ["Practice", "Process"];
-const STATUSES = ["Draft", "In force", "Obsoleted"];
-const PROSE_REQUIRED = ["number", "title", "kind", "issued", "author", "status"];
 const SHELL_LANGS = new Set(["sh", "bash", "zsh", "shell", "console"]);
 const LEVELS = [
   ["MUST NOT", "must"], ["MUST", "must"],
@@ -98,19 +87,7 @@ const innerSheet = (html) => html.split(SHEET_OPEN)[1].split(SHEET_CLOSE)[0];
 
 /* ---------------- parse a standard ---------------- */
 export function parseStandard(src, file) {
-  const errors = [];
-  const { yaml, body } = splitFrontmatter(src, file);
-  const meta = parseYaml(yaml);
-
-  for (const k of REQUIRED) {
-    if (meta[k] === undefined || meta[k] === null || meta[k] === "") errors.push(`missing frontmatter: ${k}`);
-  }
-  if (meta.category && !CATEGORIES.includes(meta.category)) {
-    errors.push(`unknown category "${meta.category}" (expected ${CATEGORIES.join(" | ")})`);
-  }
-  if (meta.status && !STATUSES.includes(meta.status)) {
-    errors.push(`unknown status "${meta.status}" (expected ${STATUSES.join(" | ")})`);
-  }
+  const { meta, body, errors } = parseDocumentMetadata(src, file, "standard");
 
   // walk blocks, intercepting clause headings
   const toks = blocks(body);
@@ -192,31 +169,7 @@ export function parseStandard(src, file) {
 // document declares itself under STD-006 and sits in the directory its kind
 // belongs to.
 export function parseProse(src, file, cls) {
-  const errors = [];
-  let yaml, body;
-  try {
-    ({ yaml, body } = splitFrontmatter(src, file));
-  } catch {
-    return { meta: {}, nodes: [], relates: [], errors: ["no frontmatter. STD-006 §3.1 requires title, kind, issued, author, status."] };
-  }
-  const meta = parseYaml(yaml);
-
-  for (const k of PROSE_REQUIRED) {
-    if (meta[k] === undefined || meta[k] === null || meta[k] === "") {
-      errors.push(`missing frontmatter: ${k} (STD-006 §3.1, §3.10)`);
-    }
-  }
-  if (meta.kind && meta.kind !== cls.kind) {
-    errors.push(`kind is "${meta.kind}" but ${cls.dir}/ holds ${cls.kind} documents (STD-006 §4)`);
-  }
-  if (meta.status && !cls.statuses.includes(meta.status)) {
-    errors.push(`unknown status "${meta.status}" (expected ${cls.statuses.join(" | ")})`);
-  }
-  const named = file.match(new RegExp(`^${cls.prefix}-(\\d{3})-`));
-  if (!named) errors.push(`filename must start ${cls.prefix}-nnn- (STD-006 §3.10)`);
-  else if (meta.number && named[1] !== String(meta.number)) {
-    errors.push(`filename says ${cls.prefix}-${named[1]} but number is "${meta.number}" (STD-006 §3.10)`);
-  }
+  const { meta, body, errors } = parseDocumentMetadata(src, file, cls.kind);
 
   const toks = blocks(body);
   const nodes = [];
@@ -539,9 +492,9 @@ ${regTable(["Ref", "Skill", "Provenance", "Relates to"], skills.map((k) => `<tr>
      understanding and is awaiting ratification, which only a person can give
      (<code>STD-001 §3.14</code>). Nothing below the standards binds anything at
      all.</p>
-  <p>This page is generated from the documents themselves. A standard that does
-     not conform to <code>STD-001</code>, or a document that does not conform to
-     <code>STD-006</code>, does not render, and so does not appear here.</p>
+  <p>This page is generated from the documents themselves. Publishing runs the
+     renderer and the document, skill, and design validators. These check
+     structure and metadata, not whether requirements agree or examples work.</p>
 </div>
 <h2>Standards</h2>
 ${regTable(["Ref", "Title", "Category", "Applies to", "Status", "Clauses"], stdRows)}
@@ -707,19 +660,17 @@ function main() {
   const pick = (dir) => (args.length ? args.filter((f) => f.includes(`${dir}/`)) : listMd(join(ROOT, dir)));
   const stdFiles = args.length ? args.filter((f) => f.includes("standards/")) : listMd(STD_DIR);
 
-  const cssVars = tokensToCss();
-  // Rendering a renumbered corpus into a directory that still holds the old
-  // filenames leaves pages nothing links to any more — stale, unreachable, and
-  // indistinguishable from current. Clear it.
-  if (!args.length && existsSync(OUT_DIR)) rmSync(OUT_DIR, { recursive: true });
-  mkdirSync(OUT_DIR, { recursive: true });
-
   let failed = 0;
   const report = (path, why, errors) => {
     failed++;
     console.log(`\n  x ${path} — ${why}`);
     for (const e of errors) console.log(`      ${e}`);
   };
+
+  // DESIGN.md supplies the tokens but is not a page in the register. Its shared
+  // metadata still has to satisfy STD-006, including the singleton exception.
+  const design = parseDocumentMetadata(readFileSync(join(ROOT, "DESIGN.md"), "utf8"), "DESIGN.md", "design");
+  if (design.errors.length) report("DESIGN.md", "does not conform to STD-006", design.errors);
 
   // Prose first: a standard's page lists the documents that sit under it, so the
   // relationships have to be known before either side is rendered.
@@ -751,7 +702,7 @@ function main() {
       if (parsed.errors.length) { report(`skills/${entry.name}/SKILL.md`, "is not a valid skill", parsed.errors); continue; }
       const id = `SKL-${entry.number}`;
       skills.push({
-        parsed, entry, id, name: entry.name, provenance: entry.provenance,
+        parsed, entry, id, source: md, name: entry.name, provenance: entry.provenance,
         title: entry.name, relates: parsed.relates,
         file: `${id.toLowerCase()}.html`, anchor: id,
       });
@@ -771,10 +722,24 @@ function main() {
     });
   }
 
+  const duplicates = duplicateIdentityErrors([...standards, ...docs, ...skills]);
+  if (duplicates.length) report("corpus", "ambiguous document identities", duplicates);
+  if (failed) {
+    console.log(`  ${failed} validation failure(s); no pages written.`);
+    process.exit(1);
+  }
+
   if (!standards.length && !docs.length && !skills.length) {
     console.error("no documents found to render");
     process.exit(1);
   }
+
+  const cssVars = tokensToCss();
+  // Rendering a renumbered corpus into a directory that still holds the old
+  // filenames leaves pages nothing links to any more — stale, unreachable, and
+  // indistinguishable from current. Clear it, but only after validation passes.
+  if (!args.length && existsSync(OUT_DIR)) rmSync(OUT_DIR, { recursive: true });
+  mkdirSync(OUT_DIR, { recursive: true });
 
   docs.sort((a, b) => a.id.localeCompare(b.id));
   skills.sort((a, b) => a.id.localeCompare(b.id));
@@ -826,10 +791,6 @@ function main() {
     `\n  rendered to out/standards/ — index.html lists ${standards.length} standard(s), ` +
     `${docs.length} document(s) and ${skills.length} skill(s); standards.html bundles them`
   );
-  if (failed) {
-    console.log(`  ${failed} document(s) did not conform.`);
-    process.exit(1);
-  }
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) main();

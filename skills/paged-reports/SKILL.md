@@ -1,8 +1,8 @@
 ---
 name: paged-reports
 description: >
-  Turn a markdown document into a styled, print-ready HTML report — running headers,
-  page numbers, smart page breaks, cover page — and render it to PDF via headless
+  Turns a markdown document into a styled, print-ready HTML report — running headers,
+  page numbers, smart page breaks, cover page — and renders it to PDF via headless
   Chrome. Also produces horizontal-scroll magazine spreads for shareable URLs.
   Brand-agnostic: reads its tokens from the project's DESIGN.md or brand skill.
   Use when asked for a PDF, a printable report, a client-ready document, a one-pager,
@@ -41,8 +41,9 @@ Look in this order and stop at the first hit:
    `.no-break-before` on the first section after the cover, `break-inside: avoid` on
    anything that must stay whole. This is the part that separates a professional PDF
    from a wall of text — read the "Smart Page Break System" section before writing HTML.
-4. **Render.** Write the HTML to a temp path, then either open it for a Cmd+P preview or
-   drive headless Chrome for a direct PDF.
+4. **Render.** Write the HTML to a temp path, then use the preflight below for
+   a browser preview or direct PDF. Ask before adding dependencies or fetching
+   third-party scripts/fonts; the templates' paged.js and font URLs need network access.
 5. **Look at the output.** Open the PDF, or convert its pages to images and inspect
    them. Page breaks fail in ways that are invisible in the HTML — an orphaned heading
    at a page bottom, a table split across a spread, a blank page after the cover.
@@ -50,15 +51,44 @@ Look in this order and stop at the first hit:
 
 ## PDF generation
 
-The `browser-automation` skill (chrome-driver) provides the `pdf` binary:
+Use an available `agent-browser`; the `browser-automation` skill explains its
+session and authorization workflow. Check the installed version and help first:
 
-```bash
-PDF_BIN=$(ls -d ~/.claude/plugins/cache/focus-marketplace/chrome-driver/*/bin/pdf | sort -V | tail -1)
-$PDF_BIN "file:///tmp/report-$(date +%s).html" ./output.pdf
+```sh
+command -v agent-browser
+agent-browser --version
+agent-browser skills get core --full
+agent-browser pdf --help
 ```
 
-If chrome-driver is not installed, fall back to the browser print path rather than
-silently producing HTML and calling it a PDF.
+If unavailable, stop and ask before adding project-pinned tooling through mise
+or downloading a browser. Do not silently install a CLI, browser, or renderer.
+Use command-specific help if this build has no `skills get` command.
+
+Set `HTML_PATH` and `PDF_PATH` to the actual absolute paths (not a fresh
+timestamp unrelated to the file written). For the paged templates:
+
+```sh
+SESSION=paged-report
+trap 'agent-browser --session "$SESSION" close' EXIT
+agent-browser --session "$SESSION" open "file://$HTML_PATH"
+agent-browser --session "$SESSION" set viewport 1280 720 2
+agent-browser --session "$SESSION" wait --fn 'window.__reportReady === true'
+agent-browser --session "$SESSION" pdf "$PDF_PATH"
+test -s "$PDF_PATH"
+agent-browser --session "$SESSION" close
+trap - EXIT
+```
+
+The templates set `__reportReady` only after fonts, images, and pagination
+complete. A timeout is a failure to investigate, not permission to print an
+unfinished page. For a standard template, await fonts/images instead; it has no
+paged.js ready signal. Inspect every resulting PDF page, including dimensions,
+backgrounds, header/footer placement, and blank pages. `pdf` options vary by
+build; do not invent paper-size flags or promise CSS page sizing without checking.
+
+A user may print a browser preview manually if direct PDF output is unavailable.
+Deliver it explicitly as **HTML awaiting printing**, never as a completed PDF.
 
 ## Reference
 

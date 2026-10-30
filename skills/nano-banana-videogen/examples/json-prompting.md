@@ -1,7 +1,11 @@
 # JSON-Structured Prompting (Advanced)
 
 **Status**: Experimental community-discovered technique
-**Benefit**: 300%+ improvement in consistency and quality over traditional text prompts
+**Benefit**: Editable prompt structure; no measured quality improvement is established here.
+
+Complete `../SKILL.md`'s approval, mise, and fnox preflight first. Bare commands
+assume its authorized `mise exec -- fnox exec -- bash` shell. This JSON is
+prompt text, not a provider-enforced schema. Check each rendered result.
 
 ## What is JSON Prompting?
 
@@ -156,7 +160,6 @@ $(cat product-commercial.json)" \
 --duration 8 \
 --resolution 1080p \
 --aspect 16:9 \
---no-audio \
 --output product-orbit.mp4
 ```
 

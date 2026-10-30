@@ -213,8 +213,8 @@ Four traits govern every choice, and each forbids something:
 - **Authoritative** — states what is in force. Forbids hedging: no "consider", no "you might want
   to", no "best practice suggests".
 - **Traceable** — every clause shows its provenance. Forbids the undated, unattributed rule.
-- **Actionable** — every clause ships the command that satisfies it. Forbids the principle with no
-  procedure.
+- **Actionable** — include the command that satisfies a clause when one exists. Do not invent a
+  command for a requirement that needs judgement (`STD-001 §3.7`).
 - **Dry** — the wit lives in the fixtures, never the copy. Forbids jokes, emoji, and enthusiasm.
 
 ### Lineage
@@ -440,14 +440,15 @@ Standards are published as reports, so print is a first-class surface, not an af
 The source document is the artifact and the site is its rendering, so the source has design rules of
 its own.
 
-- Standards are authored in **MDX**, which is what makes the demonstration component possible.
+- Standards are authored in **Markdown**. The MDX demonstration pipeline chosen in `ADR-003`
+  remains unimplemented; the current renderer does not execute MDX components.
 - The raw source must read as a complete standard with no rendering at all. Heading structure
   carries the section numbers, the header block is frontmatter, and requirement levels are literal
   uppercase keywords in the sentence — never conveyed by styling.
 - Every visual affordance needs a source equivalent: a level band is a keyword in the clause text, an
   agent block is a fenced code block, a demonstration is its fallback text.
-- `View MDX source` is a standing act on every standard. An agent that cannot reach the source is
-  reading a picture of a standard.
+- A source-view control is part of the `ADR-003` design, not a shipped feature. Source currently
+  lives in the repository; the site does not expose a `View MDX source` control.
 
 ## Do's and Don'ts
 
@@ -492,12 +493,12 @@ jokes, emoji, and enthusiasm.
    revised; the clause underneath it does not equivocate.
 3. Every clause carries its date, revision, and what it obsoletes. An undated rule is not a
    standard, it is folklore.
-4. Ship the command. A clause the reader cannot act on in one step is unfinished.
+4. Ship the command when there is one. Otherwise state how the requirement is checked.
 5. Cut the qualifier: very, really, just, simply, basically, obviously.
 6. Say what changed, not that something changed. "R3 moves preview secrets to the preview vault" —
    never "this standard has been updated."
 7. State divergence as fact plus next step. No apology, no reassurance, no blaming the repository.
-8. Keep the wit in the fixtures. *Category: In Force*, *Distribution is unlimited within the fleet*,
+8. Keep the wit in the fixtures. *Status: In force*, *Distribution is unlimited within the fleet*,
    *Obsoletes: STD-009* — dry in form, warm in effect. A joke inside a clause is a defect.
 9. Say what the standard does **not** cover. Early RFCs scope themselves out loud, and an unstated
    boundary becomes someone's wrong assumption.

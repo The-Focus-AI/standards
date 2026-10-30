@@ -8,6 +8,16 @@ For shorter reports focusing on actionable insights and business decisions.
 ---
 
 ```markdown
+---
+number: "<next free number>"
+title: "[Topic]: Executive Summary"
+kind: note
+issued: "YYYY-MM-DD"
+author: "<actual author or agent identity>"
+status: Current
+verified: "YYYY-MM-DD"
+---
+
 # [Topic]: Executive Summary
 
 *Date: [YYYY-MM-DD] | Sources: [N]*

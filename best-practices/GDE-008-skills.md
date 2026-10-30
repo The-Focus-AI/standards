@@ -17,68 +17,117 @@ Skills are managed with the `skills` CLI (npm package `skills`), pinned in
 never manually copy skill directories. After `mise install`, the `skills` binary is
 on PATH, so prefer it over `npx skills` to avoid version drift.
 
+The root and default-project manifests pin **1.7.4**, the npm `latest` release
+checked on 2026-10-30. It requires Node **22.20.0 or newer**. The CLI behavior
+below was checked against that release; this does not update every upstream
+skill's content or imply its integration has been tested.
+
 ## How it works
 
 - `skills add <github-repo>` — installs skill(s) into `.agents/skills/` (and other
   detected agent dirs) and records an entry in `skills-lock.json`, including a
-  `computedHash` pinning the current version.
-- `skills-lock.json` — the committed, reproducible source of truth (analogous to
-  `package-lock.json`). This is what makes installs identical across machines and CI.
-- `mise install` / `[tasks.install]` runs `skills experimental_install`, which
-  restores every skill from `skills-lock.json` — equivalent to `npm ci`.
-- `skills update -y` — fetches the latest versions and rewrites the hashes in
-  `skills-lock.json`. Run periodically, then review and commit the diff.
+  `computedHash` recording the fetched content.
+- `skills-lock.json` — the committed inventory of selected skills and sources,
+  with immutable commit refs rather than moving branches.
+- `mise run install` runs `scripts/restore-skills.mjs`. It invokes the CLI in a
+  temporary directory, checks the entire inventory and installed content hashes,
+  and replaces `.agents/skills/` only after verification. It never rewrites the
+  project lock. The template copies this helper from the canonical script.
+- `skills update --project -y` checks recorded refs, so a commit-pinned source
+  does not advance to latest. Updating content deliberately means selecting a
+  new commit with `skills add`, then reviewing the diff. Always scope updates
+  to the project; an unscoped named update can also change global skills.
 - `skills use <source> --skill <name>` — emits a skill's `SKILL.md` prompt directly
   from an upstream repository without installing it or modifying `skills-lock.json`.
 - `skills list` — shows what's installed and which agents each skill targets.
 
-Notes:
+Notes for 1.7.4:
 
-- `experimental_install` and `experimental_sync` are still `experimental_`-prefixed
-  as of skills v1.5.13; their names may change in future releases.
-- `skills update` uses the GitHub API. We are `gh`-authenticated, so
-  deletion-detection works locally; if you see "Failed to check for deleted skills"
-  in CI, set `GH_TOKEN`.
-- Removing a skill with `skills rm` in v1.5.13 deletes files but leaves the
-  `skills-lock.json` entry, so the next `experimental_install` reinstalls it. To
-  truly remove a skill, edit `skills-lock.json` by hand (`STD-011 §3.5`).
+- Restore is still `experimental_install`; `skills install` is an alias for
+  `add`, not lock restoration. There is no frozen restore mode: unknown flags
+  such as `--frozen-lockfile` and `--frozen` do not stop content or lock changes.
+- **`skills check` mutates content and locks**, because it dispatches to update.
+  Do not use it as a read-only audit command.
+- Removing a project skill with `skills remove <name> -y` (alias `skills rm`)
+  removes files and its lock entry. Agent-specific removal retains the shared
+  entry while another agent still uses it (`STD-011 §3.5`).
 - Lock entry names must be kebab-case (matching the skill folder and `SKILL.md`
   frontmatter `name`). Do not keep title-case duplicates alongside kebab-case names.
 
-## Standard skill set
+### Verify a restore
 
-The following are installed on all projects and are recorded in `skills-lock.json`
-(and mirrored in `templates/default-project/skills-lock.json`). Source repos are
-GitHub (`sourceType: github`). Install only this set (`STD-011 §3.7`) — do not run
+Run the repository entry point, not the raw experimental installer:
+
+```bash
+mise run install
+node scripts/restore-skills.mjs --check          # installed files, without network
+node scripts/restore-skills.mjs --validate-lock  # lock shape and immutable sources only
+```
+
+The wrapper supports this inventory's GitHub shorthand sources, canonical
+paths and full commit SHAs. It rejects a changed lock, missing skill, unexpected
+name, symlink, or installed-byte hash mismatch before replacing working skills.
+Unknown installed skills are preserved by refusing replacement, not deleted.
+Concurrent wrapper runs are rejected; an abandoned guard needs inspection before
+removal. This is not a sandbox for untrusted skills, a power-loss-safe transaction,
+or a lock against someone concurrently running the raw CLI.
+
+Hashing follows skills 1.7.4's path/content format. A CLI that drops source files
+can fail verification even if it exits successfully; investigate, do not weaken
+the check or regenerate the hash to hide the failure.
+
+## Installed selection and capability inventory
+
+`skills-lock.json` and `templates/default-project/skills-lock.json` are the exact
+current default selection; the catalogue below also includes capabilities not
+installed by default. Source repos are GitHub (`sourceType: github`). Do not run
 `skills add mattpocock/skills -y` or `skills add cursor/plugins -y` without naming
-the skills, because both repositories also carry skills outside this standard set.
+the skills, because both repositories also carry unrelated skills (`STD-011 §3.7`).
+
+The 2026-10-30 cleanup keeps all 88 external selections and reduces internal
+defaults to `setup-project` and `work-next-issue`: 90 entries in each identical
+lock. The other 13 owned capabilities remain available on demand; no authored
+skill directory was removed. This applies the smaller default proposed during
+the maintainer's "fix all of it" request, not a requirement on every project.
+
+Sources are pinned to published commits. The two internal entries therefore
+refer to the last published version, not these uncommitted source edits. After
+publishing skill changes, refresh those two pins through the CLI in a separate
+reviewed lock update. Never point a consumer lock at an unpublished commit.
+
+Two external names no longer exist at upstream HEAD: `resolving-merge-conflicts`
+was removed, and `writing-great-skills` was renamed to `writing-for-agents`.
+They remain pinned to their last available revisions to preserve the requested
+external selection; replacing/removing those capabilities is a deliberate
+inventory change, not something restore silently decides.
 
 ### Skills we own — all in this repository
 
 Every Focus-authored or vendored skill lives in `skills/` here, one folder per
-skill, and installs the same way:
+skill, and installs the same way. Resolve and review `REF` as shown under
+"Keeping skills current"; do not record a moving branch in the project lock:
 
 ```bash
-skills add The-Focus-AI/standards --skill <name> -y
+skills add "The-Focus-AI/standards#$REF" --skill <name> --agent amp -y
 ```
 
-| Skill | Skill folder | What it does |
+| Skill | Recommended scope | What it does |
 | --- | --- | --- |
-| `activity-report` | `skills/activity-report` | Live production usage joined against git history → interpreted, client-ready report |
-| `tech-research` | `skills/tech-research` | Pick the best library/tool for a need; write a dated, cited report into `reports/` |
-| `research-methodology` | `skills/research-methodology` | General research method and report templates (literature review, comparative, exec summary) |
-| `browser-automation` | `skills/browser-automation` | Drive Chrome: navigate, extract, screenshot, fill forms, print PDFs |
-| `nano-banana-imagegen` | `skills/nano-banana-imagegen` | Generate images — icons, headers, illustrations, photo edits |
-| `nano-banana-videogen` | `skills/nano-banana-videogen` | Generate video — image-to-video, scene extension, dialogue |
-| `focus-ai-brand` | `skills/focus-ai-brand` | The Focus.AI brand: palettes, type, grid, components, voice |
-| `paged-reports` | `skills/paged-reports` | Markdown → paged HTML → PDF, with page-break control and magazine mode |
-| `pptx-decks` | `skills/pptx-decks` | Markdown → branded `.pptx` via PptxGenJS, with visual QA |
-| `setup-project` | `skills/setup-project` | Scaffold a new project to these standards |
-| `standardize-project` | `skills/standardize-project` | Audit an existing project against these standards, plan the migration |
-| `standards-map` | `skills/standards-map` | Look up latest standards → dated mapping report (guide applicability, exceptions, gaps) |
-| `develop-design-md` | `skills/develop-design-md` | Take a project from no identity to a validated `DESIGN.md` |
-| `work-next-issue` | `skills/work-next-issue` | Execute `STD-002` and `STD-003`: frontier → claim → branch → pull request |
-| `build-focus-course` | `skills/build-focus-course` | Author a multi-lesson technical course for the Focus.AI platform |
+| `activity-report` | On demand: production reporting | Live production usage joined against git history → interpreted, client-ready report |
+| `tech-research` | On demand: technical selection | Pick the best library/tool for a need; write a dated, cited report into `reports/` |
+| `research-methodology` | On demand: deep research | General research method and report templates (literature review, comparative, exec summary) |
+| `browser-automation` | On demand: browser tasks | Drive the available browser with an explicit tooling preflight |
+| `nano-banana-imagegen` | On demand: image generation | Generate images — icons, headers, illustrations, photo edits; requires its external CLI and scoped API access |
+| `nano-banana-videogen` | On demand: video generation | Generate video — image-to-video, scene extension, dialogue; requires its external CLI and scoped API access |
+| `focus-ai-brand` | On demand: Focus-branded output only | The Focus.AI brand: palettes, type, grid, components, voice |
+| `paged-reports` | On demand: printable deliverables | Markdown → paged HTML → PDF, with page-break control and magazine mode; verify the renderer dependency first |
+| `pptx-decks` | On demand: PowerPoint deliverables | Markdown → branded `.pptx` via PptxGenJS, with visual QA; verify local dependencies and slide rendering first |
+| `setup-project` | Default: bootstrap | Scaffold a new project to these standards |
+| `standardize-project` | On demand: migration | Audit an existing project against these standards, plan the migration |
+| `standards-map` | On demand: read-only audit | Look up latest standards → dated mapping report (guide applicability, exceptions, gaps) |
+| `develop-design-md` | On demand: visual identity | Take a project from no identity to a validated `DESIGN.md` |
+| `work-next-issue` | Default: implementation workflow | Execute `STD-002` and `STD-003`: frontier → claim → branch → pull request |
+| `build-focus-course` | Only the course platform | Author a multi-lesson technical course for the Focus.AI platform |
 
 `skills/VENDORED.md` records each skill's `SKL-nnn` number, where it came from, and
 at which commit.
@@ -88,9 +137,16 @@ like; `paged-reports` and `pptx-decks` say how documents get made. A project wit
 brand uses the mechanics skills with its own `DESIGN.md` and never touches ours. When the
 brand changes, only the brand skill changes.
 
+Neither `pptx-decks` nor `focus-ai-brand` is needed for ordinary application
+development. Keep both available: install the former for a deck, and the latter
+only when that deliverable uses Focus branding. Installing a skill does not
+install PptxGenJS, a PDF renderer, or a browser driver. The known portability
+requirements belong in each skill's preflight; this inventory does not certify
+those tools or silently replace a client's visual identity.
+
 ### Third-party utility skills
 
-Not ours; installed from upstream so `skills update` keeps giving us their fixes.
+Not ours; updates come from their upstream repositories at reviewed revisions.
 
 | Skill | Source repo | Skill folder |
 | --- | --- | --- |
@@ -121,38 +177,22 @@ resolves to `harness/pstack/claude-code/skills/` instead of `pstack/skills/`. In
 addition, `cursor/plugins` carries unrelated plugins (`origin-api`,
 `port-github-app-to-origin`), so `STD-011 §3.7` forbids installing with `--all`.
 
-To guarantee you are pulling the latest canonical Cursor-native version from
-upstream `main`, always pass the `tree/main/pstack/skills` subpath URL and name the
-55 non-colliding skills explicitly:
+For a deliberate pstack update, select an immutable revision and derive the names
+from the current lock instead of maintaining a second installation list:
 
 ```bash
-skills add https://github.com/cursor/plugins/tree/main/pstack/skills \
-  -s architect -s arena -s automate-me -s benchmark-checklist -s blast-radius \
-  -s bro -s correct -s create-formal-verification-skill \
-  -s create-verification-skill -s figure-it-out -s how -s in-your-own-words \
-  -s interrogate -s ketchup -s maintain-formal-verification-skill \
-  -s maintain-verification-skill -s make-bot-ui -s no-comments -s poteto-help \
-  -s poteto-mode -s principle-attack-the-premise \
-  -s principle-boundary-discipline -s principle-build-the-lever \
-  -s principle-encode-lessons-in-structure \
-  -s principle-exhaust-the-design-space -s principle-experience-first \
-  -s principle-explain-the-number -s principle-fix-root-causes \
-  -s principle-foundational-thinking -s principle-guard-the-context-window \
-  -s principle-laziness-protocol -s principle-make-operations-idempotent \
-  -s principle-migrate-callers-then-delete-legacy-apis \
-  -s principle-minimize-reader-load -s principle-model-the-domain \
-  -s principle-never-block-on-the-human \
-  -s principle-outcome-oriented-execution -s principle-prove-it-works \
-  -s principle-redesign-from-first-principles \
-  -s principle-separate-before-serializing-shared-state \
-  -s principle-sequence-verifiable-units -s principle-subtract-before-you-add \
-  -s principle-test-behavior-not-implementation \
-  -s principle-type-system-discipline -s recall -s reflect -s setup-pstack \
-  -s sharpen -s show-me-your-work -s statechart -s swarm -s technical-writing \
-  -s typescript-best-practices -s unslop -s why -a cursor -y
+set -euo pipefail
+PSTACK_REF=$(git ls-remote https://github.com/cursor/plugins.git HEAD | cut -f1)
+[[ "$PSTACK_REF" =~ ^[0-9a-f]{40}$ ]]
+mapfile -t NAMES < <(jq -r '.skills | to_entries[] | select(.value.source == "cursor/plugins") | .key' skills-lock.json)
+test "${#NAMES[@]}" -gt 0
+skills add "https://github.com/cursor/plugins/tree/$PSTACK_REF/pstack/skills" \
+  --skill "${NAMES[@]}" --agent amp -y
+git diff -- skills-lock.json
+node scripts/restore-skills.mjs --check
 ```
 
-After installing or updating, an agent MUST run this verification check to confirm
+After installing or updating, use this verification check for `STD-011 §3.8` to confirm
 that every `cursor/plugins` entry in `skills-lock.json` points to `pstack/skills/`
 and has a 64-hex SHA-256 `computedHash`:
 
@@ -166,16 +206,15 @@ jq -e '
 ' skills-lock.json
 ```
 
-**CLI version caveat (`skills@1.5.13` vs `skills>=1.7.4`).** In `skills` v1.5.13,
-`skills experimental_install` (`runInstallFromLock`) and `skills update`
-(`updateProjectSkills`) ignore `entry.skillPath` and re-clone `cursor/plugins#main`
-from the repository root, which causes `.claude-plugin/marketplace.json` to rewrite
-`skillPath` to `harness/pstack/claude-code/skills/<name>/SKILL.md`. (`skills`
-v1.7.4 fixes this via `buildLocalUpdateSource(entry)`, which appends
-`entry.skillPath`.) While `skills@1.5.13` is pinned, refresh pstack skills to the
-latest upstream `main` by re-running the explicit `skills add
-https://github.com/cursor/plugins/tree/main/pstack/skills ...` command above, then
-running the `jq -e` check and reviewing `git diff skills-lock.json` (`STD-011 §3.6`).
+**CLI scope caveat (1.7.4).** The inventory uses GitHub `owner/repo` sources with
+recorded `skillPath`. `buildLocalUpdateSource(entry)` now includes that canonical
+directory and the recorded ref, fixing the old v1.5.13 adapter-tree selection.
+Generic Git/SSH/`.git` sources do not all receive this subpath handling; do not
+change the source format and assume restoration stays equivalent.
+
+The hash-format check above validates shape, not integrity. Moving refs can
+still install new content and replace hashes; use the restore checks above and
+review intentional updates under `STD-011 §3.6`.
 
 #### Entry, setup, and context
 
@@ -282,25 +321,34 @@ Both `mattpocock/skills` and `cursor/plugins` (`pstack/skills`) ship skills whos
 
 | Skill name | Source A (`mattpocock/skills` — locked default in `skills-lock.json`) | Source B (`cursor/plugins` pstack — available on demand or by project switch) | Agent selection rule |
 | --- | --- | --- | --- |
-| `tdd` | `skills/engineering/tdd/SKILL.md` (`computedHash`: `81eca2a5…`) — full red-green-refactor loop across architectural seams (`GLOSSARY.md`, ADRs, vertical slices) | `pstack/skills/tdd/SKILL.md` (`computedHash`: `d3316fbb89ac596c91bb8d529180393c3b69fb6408f7d5cdccb74ead97cbf188`) — focused failing-before regression test for a bug fix when a cheap local test path exists; skips when integration-heavy | Use **Source A (`mattpocock`)** when implementing a feature or vertical slice test-first from a spec (`/implement`). Use **Source B (`pstack`)** when fixing a bug with a cheap local reproduction under `/poteto-mode` (`playbooks/bug-fix.md`). |
-| `teach` | `skills/productivity/teach/SKILL.md` (`computedHash`: `68999bb1…`) — stateful multi-session teaching workspace (`MISSION.md`, `./lessons/`, `./reference/*.html`, learning records) | `pstack/skills/teach/SKILL.md` (`computedHash`: `371a2a40807cc1c0611d50b8170b2395f9c0297f7eb475e071018e12aa766bc5`) — explain a change or subsystem in one plain account by running `how` and `why` in parallel and writing through `unslop` | Use **Source A (`mattpocock`)** when the user asks to learn a topic across sessions in a workspace. Use **Source B (`pstack`)** when explaining how and why code or a diff in the repository works. |
+| `tdd` | `skills/engineering/tdd/SKILL.md` — full red-green-refactor loop across architectural seams (`GLOSSARY.md`, ADRs, vertical slices) | `pstack/skills/tdd/SKILL.md` — focused failing-before regression test for a bug fix when a cheap local test path exists; skips when integration-heavy | Use **Source A (`mattpocock`)** when implementing a feature or vertical slice test-first from a spec (`/implement`). Use **Source B (`pstack`)** when fixing a bug with a cheap local reproduction under `/poteto-mode` (`playbooks/bug-fix.md`). |
+| `teach` | `skills/productivity/teach/SKILL.md` — stateful multi-session teaching workspace (`MISSION.md`, `./lessons/`, `./reference/*.html`, learning records) | `pstack/skills/teach/SKILL.md` — explain a change or subsystem in one plain account by running `how` and `why` in parallel and writing through `unslop` | Use **Source A (`mattpocock`)** when the user asks to learn a topic across sessions in a workspace. Use **Source B (`pstack`)** when explaining how and why code or a diff in the repository works. |
 
-**How an agent invokes or switches between them:**
+Hashes and revisions belong in the lock, not a second table. For an on-demand
+invocation, use the already reviewed source revision from that lock:
 
 ```bash
-# 1. Invoke pstack's tdd or teach on demand WITHOUT modifying skills-lock.json or .agents/skills/:
-skills use https://github.com/cursor/plugins/tree/main/pstack/skills --skill tdd
-skills use https://github.com/cursor/plugins/tree/main/pstack/skills --skill teach
+set -euo pipefail
+PSTACK_REF=$(jq -er '.skills["poteto-mode"].ref' skills-lock.json)
+MATT_REF=$(jq -er '.skills.implement.ref' skills-lock.json)
+[[ "$PSTACK_REF" =~ ^[0-9a-f]{40}$ && "$MATT_REF" =~ ^[0-9a-f]{40}$ ]]
+skills use "https://github.com/cursor/plugins/tree/$PSTACK_REF/pstack/skills" --skill tdd
+skills use "mattpocock/skills#$MATT_REF" --skill teach
+```
 
-# 2. Invoke Matt Pocock's tdd or teach on demand:
-skills use mattpocock/skills --skill tdd
-skills use mattpocock/skills --skill teach
+Either invocation can select `tdd` or `teach`; neither updates the lock or
+installs supporting files. Read any referenced resources from the same revision.
+To switch the installed pair, run **one** of these deliberate alternatives,
+then review the lock diff and run the restore verification above:
 
-# 3. Switch a repository's locked tdd and teach to pstack (updates .agents/skills/ and skills-lock.json):
-skills add https://github.com/cursor/plugins/tree/main/pstack/skills -s tdd -s teach -a cursor -y
+```bash
+# Choose pstack:
+skills add "https://github.com/cursor/plugins/tree/$PSTACK_REF/pstack/skills" -s tdd -s teach --agent amp -y
+```
 
-# 4. Switch a repository's locked tdd and teach back to mattpocock:
-skills add mattpocock/skills -s tdd -s teach -a cursor -y
+```bash
+# Or choose Matt Pocock:
+skills add "mattpocock/skills#$MATT_REF" -s tdd -s teach --agent amp -y
 ```
 
 #### Dependencies outside `skills-lock.json`
@@ -331,7 +379,7 @@ fits. Run `setup-matt-pocock-skills` once per repo before first use of the
 tracker-backed skills.
 
 Issue states, the label vocabulary, claiming, and Wayfinder operations are
-specified by `STD-002`, which binds every repository worked by an agent. A
+specified by `STD-002` (Draft; check the project's adopted revision). A
 project records only its own tracker configuration — which tracker, and the
 local fallback path — in its `AGENTS.md`.
 
@@ -410,8 +458,8 @@ of `mise lint`, so a broken skill fails CI rather than failing at install time.
 
 Once the skill is on `main`, run `skills add` against it from a project so the CLI
 computes and records the hash in that project's `skills-lock.json`; commit the standards
-copy of the lock file from the same run. Never hand-write a `computedHash` — a wrong
-hash makes `experimental_install` non-reproducible.
+copy of the lock file from the same run. Never hand-write a `computedHash` — it
+records content the CLI fetched, even though the current installer does not enforce it.
 
 ### Vendoring policy
 
@@ -421,35 +469,55 @@ birth them. When a skill turns up elsewhere, move it in, record it in
 drift.
 
 Third-party skills are the opposite: leave them upstream. Copying them in means
-republishing someone else's work and inheriting their maintenance — `skills update`
-already gives us their fixes for free.
+republishing someone else's work and inheriting their maintenance. Deliberate
+updates select reviewed upstream revisions instead.
 
 ### Note on repository visibility
 
-`The-Focus-AI/standards` is private, so `skills add` against it needs GitHub auth. That
-is fine locally (the CLI falls back to `gh auth token`) but CI needs `GH_TOKEN` set. If
-these skills are ever to be installable by people outside the org, they need to move to
-a public repo — that is a decision, not an oversight.
+`The-Focus-AI/standards` is public. Installing its skills does not require repository
+access credentials. Authenticated GitHub API calls can still avoid anonymous rate
+limits; use scoped CI credentials only when needed.
 
 ## Adding a new skill
 
-Prefer adding a specific skill folder, not the entire upstream repo:
-
-```bash
-skills add <owner>/<repo> --skill <folder> -y
-skills add mattpocock/skills --skill triage -y
-skills add https://github.com/cursor/plugins/tree/main/pstack/skills --skill poteto-mode -y
-skills add firecrawl/cli -y   # OK: firecrawl/cli is entirely in the standard set
-```
-
-Then commit the updated `skills-lock.json` (and `templates/default-project/skills-lock.json`
-when adding to the standard set). Run `mise install` (or `skills experimental_install`)
-to reproduce on another machine.
+Use the pinned-source procedure below, naming only the intended skill and its
+canonical subpath. Even `firecrawl/cli` now contains skills beyond the selected
+set, so do not install it wholesale. Review the resulting source, ref, path and
+hash, then commit the lock (and its template copy when changing shared defaults).
+Run `mise run install` to reproduce on another machine.
 
 ## Keeping skills current
 
+`skills update --project -y` restores/checks the recorded refs; it cannot advance
+an immutable pin. For new content, resolve the upstream revision, name only the
+intended skill, and retain its canonical subpath. For example:
+
 ```bash
-skills update -y        # update all project skills, rewrite hashes
-skills update find-skills firecrawl wayfinder -y   # update a subset
-git diff skills-lock.json   # review before committing (STD-011 §3.6)
+set -euo pipefail
+REF=$(git ls-remote https://github.com/The-Focus-AI/standards.git HEAD | cut -f1)
+[[ "$REF" =~ ^[0-9a-f]{40}$ ]]
+skills add "The-Focus-AI/standards#$REF" --skill setup-project work-next-issue --agent amp -y
+git diff -- skills-lock.json
+node scripts/restore-skills.mjs --check
 ```
+
+In this source repository, run inventory maintenance in a temporary consumer
+directory and copy only the CLI-generated lock back after review. The CLI detects
+`skills/` as an OpenClaw installation: running unscoped `skills remove` here can
+delete authored sources. For the shared defaults, keep the template lock identical.
+
+## CLI verification sources
+
+Checked 2026-10-30: [npm release metadata](https://registry.npmjs.org/skills/1.7.4)
+and the published CLI, with isolated Git fixtures for canonical/adapter paths,
+refs, hash drift, incomplete restores, update scope, and removal. The complete
+90-entry inventory was then restored from GitHub in a fresh consumer: all
+installed folder hashes matched and the project lock remained byte-identical.
+This verifies restoration, not every skill's behavior or private-source access.
+
+Primary source at the release revision:
+[restore](https://github.com/vercel-labs/skills/blob/a80e4c9d12d607631249d4d7d059f835d4b2f13a/src/install.ts),
+[source construction](https://github.com/vercel-labs/skills/blob/a80e4c9d12d607631249d4d7d059f835d4b2f13a/src/update-source.ts),
+[command dispatch](https://github.com/vercel-labs/skills/blob/a80e4c9d12d607631249d4d7d059f835d4b2f13a/src/cli.ts),
+[updates](https://github.com/vercel-labs/skills/blob/a80e4c9d12d607631249d4d7d059f835d4b2f13a/src/update.ts),
+and [removal](https://github.com/vercel-labs/skills/blob/a80e4c9d12d607631249d4d7d059f835d4b2f13a/src/remove.ts).

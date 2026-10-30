@@ -5,7 +5,7 @@ title: Authentication
 category: Practice
 status: Draft
 issued: "2026-07-25"
-revision: R2
+revision: R3
 applies-to: Every client-facing project with sign-in, and every product acting as an OAuth client
 author: W. Schenk
 ---
@@ -20,6 +20,10 @@ work fine in testing and fail in front of a client.
 Almost every clause here was recovered from an anti-pattern list. They are
 recorded as requirements because each one has already cost somebody an outage or
 a leak.
+
+R3 makes the per-client boundary explicit for OAuth applications and credentials
+in every environment, not just for Clerk user pools in production. Reuse across
+environments of the same client is distinct from sharing between clients.
 
 **Out of scope.** The per-provider OAuth setup walkthroughs, which stay in
 `best-practices/GDE-002-clerk.md`. Secret storage, which is `STD-007`. Authorisation
@@ -63,15 +67,13 @@ failure is invisible until a client sees another client's user.
 
 A production deployment MUST use a Clerk production instance.
 
-A development instance uses Clerk's shared OAuth credentials, has stricter rate
-limits, and sends email from `accounts.dev`. It is for local development. The
+A development instance defaults to Clerk's shared OAuth credentials, has stricter
+rate limits, and sends email from `accounts.dev`. It is for development. The
 publishable key decodes to the frontend API host, so which instance a deployment
 is running is checkable rather than assumed.
 
-```sh
-echo "${NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY#pk_live_}" | base64 -d
-# a *.clerk.accounts.dev result means this is a DEV instance
-```
+Use the publishable-key diagnostic in `GDE-002`; it recognizes both `pk_live_`
+and `pk_test_` rather than silently trying to decode the wrong prefix.
 
 ### 3.4
 
@@ -91,11 +93,25 @@ a Clerk fault rather than a DNS setting.
 
 ### 3.6
 
-Social sign-in in production MUST use the project's own OAuth credentials.
+Every client's social sign-in MUST use client-specific OAuth applications and
+credentials in every environment.
 
-Development shares Clerk's credentials and they do not carry over. Shipping with
-social login enabled and no custom credentials produces sign-in buttons that
-simply fail, and they fail only in production.
+Client-specific means the provider application or registration, client ID, and
+client secret are never shared with another client, even when both clients use
+subdomains of the same root. Separate Clerk applications isolate user pools;
+separate OAuth applications isolate consent, credentials, rotation, and
+revocation at the provider.
+
+Clerk's shared development credentials are provider-supplied defaults, not a
+compliant client-specific configuration. Custom credentials replace those
+defaults in development as well as production; a working development sign-in
+with shared defaults does not establish compliance.
+
+The same client-specific OAuth application and credentials can serve that
+client's development, preview, and production environments where the provider
+supports their callbacks and the credential permissions are appropriate.
+`STD-007 §3.4` governs production parity and documented environment differences;
+it does not permit cross-client sharing.
 
 ### 3.7
 

@@ -1,8 +1,8 @@
 ---
 name: tech-research
 description: >
-  Find the single best library, tool, or technique for a specific project need, judged on
-  simplicity, popularity, and maintenance — then write it up as a dated, citation-backed
+  Finds the single best library, tool, or technique for a specific project need, judged on
+  simplicity, popularity, and maintenance — then writes it up as a dated, citation-backed
   report in reports/ that another agent can implement from without re-researching.
   Use when choosing between libraries, picking a tool, evaluating an approach, or asking
   what the current best practice is.
@@ -60,16 +60,26 @@ Note the version you researched. Libraries move; an unversioned claim rots silen
 
 ### 4. Write the report
 
-Write to `reports/YYYY-MM-DD-descriptive-topic-name.md`, using today's actual date.
-That path and naming convention is the standard across TheFocus.AI projects — see the
-`reports/` directory in the standards repo for worked examples.
+In this corpus, read `STD-001` / `STD-006`, allocate the next unassigned NOTE
+number, and write `reports/NOTE-nnn-YYYY-MM-DD-descriptive-topic-name.md`.
+Elsewhere follow the target's adopted convention, not an assumed fleet-wide
+filename rule. Use the real issue date and the date claims were checked.
+Preserve existing original authorship; do not infer it from a template. For a
+new agent-authored report, name the agent and distinguish its recommendation
+from a decision accepted by a person. A recommendation is not permission to
+install tools, spend on a provider, or implement a change.
 
 ## Report format
 
 ````markdown
 ---
+number: "<next free number>"
 title: "[Topic]: [Recommendation Name]"
-date: YYYY-MM-DD
+kind: note
+issued: "YYYY-MM-DD"
+author: "<actual author or agent identity>"
+status: Current
+verified: "YYYY-MM-DD"
 topic: [short topic slug]
 recommendation: [library/tool name]
 version_researched: [version number if applicable]
@@ -96,7 +106,9 @@ working with this? What are the key abstractions?[2]
 ## Setup
 
 Step-by-step installation and configuration. Be explicit about every step, including
-the config files that need to exist.
+the config files that need to exist. Prefer existing project dependencies;
+document approval before additions, mise-pinned tools, and fnox declarations
+for secrets. Never include real credentials or a global-install shortcut.
 
 ## Core Usage Patterns
 

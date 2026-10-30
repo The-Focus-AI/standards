@@ -8,13 +8,15 @@ status: Current
 verified: "2026-07-25"
 ---
 
-> Rules extracted to STD-009; this is the per-provider walkthrough.
+> The isolation policy lives in `STD-009` (Draft); this is its per-provider
+> walkthrough. `STD-007 §3.4` covers reuse across environments of the same client.
 
 # Clerk authentication
 
-Clerk is the default auth layer (see `best-practices/GDE-009-technology-defaults.md`). These rules cover how to set
-it up across multiple client projects that live on subdomains of one root
-domain (e.g. `thp.thefocus.ai`, `habitats.thefocus.ai`).
+Clerk is the default auth layer (see `GDE-009`). This walkthrough sets it up
+across multiple client projects, including projects on subdomains of one root
+domain (e.g. `thp.thefocus.ai`, `habitats.thefocus.ai`). Each client has its own
+Clerk application and its own OAuth applications and credentials.
 
 # One Clerk application per client
 
@@ -34,17 +36,32 @@ domain (e.g. `thp.thefocus.ai`, `habitats.thefocus.ai`).
 # Always run a production instance in production
 
 - **Never ship a development instance to production.** A dev instance
-  (`pk_test_…`, Frontend API on `*.clerk.accounts.dev`) uses Clerk's _shared_
-  OAuth credentials, has stricter rate limits, and sends email from
-  `accounts.dev`. It is for local dev only.
+  (`pk_test_…`, Frontend API on `*.clerk.accounts.dev`) defaults to Clerk's
+  _shared_ OAuth credentials, has stricter rate limits, and sends email from
+  `accounts.dev`. It is for local dev only; the shared OAuth defaults are not
+  the client-specific configuration described in `STD-009 §3.6`.
 - Production uses `pk_live_…` / `sk_live_…` on your own custom domain.
 - Sanity-check which instance a deployment uses by decoding the publishable key
-  (it is base64 of the Frontend API host):
+  (the payload is base64 of the Frontend API host followed by `$`):
 
   ```bash
-  echo "${NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY#pk_live_}" | base64 -d
-  # → clerk.thp.thefocus.ai   (a *.clerk.accounts.dev result means it's a DEV instance)
+  node <<'JS'
+  const key = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY ?? "";
+  const match = key.match(/^pk_(live|test)_([A-Za-z0-9+/]+={0,2})$/);
+  if (!match) throw new Error("Expected a Clerk publishable key (pk_live_ or pk_test_)");
+  const decoded = Buffer.from(match[2], "base64").toString("utf8");
+  if (Buffer.from(decoded).toString("base64").replace(/=+$/, "") !== match[2].replace(/=+$/, "") ||
+      !/^(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9-]+\$$/i.test(decoded)) {
+    throw new Error("Invalid publishable-key host payload");
+  }
+  console.log(`${match[1] === "live" ? "production" : "development"}: ${decoded.slice(0, -1)}`);
+  JS
   ```
+
+This diagnostic checks key shape and identifies the instance type; it does not
+test sign-in, OAuth ownership, or origin isolation. The decoder was checked
+2026-10-30 against Clerk's [key implementation](https://github.com/clerk/javascript/blob/main/packages/shared/src/keys.ts)
+with synthetic live/test keys and invalid inputs. It prints only type and host.
 
 # Per-client production setup (repeat for each client)
 
@@ -66,7 +83,7 @@ domain (e.g. `thp.thefocus.ai`, `habitats.thefocus.ai`).
    (orange-cloud) record fails Clerk's domain/SSL verification.
 5. Put `pk_live_…` / `sk_live_…` in that client's hosting env (each client is
    its own Vercel project). The #1 prod mistake is forgetting to swap the keys.
-6. Add your own social OAuth credentials (see "Social OAuth" below) and
+6. Add that client's social OAuth credentials (see "Social OAuth" below) and
    re-point webhooks to the production instance.
 7. Lock origins in middleware so a token from one client is rejected by another:
 
@@ -80,65 +97,96 @@ domain (e.g. `thp.thefocus.ai`, `habitats.thefocus.ai`).
 
 # Social OAuth (Google + Microsoft)
 
-Development instances use Clerk's _shared_ OAuth credentials, so social login
-"just works" in dev. **Production instances require your own credentials** — any
-social button that worked in dev breaks in prod until you add them.
+Clerk supplies _shared_ OAuth credentials by default for development instances;
+production instances require custom credentials. That vendor convenience is
+not a compliant client-specific setup under `STD-009 §3.6`. Configure **Use
+custom credentials** with the client's own provider registration in development
+as well as production. A sign-in that works with Clerk's shared defaults has not
+tested the client's OAuth configuration.
 
-Each Clerk production instance has one redirect URI, tied to its Frontend API
-domain. **Copy the exact value from the Clerk Dashboard** (SSO Connections →
-provider → _Use custom credentials_); it looks like:
+For each instance and provider, **copy the exact redirect URI from the Clerk
+Dashboard** (SSO Connections → provider → _Use custom credentials_). Production
+examples look like the following; these two clients' callbacks belong in
+different provider applications, not one shared registration:
 
 ```text
-https://clerk.thp.thefocus.ai/v1/oauth_callback        # THP instance
-https://clerk.habitats.thefocus.ai/v1/oauth_callback   # Habitats instance
+https://clerk.thp.thefocus.ai/v1/oauth_callback        # THP OAuth app only
+https://clerk.habitats.thefocus.ai/v1/oauth_callback   # Habitats OAuth app only
 ```
 
-## One shared OAuth app per provider (standard)
+## Per-client OAuth applications and credentials
 
-Because every client lives under `thefocus.ai`, use **one Google app and one
-Microsoft app for all clients**, each listing **multiple redirect URIs** (one
-per Clerk instance). Paste the same Client ID/Secret into each client's Clerk
-instance.
+Under `STD-009 §3.6`, each client gets its own Google OAuth application and
+Microsoft app registration for the providers it uses, with client IDs and
+secrets that are never copied into another client's Clerk application. This is
+the isolation boundary even when clients share a root domain, consent-screen
+branding, or the team administering their provider accounts.
 
-- Least to manage; a single Google consent screen (authorized domain
-  `thefocus.ai`) and one multitenant Microsoft app cover every `*.thefocus.ai`
-  subdomain.
-- Sharing the OAuth _app_ does NOT weaken isolation: it only brokers "this is
-  the user's Google/MS account." The user pool still lives in each separate
-  Clerk application.
-- Trade-off: one consent-screen brand for all clients, shared secret rotation.
-  Only split to a per-client OAuth app when a client needs branded consent or
-  must own the provider relationship.
+- Separate Clerk applications isolate user pools. Separate provider
+  applications additionally keep consent, credentials, rotation, and revocation
+  within one client's boundary; different branding is not a prerequisite.
+- Multiple redirect URIs can belong to one client's application: development,
+  preview, and production can reuse that client's registration and credentials
+  where supported and appropriately scoped (`STD-007 §3.4`). Each callback and
+  origin belongs to that client, never another client.
+- Store credentials in the client's project vault (`STD-007 §3.1`), and record
+  their owner and renewal date where they expire (`STD-007 §3.9`). Within-client
+  reuse means coordinating rotation across that client's environments, not
+  across the whole client fleet.
 
-## Google setup (per provider, once)
+## Google setup (repeat for each client)
 
-1. Clerk Dashboard → SSO Connections → Google → enable + **Use custom
-   credentials** → copy the Redirect URI.
-2. Google Cloud Console → **OAuth consent screen**: External; set the app name
-   (shown to users); **Authorized domains** = `thefocus.ai` (covers all
-   subdomains); **publish to "In production"** (Testing mode caps at 100 users).
+1. In this client's Clerk application, open each instance being configured:
+   **SSO Connections → Google** → enable + **Use custom credentials** → copy
+   its Redirect URI.
+2. In Google Cloud Console, select or create a project dedicated to this
+   client. Configure its **OAuth consent screen / Google Auth Platform** with
+   the client's app name and **External** audience. Set **Authorized domains**
+   for the client's URLs (`thefocus.ai` for the THP example); a shared parent
+   domain is not a reason to share the OAuth application. **Publish to "In
+   production"** before production use (`STD-009 §3.8`), completing any Google
+   verification required for the app's branding or scopes.
 3. **Credentials → OAuth client ID → Web application**:
-   - Authorized JavaScript origins: `https://thp.thefocus.ai` (add each client
-     origin).
-   - Authorized redirect URIs: add the Clerk Redirect URI for each instance.
-4. Paste Client ID + Secret into each client's Clerk instance.
+   - Name the OAuth client for this client project.
+   - Authorized JavaScript origins: `https://thp.thefocus.ai`, plus the origins
+     used by this same client's other environments as needed.
+   - Authorized redirect URIs: add the exact Clerk Redirect URIs collected for
+     this client, not callbacks from other clients.
+4. Save Client ID + Secret in this client's project vault, then enter them into
+   **Use custom credentials** in only this client's Clerk instances and save.
 
-## Microsoft / Entra ID setup (per provider, once)
+## Microsoft / Entra ID setup (repeat for each client)
 
-1. Clerk Dashboard → SSO Connections → Microsoft → enable + **Use custom
-   credentials** → copy the Redirect URI.
+1. In this client's Clerk application, open each instance being configured:
+   **SSO Connections → Microsoft** → enable + **Use custom credentials** → copy
+   its Redirect URI.
 2. Azure → Microsoft Entra ID → **App registrations → New registration**:
+   - Name this registration for the client; use a separate registration for
+     every other client.
    - **Supported account types: "Accounts in any organizational directory
      (multitenant) and personal Microsoft accounts."** Required so external
      orgs (e.g. a client's tenant) can sign in. Clerk uses the `common` tenant.
-   - Redirect URI: platform **Web**, add the Clerk Redirect URI for each
-     instance.
+     Multitenant describes who can sign in, not permission to share this
+     registration across our client projects.
+   - Redirect URI: platform **Web**, enter this client's Clerk Redirect URI.
+     Add callbacks for other environments of this same client in the
+     registration's **Authentication** settings as needed.
 3. **Certificates & secrets → New client secret** → copy the Value. Note the
-   expiry (≤24mo) and set a rotation reminder — expired secrets silently break
-   Microsoft login.
+   expiry (≤24mo), record the renewal owner, and set a rotation reminder —
+   expired secrets silently break Microsoft login.
 4. **Token configuration**: add the `email` optional claim.
-5. Paste Application (client) ID + secret Value into each client's Clerk
-   instance.
+5. Save Application (client) ID + secret Value in this client's project vault,
+   then enter them into **Use custom credentials** in only this client's Clerk
+   instances and save. The secret **Value**, not the Secret ID, is the credential.
+
+## Check the client boundary
+
+Compare provider application/client IDs across clients: they differ. Review
+each registration's callbacks and origins: none belongs to another client.
+Then test each enabled provider from this client's Clerk Account Portal in
+each configured environment, confirming the expected client application and
+successful callback. A check against development defaults does not substitute
+for this test.
 
 # Access control per client
 
@@ -151,8 +199,12 @@ instance.
 # Anti-patterns
 
 - Dev instance (`pk_test`) serving a production site.
-- One shared app + satellite domains used to "separate" clients (leaks the user
-  pool across clients).
+- One shared Clerk app + satellite domains used to "separate" clients (leaks
+  the user pool across clients).
+- One Google OAuth app or Microsoft registration shared across clients, even
+  with separate Clerk apps — couples provider consent and credential lifecycle.
+- Treating Clerk's shared development OAuth defaults as a completed
+  client-specific configuration.
 - Setting the instance domain to the bare root (`thefocus.ai`) — that shares
   sessions across all subdomains and re-couples clients.
 - Cloudflare-proxied Clerk CNAMEs (orange cloud) — verification fails.
@@ -164,3 +216,16 @@ instance.
   login outage.
 - Google OAuth app left in "Testing" publishing status — only 100 users can
   sign in.
+
+# OAuth setup references
+
+Checked for this OAuth credential setup update on 2026-10-29; the rest of the
+Clerk configuration walkthrough was not reverified in this update. Consult the
+provider guides for current dashboard labels and additional connection settings.
+
+- [Clerk: social OAuth](https://clerk.com/docs/nextjs/guides/configure/auth-strategies/social-connections/overview).
+- [Clerk: Google](https://clerk.com/docs/guides/configure/auth-strategies/social-connections/google).
+- [Clerk: Microsoft](https://clerk.com/docs/guides/configure/auth-strategies/social-connections/microsoft).
+- [Google: manage OAuth clients](https://support.google.com/cloud/answer/6158849).
+- [Google: manage OAuth app branding](https://support.google.com/cloud/answer/15549049).
+- [Microsoft: redirect URIs](https://learn.microsoft.com/en-us/entra/identity-platform/how-to-add-redirect-uri).

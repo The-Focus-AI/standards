@@ -5,7 +5,7 @@ title: Issues and agent workflow
 category: Practice
 status: Draft
 issued: "2026-07-25"
-revision: R1
+revision: R3
 applies-to: Every repository worked by an agent
 author: W. Schenk
 ---
@@ -74,15 +74,25 @@ acceptance criteria, a verification plan, and what is out of scope.
 anything. Those five sections are what make that promise checkable. An issue
 missing any of them is `backlog`, however obvious the work seems.
 
+Acceptance criteria describe observable outcomes: what must be true when the
+work is finished. The verification plan says how to demonstrate those outcomes,
+with commands, inputs, environments, or review evidence. "Tests pass" alone
+describes neither the desired behavior nor which cases would catch a regression.
+
 ### 3.5
 
-An agent MUST NOT move an issue into `ready`.
+An agent MAY move an issue into `ready` when it satisfies §3.4 and requires no
+unresolved product decision or approval to begin the described work.
 
-This is the triage gate, and it is the one place a person is structurally
-required. Without it an agent can declare its own underspecified ticket ready
-and then pick it up, which converts a planning failure into merged code. An
-agent that believes an issue is ready says so in a comment and leaves the label
-alone.
+Readiness is a quality check, not a person-only label. An agent can clarify a
+ticket, supply its verification plan, and state why it is actionable. It cannot
+invent a client's acceptance decision or assume authorization for a new product
+direction. An unresolved question for a person belongs in `blocked`; incomplete
+specification without such a question stays in backlog.
+
+The state-change comment records the readiness assessment (§3.12–3.13).
+Readiness does not authorize merging, deployment, spending, or credential changes;
+the applicable project and release approvals still apply.
 
 ### 3.6
 
@@ -104,13 +114,12 @@ listing. If the issue has gained an assignee, changed state, or closed, the
 agent takes the next item instead. Two agents on one ticket is two branches, two
 pull requests, and a merge conflict nobody planned.
 
-```sh
-gh issue view "$N" --json assignees,state,labels \
-  | jq -e '.assignees == [] and .state == "OPEN"' || exit 0
-gh issue edit "$N" --add-assignee "@me" --add-label active
-gh issue view "$N" --json assignees \
-  | jq -e '[.assignees[].login] == ["'"$AGENT"'"]' || exit 0
-```
+Recheck the entire frontier condition: open, `ready`, unassigned, no open
+blocker, and not a planning item under §3.16. Inspect native blocking relations
+and any body-based fallback; unreadable dependencies are not proof of no blockers.
+After assigning, replace `ready` with `active`, rather than retaining both.
+The former shell example checked only open/unassigned and did not satisfy this
+clause; tracker-specific claim tooling needs to implement the complete check.
 
 ### 3.8
 
@@ -120,6 +129,10 @@ does not.
 Assignment is not atomic on any tracker this fleet uses. Read back after
 writing: if the agent is not the sole assignee, another session won the race and
 this one stops, without commenting and without unassigning the winner.
+
+Sole assignment is necessary, not proof of a session-exclusive lock. Sessions
+sharing one GitHub identity need a separate session-claim mechanism or explicit
+coordination; an assignee-only read-back cannot distinguish them.
 
 ### 3.9
 
@@ -145,9 +158,10 @@ relabelling anything.
 An agent MUST take work only from the frontier.
 
 The frontier is every issue that is `ready`, unassigned, and has no open
-blocking relationship. An agent that reaches outside it is either working
-something a person has not accepted, something already claimed, or something
-whose prerequisites do not exist yet.
+blocking relationship, excluding planning items under §3.16. An agent that
+reaches outside it is working something not yet actionable, already claimed,
+or missing prerequisites. A qualified agent can establish readiness under §3.5;
+that is distinct from claiming the work.
 
 ### 3.12
 
@@ -206,11 +220,14 @@ the requirement it satisfies. Naming and the shape of the pull request are
 
 ### 3.18
 
-An issue MUST NOT be closed by an agent before its pull request merges.
+An issue MUST NOT be closed by an agent before its pull request merges, except
+when closing a verified duplicate with a link to the original open issue.
 
-Merging closes the issue, and nothing else does. An agent that closes on
-"finished writing the code" closes work that has not shipped, which is the one
-tracker lie that costs a release.
+Duplicate closure consolidates tracking; it does not claim the work shipped.
+Check that the original covers the duplicate's acceptance criteria, preserve
+any additional context there, and leave the original open. Otherwise, an agent
+that closes on "finished writing the code" closes work that has not shipped,
+which is the tracker lie that costs a release.
 
 ### 3.19
 
@@ -218,17 +235,19 @@ An issue SHOULD NOT be created for work already described by an open issue.
 
 At the volume this fleet generates, duplicates are the main way a tracker
 becomes unusable. Search before filing; when work turns out to be a duplicate,
-close it referencing the original rather than merging the two descriptions.
+use the linked-duplicate exception in §3.18 rather than claiming completion.
 
 ## 4. The state machine
 
 ```mermaid
 stateDiagram-v2
     [*] --> backlog: filed
-    backlog --> ready: specified and accepted, person only (3.5)
+    backlog --> ready: readiness checked, person or agent (3.4, 3.5)
     ready --> active: claim, verify, assign (3.6 to 3.8)
     active --> blocked: needs a person
-    blocked --> ready: person answers
+    blocked --> ready: answer received, readiness rechecked
+    active --> ready: claim released, still actionable
+    active --> backlog: claim released, needs specification
     active --> [*]: branch, pull request, merge (3.17)
     backlog --> wontfix
     ready --> wontfix
@@ -252,13 +271,20 @@ done is closed by its pull request merging, with its state label left as it was.
 | Label | Axis | Meaning | Who sets it |
 | --- | --- | --- | --- |
 | *(none)* | state | Backlog — captured, not yet specified or accepted | Default |
-| `ready` | state | Fully specified; an agent can finish it unaided | Person only |
+| `ready` | state | Fully specified; actionable under §3.4–3.5 | Person or agent |
 | `active` | state | An agent is working it; assignee names which | Agent |
 | `blocked` | state | Waiting on a person | Agent or person |
 | `wontfix` | state | Decided against; reason recorded | Person |
 | `type:spec` | type | A spec or PRD, not a ticket | Anyone |
 | `type:epic` | type | A container for tickets | Anyone |
-| `wayfinder:*` | type | Wayfinder map and child-ticket kinds | Wayfinder |
+| `wayfinder:map` | type | A planning map, excluded from the frontier | Wayfinder |
+| Other `wayfinder:*` | type | Child-ticket kinds; not automatically planning containers | Wayfinder |
+| `automated`, `bug` | origin / kind | A machine-reported failure or defect, not readiness | Automation or triage |
+| `auto-merge` | permission | Explicit opt-in under `STD-003 §3.13`, not a state | Person |
+
+Only the four state labels are mutually exclusive. Type, origin, and permission
+labels can coexist with a state. Project maturity is a separate project-level
+decision, not another ticket state; `ready` means actionable at every maturity.
 
 Migrating from the previous vocabulary: `ready-for-agent` becomes `ready`,
 `needs-triage` is deleted (an unlabelled issue is already backlog), and

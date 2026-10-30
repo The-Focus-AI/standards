@@ -66,8 +66,8 @@ Run (adapt paths):
 
 Record `STANDARDS_SHA` in every report and PR body. Optionally also list open
 PRs on `The-Focus-AI/standards` that add Draft STDs/GDEs (for example testing)
-and treat those documents as Draft — check against them, but do not require
-full conformance until they are In force / Current on `main`.
+and record them separately as proposals. Only In force standards bind;
+Current guides explain them and do not create additional requirements.
 
 Read before judging anything:
 
@@ -78,7 +78,7 @@ Read before judging anything:
 - `$STANDARDS/best-practices/GDE-012-auditing-an-existing-project.md`
 - `$STANDARDS/templates/default-project/` (canonical skeleton)
 - Every `standards/STD-*.md` with status In force or Draft
-- Every `best-practices/GDE-*.md` with status Current (and Draft if present)
+- Every `best-practices/GDE-*.md` with status Current
 
 ## Phase 1 — Skills lock diff (including tdd/teach)
 
@@ -91,9 +91,11 @@ Canonical lock: `$STANDARDS/templates/default-project/skills-lock.json`
 
 Produce a machine-readable and human-readable diff:
 
-1. Names only in canonical → Missing skill (gap) unless N/A for this stack.
+1. Names only in canonical → Missing recommended skill; check applicability
+   and whether the project adopted that inventory before classifying it.
 2. Names only in project → Extra / unapproved (soft gap or exception; say which).
-3. Same name, different `computedHash` or `source`/`skillPath` → Stale pin (gap).
+3. Same name, different `computedHash` or `source`/`skillPath` → Drift to review,
+   not proof of a stale pin. Check the project's recorded choice; its pin may be newer.
 4. For names `tdd` and `teach`: apply `GDE-008` / `STD-011` §3.9 selection rule:
    - Default lock entry MUST be `mattpocock/skills` for both unless the project
      has a recorded Exception to use pstack.
@@ -104,17 +106,20 @@ Produce a machine-readable and human-readable diff:
 5. Never recommend bare `skills add mattpocock/skills -y` or
    `skills add cursor/plugins -y` (`STD-011` §3.7). Prefer
    `skills add <owner>/<repo> --skill <folder> -y` or copy the canonical lock
-   then `mise install` / `skills experimental_install`.
+   then `mise run install` / `skills experimental_install`.
 
 Write findings into the gap report under heading "Skills".
 
 ## Phase 2 — Standards and guides checklist
 
-For each In force or Draft STD and each Current (and Draft) GDE, in numeric
+For each In force or Draft STD and each Current GDE, in numeric
 order:
 
 1. Decide Applies / Not applicable (use applies-to and `GDE-012`).
 2. If Applies: Conforms | Exception (cite where documented) | Gap | Soft gap.
+   Record the source kind and status separately. Label differences from Draft
+   standards or guides as adoption recommendations, not fleet nonconformance.
+   If the project explicitly adopted one, cite that local decision.
 3. Cite the concrete file/path/command that proves the classification.
 4. Map Gaps to the default-project template file that shows the expected shape
    when one exists (for example `docs/testing.md`, `.github/workflows/ci.yml`,
@@ -158,9 +163,10 @@ PR is allowed) or the user already approved skipping straight to fixes.
 For each approved fix batch (or each gap if the user said "fix them"):
 
 1. Open a GitHub issue describing the gap and pointing at the report section.
-   Do NOT add the `ready` label (`STD-002` — humans label ready).
-2. When the user labels ready OR explicitly authorizes work without ready for
-   this run, cut branch `<issue-number>-<slug>` from the default branch.
+   Assess it under `STD-002 §3.4–3.5`; a person or agent may mark a fully
+   specified issue `ready`, but unresolved decisions or approvals are not assumed.
+2. Once it is on the frontier, claim and verify ownership under `STD-002 §3.7–3.8`,
+   then cut branch `<issue-number>-<slug>` from the default branch.
 3. Apply the smallest additive change that closes that gap. Match
    `$STANDARDS/templates/default-project/` when adding missing skeleton files.
 4. Open a **draft** pull request whose body starts with `STD-003` sections in
@@ -188,7 +194,7 @@ Return to the user:
 
 - [ ] Standards corpus fetched; `STANDARDS_SHA` recorded
 - [ ] `skills-lock.json` diff completed with tdd/teach rule applied
-- [ ] Every In force/Draft STD and Current/Draft GDE classified
+- [ ] Every In force/Draft STD and Current GDE classified
 - [ ] Gap report written under `reports/`
 - [ ] Each fix that was authorized has issue + branch + draft PR (`STD-003`)
 - [ ] No PR merged; no document ratified; no secrets printed

@@ -5,7 +5,7 @@ title: Repository tooling and tasks
 category: Practice
 status: Draft
 issued: "2026-07-25"
-revision: R1
+revision: R2
 applies-to: Every repository
 author: W. Schenk
 ---
@@ -17,7 +17,7 @@ it, and run it without reading the README and guessing. This standard fixes that
 contract: every tool a repository needs is declared in one file, and every
 repository answers the same four commands.
 
-The contract matters more than the tool. `mise install`, `mise run lint`,
+The contract matters more than the tool. `mise run install`, `mise run lint`,
 `mise run test` mean the same thing in every repository the fleet touches, which
 is what lets an agent — or a CI runner, or an agent platform's bootstrap — work
 somewhere it has no specific knowledge of.
@@ -84,12 +84,16 @@ run = 'echo "==> Deploy: Standards are reference-only, nothing to deploy."'
 
 ### 3.5
 
-`mise install` MUST leave the repository ready to work with no further steps.
+`mise run install` MUST leave the repository ready to work with no further steps.
 
-Dependencies, agent skills, and any generated files. If a contributor has to run
-a second command before `lint` and `test` will pass, that command belongs inside
-`install`. This is what an agent platform's bootstrap calls, and it gets one
-call.
+Dependencies, agent skills, and any generated files belong in `[tasks.install]`.
+`mise install` is a different command: it installs the tools declared in
+`mise.toml`, not the repository's dependencies. Bootstrap installs tools first,
+then calls the task; repository-specific setup has one owner.
+
+```sh
+mise install && mise run install
+```
 
 ### 3.6
 
@@ -105,9 +109,12 @@ fail.
 
 Environment variables MUST reach the process through mise, from fnox.
 
-Declared in `mise.toml` as `[env] _.file = ".fnox/env"` with the rest resolved by
-fnox, so entering the directory is what configures the shell. An agent should
-never be told to export a variable by hand, because an agent has no hand.
+The cloud platform injects the bootstrap token under `STD-007 §3.3`; fnox
+resolves application secrets and mise supplies the project's execution context.
+Use `fnox exec --` for non-interactive commands or the documented shell activation
+for interactive work. A gitignored `[env] _.file = ".fnox/env"` is an optional
+local-exception fallback, not a required cloud credential file. Do not make
+manual exports or a person's laptop shell part of the application setup.
 
 ### 3.8
 

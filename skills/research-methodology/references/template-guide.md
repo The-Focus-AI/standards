@@ -2,6 +2,16 @@
 
 Choose the appropriate template based on your research needs.
 
+## Provenance envelope
+
+The templates contain the `STD-006` note envelope for this corpus. Replace all
+placeholders: allocate the next free number, use the original issue date, name
+the actual author, and set `verified` only to the date the claims were checked.
+Save to `reports/NOTE-nnn-YYYY-MM-DD-slug.md`. Do not reuse retired numbers or
+invent an original author when migrating existing research. Keep attribution
+and citations; disclose unverified claims and agent-made decisions. In another
+repository, use its adopted document convention instead of imposing this one.
+
 ## Quick Reference
 
 | Research Need | Template | Time | File |

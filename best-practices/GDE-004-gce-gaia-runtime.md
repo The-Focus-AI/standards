@@ -102,9 +102,14 @@ or deploy a service) — document that separately when it ships.
 | Gaia / habitats on GCE | **No** | Every platform merge hits production |
 | Cloud Build PR images | **Not implemented** | Planned (umwelten migration Phase 4 / Stage 2) |
 
-Until a staging Gaia host or Cloud Build PR pipeline exists, test control-plane
-UI against Preview Vercel, and treat agent-fleet changes as production deploys
-with the ~10 minute cycle cost.
+No separate staging host is required. For a release under `STD-012 §3.7` and
+§3.11, test the control-plane UI against Preview Vercel and exercise the exact
+agent-fleet candidate's build/start checks in a disposable cloud workspace.
+Record the commands, results, runtime limitations, and release approval before
+merging a change that will deploy to production. The existing ~10 minute
+production cycle is deployment behavior, not a substitute for that evidence.
+This review aligns the procedure; it does not verify that the live Gaia workflow
+has these gates configured.
 
 ## Agent (habitat) lifecycle
 

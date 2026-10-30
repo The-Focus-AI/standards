@@ -2,6 +2,10 @@
 
 Complete prompt examples for different camera movements and shot types.
 
+Complete `../SKILL.md`'s approval, mise, and fnox preflight first. Bare commands
+assume its authorized `mise exec -- fnox exec -- bash` shell. These are creative
+examples, not evidence that current models produce a particular result.
+
 ## Establishing Shots
 
 ### City Skyline

@@ -2,6 +2,10 @@
 
 Complete prompt examples for videos with speech, sound effects, and ambient audio.
 
+Complete `../SKILL.md`'s approval, mise, and fnox preflight first. Bare commands
+assume its authorized `mise exec -- fnox exec -- bash` shell. Prompted sound is
+not guaranteed; 1.0.10 does not forward its audio flags to the provider.
+
 ## Simple Dialogue
 
 ### Greeting

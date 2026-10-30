@@ -28,6 +28,10 @@ The `/report` command converts markdown to styled HTML reports. Three modes, pic
 
 ## Usage
 
+`/report` below is a request shorthand, not a bundled executable command.
+Select the project's brand; Client/Labs are optional Focus examples, not a
+default for unrelated projects.
+
 ```text
 # Standard: open in browser for manual print
 /report file:./my-document.md style:labs
@@ -44,13 +48,13 @@ The `/report` command converts markdown to styled HTML reports. Three modes, pic
 
 **Arguments:**
 
-| Arg      | Required | Default | Description                                                                 |
-| -------- | -------- | ------- | --------------------------------------------------------------------------- |
-| `file`   | Yes      | —       | Path to the markdown file                                                   |
-| `style`  | No       | `labs`  | Brand: `client` or `labs`                                                   |
-| `output` | No       | —       | PDF output path. When set, uses chrome-driver                               |
-| `paged`  | No       | `auto`  | `auto` / `true` / `false`. Auto uses paged when `output` is specified       |
-| `mode`   | No       | `paged` | `standard` / `paged` / `magazine`. `magazine` overrides the `paged` arg.    |
+| Arg | Required | Default | Description |
+| --- | --- | --- | --- |
+| `file` | Yes | — | Path to the markdown file |
+| `style` | No | Project brand | Optional Focus styles: `client` or `labs` |
+| `output` | No | — | PDF output path; run the browser preflight in `SKILL.md` |
+| `paged` | No | `auto` | `auto` / `true` / `false`. Auto uses paged when `output` is specified |
+| `mode` | No | `paged` | `standard` / `paged` / `magazine`. `magazine` overrides the `paged` arg. |
 
 ---
 
@@ -260,7 +264,9 @@ This is why magazine mode is the right pick when "we email PDFs sometimes and sh
 
 The Versant architecture report ships the canonical example: nine spreads, paper + four background
 tints + closing on `--ink`, full keyboard wiring, print fallback. Read
-`docs/status/architecture-report.html` in the versant repo for a complete starting point.
+`docs/status/architecture-report.html` in the versant repo only if that project
+is available and access is authorized. It is historical source material, not
+a dependency shipped with this skill; the scaffolding above stands on its own.
 
 ### Gotchas
 
@@ -404,13 +410,18 @@ Every paged report starts with a cover:
   <div class="cover-rule"></div>
   <div class="cover-meta">
     <strong>Prepared for:</strong> Client Name<br />
-    <strong>Date:</strong> April 2026<br />
-    <strong>Author:</strong> Will Schenk
+    <strong>Issued:</strong> {{ISSUED}}<br />
+    <strong>Author:</strong> {{AUTHOR}}
   </div>
 </section>
 ```
 
 The cover uses `page: cover` (suppresses headers) and `break-after: page` (forces content to next page).
+Copy real provenance from the source document, not a template author's name.
+For notes in this corpus, preserve `number`, `kind`, `issued`, `author`,
+`status`, and `verified` from `STD-006` in the source markdown and include the
+NOTE identifier and verification date in the report. Do not invent an original
+author or advance `verified` merely because the layout was regenerated.
 
 ---
 
@@ -626,21 +637,21 @@ For magazine-style flowing text across columns within paged reports:
 
 ## PDF Generation Workflow
 
-### With chrome-driver (direct PDF)
+### Direct PDF
 
-```bash
-# Find the chrome-driver pdf binary
-PDF_BIN=$(ls -d ~/.claude/plugins/cache/focus-marketplace/chrome-driver/*/bin/pdf | sort -V | tail -1)
+Follow `SKILL.md`'s agent-browser preflight and named-session workflow. Open
+the actual generated HTML path, wait for `window.__reportReady === true`, then
+save the current page with `pdf`. The browser and CLI are explicit prerequisites,
+not binaries hidden inside a Claude plugin. Ask before installing missing tools.
 
-# Generate PDF from HTML
-$PDF_BIN file:///tmp/focus-report-{timestamp}.html ./output.pdf
-```
+### Manual browser print
 
-### Browser Print (Cmd+P)
+1. Generate HTML and record its actual path.
+2. Open it with the workspace's available browser or authorized preview service.
+3. Inspect pagination, then use the browser's Print / Save as PDF command.
 
-1. Generate HTML → write to `/tmp/focus-report-{timestamp}.html`
-2. Open in browser: `open /tmp/focus-report-{timestamp}.html`
-3. User prints via Cmd+P (standard template) or the paged.js preview renders automatically
+In an orb, share its supported portal URL for a preview, not a loopback URL or
+a macOS-only `open` command. HTML awaiting manual printing is not a finished PDF.
 
 ---
 
@@ -657,19 +668,17 @@ $PDF_BIN file:///tmp/focus-report-{timestamp}.html ./output.pdf
 
 ## Paged.js Initialization
 
-Templates use deferred initialization to ensure fonts load before pagination:
+Use the initialization at the end of either paged template. It disables auto
+pagination, waits for DOM content, fonts, and image decoding, awaits `preview()`,
+then sets `window.__reportReady`. It reports `window.__reportError` on failure.
+Waiting for a `.pagedjs_page` alone is too early: the first page can exist while
+the rest are still being laid out.
 
-```html
-<script>
-  window.PagedConfig = { auto: false };
-</script>
-<script src="https://unpkg.com/pagedjs/dist/paged.polyfill.js"></script>
-<script>
-  document.fonts.ready.then(() => window.PagedPolyfill.preview());
-</script>
-```
-
-This prevents layout shifts from fonts loading after pagination has already chunked the content.
+The templates retain their original external paged.js/font sources. Before
+use, approve those network dependencies and choose a reviewed, pinned paged.js
+asset (or an already approved local copy). Do not silently fetch a new library
+or claim these templates are offline/self-contained. A missing asset is a
+rendering failure, not a reason to skip the readiness check.
 
 ---
 

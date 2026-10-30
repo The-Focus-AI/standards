@@ -231,10 +231,10 @@ const databaseProvider: ComponentSpec = {
   name: "database-provider",
   async apply(ctx) {
     const pool = await openPool(process.env.DATABASE_URL!);
+    ctx.effect(() => () => pool.end());
     ctx.provide(database, {
       subscribe: (onRow) => subscribeToRows(pool, onRow),
     });
-    return () => pool.end();
   },
 };
 ```
@@ -276,21 +276,22 @@ const mcpRegistry = serviceKey<AppMcpRegistry>("app:mcp-registry");
 
 const invoiceBackend: ComponentSpec = {
   inject: [mcpRegistry],
-  async apply(_ctx, view) {
+  async apply(ctx, view) {
     const pool = await openPool(process.env.DATABASE_URL!);
-    const unregister = view.get(mcpRegistry).registerTool({
+    ctx.effect(() => () => pool.end());
+    ctx.effect(() => view.get(mcpRegistry).registerTool({
       name: "invoices.list",
       input: ListInvoicesSchema,
       run: (input) => listInvoices(pool, input),
-    });
-
-    return async () => {
-      await unregister();
-      await pool.end();
-    };
+    }));
   },
 };
 ```
+
+Each resource has its own inverse registered immediately after acquisition.
+If tool registration throws, the activation still closes the pool. If tool
+unregistration rejects during teardown, context cleanup still attempts the pool
+inverse; combining both into one callback would skip it after the first rejection.
 
 The trusted host resolves `invoices.list` to that MCP tool and `conversation.ask` to an A2A action
 only after authorization. The browser knows neither implementation.

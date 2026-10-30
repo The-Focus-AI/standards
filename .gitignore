@@ -9,6 +9,8 @@ agent/skills/
 .fnox/
 *.env
 *.env.local
+.env.*
+!.env.example
 .pi/sessions/
 .pi/npm/
 .pi/git/

@@ -8,6 +8,16 @@ For academic or comprehensive topic surveys.
 ---
 
 ```markdown
+---
+number: "<next free number>"
+title: "[Topic]: Literature Review"
+kind: note
+issued: "YYYY-MM-DD"
+author: "<actual author or agent identity>"
+status: Current
+verified: "YYYY-MM-DD"
+---
+
 # [Topic]: Literature Review
 
 *Date: [YYYY-MM-DD] | Sources: [N]*

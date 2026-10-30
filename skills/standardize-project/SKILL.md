@@ -1,150 +1,97 @@
 ---
 name: standardize-project
 description: >
-  Audit an existing repository against TheFocus.AI standards — mise tooling, required
-  tasks, fnox/1Password secrets, pi config, locked skills, agent instructions, git
-  hygiene — and produce a diff-style migration plan before changing anything.
-  Use when asked to bring a project up to standard, audit a repo, check compliance,
-  or migrate a project onto mise/fnox.
-  Triggers on: "standardize", "audit this project", "bring up to standard",
-  "compliance check", "does this follow our standards", "migrate to fnox",
-  "migrate to mise", "clean up this repo's setup".
-  For a pasteable end-to-end prompt that diffs skills-lock, checks every STD/GDE,
-  writes a gap report, and opens fix PRs without merging, see PRM-002
-  (prompts/PRM-002-bring-project-up-to-standards.md) — load or paste that when
-  the user wants the full bring-up-to-current-standards loop.
+  Applies approved, additive tooling and bootstrap migrations after an evidence-backed
+  TheFocus.AI standards audit. Use to bring an existing project onto mise, fnox,
+  cloud bootstrap, or selected skills without replacing project-specific behavior.
+  Produces a proposed diff before editing; use PRM-002 for the full issue/PR loop.
 ---
 
 # Audit and Standardize a Project
 
-Inspect first, propose a plan, then change. Never overwrite existing project
-configuration blindly — the goal is a repo that meets the standard *and* still works
-the way its team expects.
+Inspect first, propose a plan, then apply only the authorized changes. A
+conforming repository that breaks the team's existing workflow is a failed
+migration.
 
-For a **read-only mapping report** (which guides apply, exceptions vs gaps, no
-migration), use `standards-map` instead — or run it first, then return here to apply.
+## Audit and approval
 
-When the user wants the full "bring this project up to current Focus standards"
-loop — skills-lock diff (including the `tdd`/`teach` rule), every In force/Draft
-STD and Current/Draft GDE checked, a conformance gap report, then fix branches
-and draft PRs per `STD-003` with **no merges and no ratification** — follow
-`PRM-002` (`prompts/PRM-002-bring-project-up-to-standards.md`) end to end. This
-skill still owns the mechanical mise/fnox/pi/AGENTS migration steps inside that
-loop once a batch is approved.
+Resolve the target and a concrete `The-Focus-AI/standards` revision using
+`standards-map`. Read `GDE-012` for the audit order and **Conforms / Exception /
+Gap / Soft gap / Not applicable** vocabulary. Use the report phases of
+`PRM-002` rather than a second checklist here. A read-only request stops with
+the report; it does not authorize installation or edits.
 
-## Target
+Only In force standards bind the fleet. Record a source's kind/status with
+each finding; Draft standards are proposals and Current guides are explanation.
+An explicitly adopted project convention may still apply—cite that adoption.
+Name conflicts with target instructions rather than silently picking a side.
 
-Resolve the target repository before doing anything. If none was given, ask and stop.
-Use explicit paths for every read and edit — it is easy to audit one repo and
-accidentally edit another.
+Before changes, give the current state, clause-backed findings, exact proposed
+file changes, key **names** and vault scope for any secret migration, commands
+to run, and outstanding approvals. Use `STD-006` report metadata and NOTE paths
+when working in this corpus; `standards-map` carries the report envelope.
 
-## Source of truth
+For the full issue → branch → draft PR loop, follow `PRM-002` only when that
+external work was requested. Readiness still needs the `STD-002` assessment and
+any unresolved approvals; a gap report does not make an issue ready or claimed.
+Do not merge, deploy, or ratify a Draft through this skill.
 
-The standards live in `The-Focus-AI/standards`. Read these before recommending anything:
-`AGENTS.md`, `best-practices/GDE-009-technology-defaults.md`, `best-practices/GDE-008-skills.md`,
-`STD-007` and `STD-008` for secrets and deployment, and whichever deployment
-guide applies — `best-practices/GDE-010-vercel-deployment.md`, `best-practices/GDE-005-gcp-deployment.md`, or `best-practices/GDE-004-gce-gaia-runtime.md`.
-Also `best-practices/GDE-002-clerk.md`, `best-practices/GDE-007-pi-extensions.md`,
-`best-practices/GDE-003-fnox-secrets.md`, and the default-project template for missing-file examples
-only.
+## Apply an approved batch
 
-If the standards conflict with the target project's own instructions, name the conflict
-and ask — do not silently pick a side.
+### Tooling and tasks
 
-## Audit order
+Use `STD-004`, `STD-005`, and `GDE-011` as the task/bootstrap references,
+checking their status and project adoption. Inspect existing tool versions
+before adding anything; do not downgrade a working runtime to a copied example.
+Use `mise use` for approved tools with reviewed exact versions where output
+depends on the version. Never silently add dependencies or globally install
+them. `mise install` installs declared tools; `mise run install` installs the
+project's dependencies/skills. Keep those responsibilities separate.
 
-1. **Agent instructions** — `AGENTS.md`, `CLAUDE.md`, `.cursor/rules`, equivalents.
-2. **Tooling** — `mise.toml`, `.tool-versions`, package manager files, lockfiles, scripts.
-3. **Secrets** — `.env`, `.env.*`, `fnox.toml`, `.fnox/`, CI secret references, README setup steps.
-4. **pi setup** — `.pi/settings.json`, packages, local session/cache ignores.
-5. **Skills** — `skills-lock.json`, `.agents/skills/`, `.pi/skills/`.
-6. **Workflow** — README, docs, GitHub remote, tracker usage, spec/ticket docs, wayfinder maps.
-7. **Git hygiene** — `.gitignore`, committed generated files, committed-secret risk.
+Merge tasks additively. Preserve project-specific install/dev/test/deploy
+behavior and make failures propagate. Use the corpus's default-project
+skeleton only as a missing-file example, not something to copy over the target.
 
-## Required output before any change
+### Secrets and cloud bootstrap
 
-1. **Current state** — what exists, what is missing.
-2. **Compliance gaps** — each mapped to the standards file that requires it.
-3. **Proposed diff** — exact files to create or edit, with the intended change.
-4. **Secrets migration plan** — discovered key *names* only, never values, plus which
-   1Password vault and service account to use.
-5. **Commands to run** from the target project.
-6. **Questions and approvals needed** — especially before touching secrets or deploys.
+Follow `GDE-003` and `STD-007`; do not duplicate their setup procedure here.
+Before setup or any secret write, run the target's ignore/tracking preflight
+for **each** intended `.fnox/`, `.env`, `.env.*`, and credential path:
+`git check-ignore -q -- <path>` and `git ls-files -- <path>`. Stop if a secret
+file is tracked; report its path without reading or printing its contents.
+Keep `.env.example` trackable and placeholder-only.
 
-Do not apply changes until the user approves, unless they asked for immediate execution.
+The target state is a project-scoped vault/service account, `fnox.toml`
+declarations, and a person supplying the bootstrap token to the authorized
+cloud environment's secret settings. Do not request their account password,
+copy their session, or persist the injected token in an image/snapshot.
+`.fnox/env` is only a documented local exception, not a required cloud file.
+Do not add a required dotenv load for a file that cloud bootstrap never creates.
+Do not move, quarantine, delete, or provision secrets without explicit approval.
 
-## Applying the migration
+### Skills, pi, and agent instructions
 
-### mise
+Use `GDE-008` / `STD-011` for the selected inventory. The internal default is
+`setup-project` plus `work-next-issue`; all other owned skills remain optional
+named installs. Preserve legitimate optional sources and project exceptions.
+Review source/pin drift rather than replacing every lock with the standards
+repo's lock. Install approved selections with the mise-pinned `skills add`
+command, never manual copying or a bare whole-repository install.
 
-Add tools with `mise use`, never by hand-editing:
+Use `GDE-007` when the project uses pi; merge, do not replace, its settings.
+Update `AGENTS.md` additively with context entry points, task commands, cloud
+bootstrap, the secret-file preflight, and workflow references to `STD-002` /
+`STD-003`. Do not recreate obsolete workflow documents as mandatory files.
 
-```bash
-mise use node@22 npm:pnpm fnox gh ripgrep fd
-mise use npm:@earendil-works/pi-coding-agent
-mise use npm:markdownlint-cli2
-```
+## Verify and hand off
 
-Merge tasks **additively** and preserve project-specific ones. Required where
-applicable: `install`, `setup`, `dev`, `lint`, `test`, `deploy`, `secrets:check`,
-`secrets:list`. Add `[env]` with `_.file = ".fnox/env"` if missing.
+After reviewing what they execute, run the approved project's install, lint,
+test, and relevant bootstrap checks in its cloud workspace. Check real failure
+behavior, not just green command names. Resolve secrets only when authorized;
+use presence checks or `fnox check`, never output values. Do not run deployment
+as a verification shortcut.
 
-### fnox and 1Password
-
-Follow `best-practices/GDE-003-fnox-secrets.md`. Target end state:
-
-- A dedicated 1Password vault per project.
-- A scoped service account with access to that vault only.
-- `.fnox/env` holding `OP_SERVICE_ACCOUNT_TOKEN` and nothing else beyond bootstrap values.
-- `fnox.toml` mapping environment variables to 1Password items.
-- Plaintext env files quarantined under `.fnox/migrated-env/` or replaced with
-  `.env.example`, after confirmation.
-- `.fnox/`, `.env`, `.env.*` gitignored — except `.env.example`.
-
-**Never print, commit, or paste a secret value.** Key names only, in the plan and in
-conversation.
-
-### Skills
-
-Install missing skills with `skills add` (mise-pinned); never copy skill directories by
-hand. Prefer `--skill <folder>` over adding a whole upstream repo. The canonical set is
-`best-practices/GDE-008-skills.md` and the locked `skills-lock.json`.
-
-Remove deprecated `to-prd` and `to-issues` entries when migrating. Replace title-case
-lock keys with kebab-case. Ensure the planning workflow skills are present and referenced
-in the project's agent instructions.
-
-### pi
-
-Merge `.pi/settings.json` — project-local sessions plus the required packages. Do not
-delete project-specific pi config.
-
-### Agent instructions
-
-Update or create the target's `AGENTS.md` additively. It should tell a future agent where
-to read project context, that tooling goes through mise, that secrets go through fnox and
-1Password, how the planning workflow runs, how issues are tracked, and which commands
-prove the project is healthy.
-
-## Verification
-
-From the target project, run what is available:
-
-```bash
-mise trust && mise install && mise tasks
-mise run install && mise run lint && mise run test
-fnox check
-```
-
-If a command cannot run, say why and what remains. An audit that ends with unverified
-claims is half an audit.
-
-## Pitfalls
-
-- **Inspect before proposing.** A plan written from assumptions about the repo wastes
-  the review it asks for.
-- **Additive, not replacing.** Project-specific tasks and pi settings are there for a
-  reason.
-- **Secrets are the dangerous part.** Get explicit approval before moving them, and
-  verify the project still starts afterward.
-- **A gap you cannot fix is still a finding.** Report it rather than quietly dropping it.
+Re-run the map against the same standards revision. Report changed paths,
+commands and results, remaining Exceptions/Gaps/Soft gaps, and any unverified
+integration. Missing credentials, tools, or human decisions are blockers to
+state honestly—not a reason to weaken a gate or declare completion.

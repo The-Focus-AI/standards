@@ -8,6 +8,16 @@ For comparing options, technologies, or approaches.
 ---
 
 ```markdown
+---
+number: "<next free number>"
+title: "[Topic]: Comparative Analysis"
+kind: note
+issued: "YYYY-MM-DD"
+author: "<actual author or agent identity>"
+status: Current
+verified: "YYYY-MM-DD"
+---
+
 # [Topic]: Comparative Analysis
 
 *Date: [YYYY-MM-DD] | Sources: [N]*

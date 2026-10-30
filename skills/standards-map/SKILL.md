@@ -1,318 +1,123 @@
 ---
 name: standards-map
 description: >
-  Look up the latest TheFocus.AI standards, inspect the current (or named) project,
-  and write a dated mapping report: how the project implements each standard, which
-  best-practice guides apply or are N/A, intentional product exceptions, and soft
-  gaps. Read-only by default — does not migrate the project.
-  Use when asked how a project maps to standards, which guides apply, for a
-  standards compliance report, or "standards map".
-  Triggers on: "standards map", "map to standards", "how do we map to standards",
-  "which standards apply", "standards report", "guide applicability",
-  "does this project follow standards", "standards coverage".
+  Maps an existing project to a revision-pinned TheFocus.AI standards corpus and
+  reports conformance, documented exceptions, gaps, and guide applicability.
+  Use for a read-only standards audit, compliance report, or skills inventory
+  comparison. Does not migrate the project or open issues and pull requests.
 ---
 
 # Standards Map
 
-Produce a **dated report** that answers:
+Produce evidence, not a migration. `GDE-012` owns the audit procedure and
+classification vocabulary; `PRM-002` owns the full report → approved fixes →
+draft PR loop. Read those documents rather than maintaining a parallel audit
+checklist here. `standardize-project` applies approved tooling changes;
+`setup-project` scaffolds new projects.
 
-1. What does this project look like against the **latest** TheFocus.AI standards?
-2. Which **best-practice guides** apply, partially apply, or are N/A — and why?
-3. What are **intentional product exceptions** vs **compliance gaps**?
+## Resolve the target and corpus
 
-This skill is **read-only by default**. It does not edit the project. If the user
-wants a migration plan or to apply fixes, hand off to `standardize-project` after
-the report (or when they ask).
+Use the named target, otherwise the current directory if it is a repository.
+If neither is clear, ask. Keep explicit target and standards paths so a sibling
+standards checkout is not edited by accident.
 
-| Skill | Job |
-| --- | --- |
-| `standards-map` | Latest standards → mapping report (this skill) |
-| `standardize-project` | Audit + migration plan → optional apply |
-| `setup-project` | Greenfield scaffold |
+Resolve `The-Focus-AI/standards` from a user-provided path, `STANDARDS_REPO`, or
+a known local clone. Record its full HEAD SHA and whether the worktree is dirty.
+Do not reset, pull into, or switch branches in someone else's working tree.
+For the latest published revision, use a disposable clone of `main` or compare
+with `git ls-remote` before claiming freshness. If offline, label the report as
+local-revision-only; do not invent missing standards from memory.
 
-## Target project
+Read the resolved corpus's `AGENTS.md`, `GDE-012`, and the audit/report phases
+of `PRM-002`. Load their referenced numbered standards and Current guides as
+needed, including `GDE-008` for skill selection, `GDE-009` for technology
+defaults, and applicable deployment/auth/testing guides. For a full-corpus map,
+classify each In force/Draft STD and each Current GDE, including N/A rows with
+reasons. Do not execute `PRM-002`'s issue/PR phases during a map.
 
-Resolve the target before reading anything else:
+## Interpret evidence
 
-1. Path the user named (absolute or relative).
-2. Else the current working directory if it looks like a project (has `AGENTS.md`,
-   `mise.toml`, `package.json`, or `.git`).
-3. Else ask and stop.
+Use **Conforms**, **Exception**, **Gap**, **Soft gap**, and **Not applicable**
+as defined in `GDE-012`. For each row record the source's kind and status,
+applicability, exact clause (if any), project evidence, and next step.
 
-Use **explicit paths** for every read. Never write into the standards repo by
-accident when the target is a sibling project.
+- Only **In force standards** bind the fleet. Draft differences are adoption
+  recommendations, not nonconformance, unless the project explicitly adopted
+  them. Current guides explain; they do not create additional requirements.
+- Cite intentional exceptions and who decided them. An undocumented assumption
+  by the agent is not a project decision. Name unresolved conflicts rather than
+  silently overriding project instructions.
+- `GDE-009` choices are defaults, not laws requiring every product to use the
+  same language, database, authentication provider, or host.
+- Check tasks by behavior, not their names alone; lint/test need meaningful
+  failure behavior. State when a check was read but not run. Do not execute
+  install, setup, secret resolution, deployments, or other mutating tasks as
+  part of a read-only audit without permission.
+- Inspect workflow evidence against `STD-002` / `STD-003` and the target's
+  actual agent instructions. Do not require a legacy issue-workflow document
+  path. An audit is not authority to mark issues ready, claim work, merge, or
+  ratify a standard.
+- For secrets, inspect declarations and ignore/tracking status, never secret
+  file contents. Check intended secret paths individually. Cloud-injected
+  project bootstrap tokens are the default under `STD-005` / `STD-007`;
+  absence of `.fnox/env` is not itself a gap. A local token file is an explicit
+  exception, not an audit remediation to perform automatically.
 
-## Source of truth — latest standards
+## Skills comparison
 
-Standards live in **`The-Focus-AI/standards`**. Always pin the report to a concrete
-revision (commit SHA + date), not "whatever I remember."
+Follow `GDE-008`, `STD-011`, and `PRM-002`'s skills-diff phase. Distinguish the
+recommended default inventory from optional sources and the project's adopted
+inventory. The internal default is `setup-project` plus `work-next-issue`;
+other owned skills remain available by name when relevant. Their absence is
+not automatically a gap, and legitimate extras are not automatically removed.
 
-### Resolve the standards tree (in order)
+Compare names, sources, paths, and pins. Different hashes mean drift to review,
+not proof that the project is stale; its revision may be newer. Preserve the
+selected source for colliding names such as `tdd` / `teach` unless an approved
+change says otherwise. Never copy locks or install skills during mapping.
 
-1. **`STANDARDS_REPO` env** if set and the path contains `best-practices/GDE-009-technology-defaults.md`.
-2. **Sibling / known clones** (first hit wins):
-   - `../standards` relative to the target
-   - `../../standards` if target is deeper
-   - `$HOME/The-Focus-AI/standards`
-   - Any path the user named for standards
-3. **GitHub (latest `main`)** when no local clone is usable:
-   - Prefer `gh api repos/The-Focus-AI/standards/commits/main --jq .sha` for the SHA
-   - Fetch files with `gh api` / `gh browse` raw, or a shallow clone into a temp dir:
-     `git clone --depth 1 https://github.com/The-Focus-AI/standards.git <tmpdir>`
-   - If the network/auth fails, say so and stop — do **not** invent standards from
-     model memory.
+## Report
 
-Record in the report:
-
-- Absolute path used (or `github:The-Focus-AI/standards@<sha>`)
-- Commit SHA and commit date when available
-- Whether the clone might be stale relative to origin (optional:
-  `git -C <standards> fetch --dry-run` / `rev-parse HEAD` vs `origin/main`)
-
-### Read these from the resolved standards tree
-
-Required:
-
-- `AGENTS.md` (root navigation / audit order)
-- `best-practices/GDE-009-technology-defaults.md` — mise, tasks, pnpm/TS defaults, fnox, skills install
-- `best-practices/GDE-008-skills.md` — canonical skill set and planning workflow
-- `STD-007` — secrets and credentials; `best-practices/GDE-003-fnox-secrets.md` for the playbook
-- `STD-008` — deployment; `best-practices/GDE-006-local-environment.md` for local setup
-- `best-practices/GDE-007-pi-extensions.md`
-- Repository layout has no standard yet — see `reports/NOTE-005-2026-07-25-standards-gap-register.md`
-- Default project template under the standards repo (`templates` / `default-project`)
-  — reference for expected files only
-- Root `skills-lock.json` — canonical skill names/hashes for diffing
-
-Conditionally (after product shape is known):
-
-| If the project looks like… | Also read |
-| --- | --- |
-| Vercel / Next / preview deploys | `best-practices/GDE-010-vercel-deployment.md` |
-| Cloud Run / App Engine / gcloud | `best-practices/GDE-005-gcp-deployment.md` |
-| Gaia / habitats / GCE agent fleet | `best-practices/GDE-004-gce-gaia-runtime.md` |
-| Clerk / user auth | `best-practices/GDE-002-clerk.md` |
-| A2A / MCP agent service | `best-practices/GDE-001-a2a-agent.md` |
-
-Do not skip the conditional list: the report must still **name** those guides under
-"N/A" when they do not apply, with one-line reasons.
-
-## Inspect the target project
-
-Follow the standards audit order, adapted for a **map** (not a migration plan):
-
-1. **Agent instructions** — `AGENTS.md`, `CLAUDE.md`, `.cursor/rules`, equivalents.
-2. **Tooling** — `mise.toml`, package manager files, lockfiles, scripts/tasks.
-3. **Secrets** — `fnox.toml`, `.fnox/` presence (not contents), `.env*` risk, gitignore.
-4. **pi** — `.pi/settings.json`, required packages vs `pi-extensions.md`.
-5. **Skills** — `skills-lock.json` vs standards lock / `skills.md` (missing, deprecated
-   `to-prd`/`to-issues`, title-case keys, wrong sources).
-6. **Workflow** — README, `docs/agents/issue-workflow.md`, tracker, wayfinder docs.
-7. **Deploy shape** — Dockerfile, Vercel, GH Actions, Pages, Cloud Run, none.
-8. **Product stack** — language, build vs no-build, auth, database, hosting.
-9. **Git hygiene** — `.gitignore`, committed secrets risk, generated dirs.
-
-Capture concrete evidence (task names, file paths, skill counts). Prefer
-`mise tasks`, reading files, and lockfile keys over guessing.
-
-**Never print secret values.** Key *names* only.
-
-## Classify every finding
-
-Use these buckets so the report does not confuse product law with tech debt:
-
-| Bucket | Meaning |
-| --- | --- |
-| **Meets** | Implements the standard as written |
-| **Exception** | Deliberate product choice documented (e.g. vanilla JS / no build) — not a bug |
-| **Soft gap** | Partial / shared vault / docs only — should improve but not blocking |
-| **Gap** | Standard expects it; missing or wrong without a documented exception |
-| **N/A** | Guide or rule does not apply to this product shape |
-
-When project `AGENTS.md` conflicts with standards defaults, **name the conflict** —
-do not silently pick standards over product law. Exceptions that are written down
-belong in **Exception**; silent drift belongs in **Gap**.
-
-## Write the report
-
-### Path
-
-Prefer, under the **target** project:
+Default to returning the dated report in the response, with no files changed.
+If the user requests a saved report, write only that authorized file in the
+target repository. In this corpus (or a project adopting `STD-006`), use the
+next unassigned NOTE number:
 
 ```text
-reports/YYYY-MM-DD-standards-map.md
+reports/NOTE-nnn-YYYY-MM-DD-standards-map.md
 ```
 
-Use today's real date. Create `reports/` if needed.
+Read `STD-001` / `STD-006` before corpus metadata work. Do not reuse retired
+numbers, invent an original author, or use a verification date for checks not
+performed. Elsewhere follow the target's document conventions and state which
+convention was used. For a new agent-authored note, identify the agent honestly.
 
-If the user asked for stdout-only or a different path, honor that, but still offer
-to write the file.
-
-### Required sections
-
-Use this skeleton (adapt tables; do not drop sections):
-
-````markdown
+```yaml
 ---
-title: "Standards map: <project-name>"
-date: YYYY-MM-DD
-project: <path or github slug>
-standards_source: <path or github:The-Focus-AI/standards@sha>
-standards_sha: <full or short sha>
-standards_date: <commit date if known>
-mode: map   # not a migration
+number: "<next free number>"
+title: "Standards map: <project>"
+kind: note
+issued: "YYYY-MM-DD"
+author: "<actual author or agent identity>"
+status: Current
+verified: "YYYY-MM-DD"
+project: "<target path or remote>"
+standards_source: "The-Focus-AI/standards"
+standards_sha: "<full commit SHA>"
 ---
+```
 
-# Standards map — <project-name>
+Use `GDE-012` / `PRM-002`'s report structure, including:
 
-## Product in one line
+1. Product shape, target revision, corpus revision, freshness/dirty-tree caveats.
+2. Scorecard and per-STD/GDE evidence table, separating binding gaps from
+   proposed adoption recommendations; list conditional guides that are N/A.
+3. Skills diff and evidence for task, secrets, workflow, deploy, and testing
+   surfaces. No blanket requirement to match the standards repo's own tooling.
+4. Exceptions and remaining gaps, suggested next steps, decisions needed,
+   commands actually run and limitations.
 
-| | |
-| --- | --- |
-| What | … |
-| Stack | … |
-| Host | … |
-| Backend | … / none |
-| Org remote | … |
-
-## Standards revision
-
-- Source: …
-- SHA: …
-- Note if local clone may lag `origin/main`.
-
-## Scorecard
-
-| Area | Grade or status | Notes |
-| --- | --- | --- |
-| Tooling (mise/pnpm) | | |
-| Secrets (fnox) | | |
-| Agent instructions | | |
-| Skills lock | | |
-| pi | | |
-| Workflow docs | | |
-| Deploy | | |
-| App stack vs defaults | | |
-
-## Standards surface → project files
-
-| Standards concept | Expected | Project artifact | Status |
-| --- | --- | --- | --- |
-| Project agent guide | AGENTS.md | … | Meets / Gap / … |
-| Tooling / tasks | mise.toml | … | |
-| Secrets | fnox.toml | … | |
-| Skills lock | skills-lock.json | … | |
-| Issue workflow | docs/agents/issue-workflow.md | … | |
-| pi config | .pi/settings.json | … | |
-| README | human entry | … | |
-| … | | | |
-
-### Required mise tasks
-
-| Task | Expected role | Project behavior | Status |
-| --- | --- | --- | --- |
-| install | deps + skills | | |
-| dev | run app / checks | | |
-| lint | quality | | |
-| test | automated | | |
-| deploy | ship | | |
-| setup / secrets:* | onboarding | | |
-
-## Guide-by-guide applicability
-
-### Always / core for this product
-
-For each applicable guide (`best-practices/GDE-009-technology-defaults.md`, `skills.md`, `security.md`,
-`pi-extensions.md`, `organization.md`, relevant parts of `deployment.md`):
-
-- What the guide requires
-- How this project maps (paths, tasks, evidence)
-- Exceptions or soft gaps
-
-### Conditionally applicable
-
-Guides that only matter for certain shapes (or partial sections of deployment.md).
-
-### Does not apply today
-
-| Guide | Why N/A | Would apply if… |
-| --- | --- | --- |
-| vercel-deployment.md | | |
-| gcp-deployment.md | | |
-| gce-gaia-runtime.md | | |
-| clerk.md | | |
-| a2a-agent.md | | |
-
-## Skills map
-
-| Category | In standards lock | In project lock | Notes |
-| --- | --- | --- | --- |
-| Focus-owned | … | … | missing / extra / wrong source |
-| Third-party | … | … | |
-| mattpocock set | … | … | deprecated names? |
-
-Call out title-case lock keys, `to-prd` / `to-issues`, and skills not from
-`The-Focus-AI/standards` when they should be.
-
-## Architecture vs default stack
-
-| Default standard | This project | Treatment |
-| --- | --- | --- |
-| TypeScript | | Meets / Exception / Gap |
-| Build pipeline | | |
-| Neon / Postgres | | |
-| Clerk | | |
-| Vercel (if web app) | | |
-
-## How guides apply by kind of work
-
-Short routing table: work type → open which guide/skill first.
-
-## Soft gaps and gaps
-
-Prioritized list. Each item: finding, standards file, severity, suggested next step
-(`standardize-project`, manual, ignore as exception).
-
-## Mental model
-
-Optional one-diagram summary: standards shell vs product exception zone vs
-N/A stack guides.
-
-## Recommended next steps
-
-1–5 bullets. If migration is warranted, point to `standardize-project` — do not
-start migrating inside this skill unless the user explicitly asked to apply fixes.
-````
-
-## Deliver
-
-1. Write the markdown file under the target project's `reports/`.
-2. Summarize in chat: product one-liner, scorecard highlights, top gaps/exceptions,
-   path to the report, standards SHA used.
-3. Ask whether they want `standardize-project` to close gaps (only if gaps exist).
-
-## Optional modes (if the user asks)
-
-| Mode | Behavior |
-| --- | --- |
-| **Default / map** | Report only (above) |
-| **Diff skills** | Emphasize lockfile key/source/hash drift vs standards |
-| **Guides only** | Applicability matrix without full file inventory |
-| **Compare two projects** | Two targets, shared standards SHA, side-by-side scorecard |
-
-Still write a dated report unless they forbid files.
-
-## Pitfalls
-
-- **Do not invent standards.** Always resolve a real tree + SHA. Model memory is not
-  the org source of truth.
-- **Do not treat exceptions as gaps.** Documented vanilla-JS / no-build / static Pages
-  is product law when `AGENTS.md` says so.
-- **Do not apply migrations here.** That is `standardize-project`. Mixing jobs
-  confuses reviewers and rewrites repos during a "report" request.
-- **Do not dump secret values.** Names only; skip `.fnox/env` contents.
-- **Do not mark Vercel/Clerk/GCP as gaps** for a client-only static PWA — mark N/A.
-- **Stale local standards clone.** Prefer noting `HEAD` vs `origin/main` when
-  networked; if you cannot check, say the report is against the local tree only.
-- **Wrong repo edits.** Target path must stay explicit when standards and project
-  sit side by side under `The-Focus-AI/`.
+Optional requested views: guides-only, skills-only, or two projects against one
+corpus revision. State the narrower scope explicitly; do not present a partial
+map as a full audit. Offer `standardize-project` or `PRM-002` for follow-up, but
+do not start it implicitly.

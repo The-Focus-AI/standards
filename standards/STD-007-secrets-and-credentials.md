@@ -5,7 +5,7 @@ title: Secrets and credentials
 category: Practice
 status: Draft
 issued: "2026-07-25"
-revision: R1
+revision: R3
 applies-to: Every repository
 author: W. Schenk
 ---
@@ -14,12 +14,20 @@ author: W. Schenk
 
 `STD-004` says secrets reach a process through mise, from fnox, and are never
 committed. This standard says where they live before that: one vault per
-project, scoped service accounts, and a hard separation between what production
-holds and what anything else can read.
+project, scoped service accounts, and only the credentials each target needs.
+Preview behaves like production by default; differences protect against harmful
+side effects or accommodate deployment constraints, rather than existing merely
+because the environment is called preview.
 
 The rules below are mostly recovered from anti-pattern lists in four separate
 deployment documents. Each was learned once, expensively, and then filed
 somewhere nobody looks before making the same mistake.
+
+R2 replaces the blanket separation of preview and production vaults in §3.4
+with production parity by default. The production-database protection in §3.5
+and credential-scoping rules in §3.11–3.12 are unchanged.
+R3 makes personal 1Password access the recovery path and cloud secret settings
+the default delivery path for the project bootstrap token (§3.3).
 
 **Out of scope.** How environment variables reach the process, which is
 `STD-004 §3.7`. Platform deployment mechanics, which are `STD-008`. What an
@@ -52,26 +60,50 @@ circulation means rotating everything it ever touched.
 
 ### 3.3
 
-The bootstrap token MUST live in a gitignored `.fnox/env` and MUST be recoverable
-from 1Password.
+A project's bootstrap token MUST be supplied to each cloud environment through
+its scoped secret settings by a person authenticated to 1Password.
 
-`.fnox/env` holds the one credential that cannot come from fnox, because it is
-what authenticates to fnox. It is gitignored, `chmod 600`, and backed up in the
-vault it unlocks so that losing a laptop is an inconvenience rather than an
-outage.
+The person retrieves the project-scoped service-account token using their own
+1Password account; the cloud platform injects it as `OP_SERVICE_ACCOUNT_TOKEN`.
+This is not the person's account password, Secret Key, or interactive session.
+The token unlocks fnox resolution for the project, not the person's other vaults.
+
+Record the token item's location, its owner, and which cloud environments receive
+it. Recovery uses an authorized person's 1Password access without needing the
+lost token; the item does not have to be in the same vault or a different vault
+merely to satisfy a layout rule. Rotation updates each receiving environment.
+
+A gitignored `.fnox/env` with mode `600` is an optional fallback for a documented
+local-development exception, not a prerequisite for a cloud workspace. Apply the
+agent secret-file preflight before writing it. Do not persist an injected token
+into a reusable image or snapshot.
 
 ```sh
-mise run setup        # writes .fnox/env from 1Password
+mise run setup        # checks the injected bootstrap token without printing it
 mise run secrets:check
 ```
 
 ### 3.4
 
-Preview and production secrets MUST NOT come from the same vault.
+Preview environments MUST behave like production by default, with only minimal,
+documented configuration differences needed for deployment constraints or to
+prevent harmful side effects.
 
-Separate vaults, or fnox profiles pointing at separate vaults. A preview
-environment is a public URL with a guessable name and looser access; if it can
-read production credentials, then so can everything that can reach it.
+Apart from the change under test, keep the same variable names, configuration
+structure, providers, authentication flows, feature settings, and integration
+behavior. A preview that silently substitutes mocks, skips auth, or disables
+webhooks is not testing the production behavior of those paths.
+
+This does not require separate vaults, API keys, or provider accounts for every
+environment. Preview and production can share a project vault and scoped runtime
+credentials when their permissions are appropriate for both. Sharing does not
+permit preview writes to the production database (§3.5), distributing
+control-plane credentials (§3.11), or exporting unrelated secrets (§3.12).
+
+Examples of necessary differences include preview URLs and OAuth callbacks,
+a separate database branch, or restricting delivery to test email recipients.
+Record each difference, its reason, and the production behavior it leaves
+unverified in the project's environment matrix (`STD-008 §3.4`).
 
 ### 3.5
 
@@ -85,9 +117,10 @@ production data, and nothing in the review process would catch it.
 
 A secret value MUST NOT be passed as a deployment flag.
 
-Not `--set-env-vars`, not a dashboard field typed by hand, not a CI variable
-with no upstream. Values go into the platform's secret store from fnox, so that
-one place remains authoritative and rotation is one action rather than a search.
+Not `--set-env-vars` or a CI variable with no upstream. Application credentials
+go into the platform's secret store from fnox, so one place stays authoritative.
+The bootstrap token is the deliberate exception to fnox-based delivery (§3.3):
+a person retrieves it from 1Password and enters it in scoped cloud secret settings.
 
 ### 3.7
 

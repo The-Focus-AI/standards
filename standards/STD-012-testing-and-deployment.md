@@ -5,7 +5,7 @@ title: Testing and deployment
 category: Practice
 status: Draft
 issued: "2026-10-23"
-revision: R1
+revision: R3
 applies-to: Every repository worked by an agent that has tests or deploys
 author: W. Schenk
 ---
@@ -34,7 +34,7 @@ flowchart LR
     CI --> PV[preview deployment]
     PV --> SM[tests against preview]
     SM --> RV[human review]
-    RV --> ST[stage] --> GT{sign-off gate} --> PROD[production]
+    RV --> GT{release gate} --> PROD[production]
     CI -- failure on main --> IS[issue opened or linked]
     PROD -- failure --> IS
     IS --> SL[Slack notification]
@@ -91,7 +91,7 @@ A test that CI runs MUST NOT require secrets, data or services that exist only
 on a developer's machine.
 
 Use a disposable service in the job (a Postgres service container, a local
-emulator), fixtures committed to the repository, or preview-scoped credentials
+emulator), fixtures committed to the repository, or appropriately scoped credentials
 from fnox under `STD-007`. A test that needs a laptop to pass will be skipped
 by the first agent that cannot reach one.
 
@@ -121,19 +121,21 @@ gh api "repos/:owner/:repo/commits/$SHA/status" \
 ### 3.7
 
 A pull request that changes a deployed surface MUST have smoke or end-to-end
-tests run against its preview before it is marked ready for review.
+verification of its release candidate before it is marked ready for review.
 
-A green unit suite says the code agrees with itself; a green run against the
-preview says the deployment works with real routing, environment and build
-output. The run's result is evidence under `STD-003 §3.8`.
+Run against the preview when the platform provides one. If the documented
+platform limitation in §3.5 prevents that, exercise the production build/start
+path in the reproducible cloud workspace and record the deployment behavior
+that remains unverified. Neither a unit suite nor a laptop-only run substitutes
+for this check. The run's result is evidence under `STD-003 §3.8`.
 
 ### 3.8
 
-A preview MUST use preview-scoped data and credentials.
+A preview MUST follow the environment and credential rules in `STD-007`.
 
-This restates `STD-007` at the point where it is most often broken: a preview
-that is convenient to point at production data is one bad migration away from
-destroying it.
+That standard owns production parity, justified differences, scoped runtime
+keys, and protection from preview writes to the production database. There is
+no second, testing-specific requirement for separate vaults or provider accounts.
 
 ### 3.9
 
@@ -159,13 +161,14 @@ change to the code.
 
 ### 3.11
 
-A production release MUST pass through a staging environment and a named
-sign-off gate before it reaches production.
+A production release MUST pass its recorded sign-off gate before deployment.
 
-The gate names what must be true and who decides it — "five priority feeds
-validated for HOV and revenue, signed off by the data owner" — so that "ready
-for production" is a checkable statement rather than a feeling. An agent MUST
-NOT pass a gate; it can report that the conditions hold.
+No separate staging environment is required. Verify the release candidate in
+preview (or the documented §3.7 alternative), record the evidence and required
+approval, then deploy that candidate through CI. A gate names what must be true
+and who decides; an agent reports evidence but cannot supply a required person's
+approval. The gate follows the project's recorded maturity under §3.20–3.21;
+a maturity value does not itself grant merge or deployment authority.
 
 ### 3.12
 
@@ -173,8 +176,8 @@ A failing blocking check on the default branch, a failed production deployment,
 or a failed scheduled check MUST open an issue or link to the open issue that
 already describes it.
 
-A failure nobody owns does not get fixed. Opening an issue puts it on the
-frontier under `STD-002`; linking instead of opening keeps one failure from
+A failure nobody owns does not get fixed. Opening an issue puts it in the
+backlog until readiness is assessed under `STD-002`; linking keeps one failure from
 becoming twenty duplicates, which `STD-002 §3.19` already asks for.
 
 ### 3.13
@@ -199,11 +202,12 @@ the automation already knew.
 
 ### 3.15
 
-An automated issue MUST NOT be labelled `ready`.
+An automated issue MUST satisfy `STD-002 §3.4–3.5` before being labelled `ready`.
 
-`STD-002 §3.5` forbids an agent moving an issue into `ready`, and automation is
-an agent for this purpose. Apply `automated` (and `bug` where applicable) so a
-person can triage it.
+A raw failure report usually lacks a goal, scope, or verification plan and stays
+in backlog. A person or agent can complete those and assess readiness; neither
+the `automated` label nor a failing check makes a ticket ready by itself. Apply
+`automated` (and `bug` where applicable) to describe origin and kind, not state.
 
 ### 3.16
 
@@ -234,7 +238,8 @@ agent reading the issue. A human reply in the Slack thread becomes an issue
 comment attributed to its author; a resolving match — a later passing run of the
 same `fp:…` fingerprint, a fix PR, or a recovered feed — posts a comment carrying
 `<!-- resolved-by:<url-or-sha> -->` and mirrors that update to the Slack thread.
-The issue closes only through its pull request or by a person, per `STD-002 §3.18`.
+Issue closure follows `STD-002 §3.18`, including its linked-duplicate exception.
+A recovery notification alone does not authorize an agent to close the original.
 
 ### 3.19
 
@@ -247,6 +252,42 @@ benchmarks and thresholds, sign-off gates, and Slack channel in
 and `## Alerting` (marking `N/A` where a section does not apply) — so that an
 agent scaffolding workflows and a person approving a release read and validate
 the same file.
+
+### 3.20
+
+A repository MUST record its owner-approved product maturity as `alpha`,
+`client-testing`, or `production` in `AGENTS.md`.
+
+Record the owner, approval date, and rationale alongside the value, including
+when it changes. An agent may recommend a classification and collect evidence;
+a person approves it. Missing or unassessed maturity is a gap, not an implicit
+`alpha` classification.
+
+Maturity describes who relies on the product, not its deployment topology or
+the existence of a production URL. It is not a ticket label: `ready` still means
+actionable at every maturity (`STD-002 §5`).
+
+### 3.21
+
+A release gate MUST apply the verification and approval profile for the
+project's recorded maturity.
+
+| Maturity | Who relies on it | Verification before release | Release gate |
+| --- | --- | --- | --- |
+| `alpha` | Internal exploration; no client operational dependency | Lint/test and smoke-test the changed workflow in a cloud preview; record known gaps. | Project owner may explicitly delegate bounded, reversible releases. No delegation is inferred from this label. |
+| `client-testing` | A named client is evaluating representative workflows | Alpha checks plus client acceptance scenarios, representative data, and clear known limitations. | Named owner accepts client-visible changes; record client acceptance where the agreed test plan requires it. |
+| `production` | People depend on the product for real work | Regression checks plus relevant auth, client-isolation, data, and migration checks; verified release candidate and rollback path. | Explicit release approval under the recorded gate, with an operational owner and recovery plan. |
+
+Record the actual checks, approver, evidence links, and any bounded delegation
+in `docs/testing.md`, referring to the maturity in `AGENTS.md` rather than
+maintaining a second value. Delegation names the permitted actions and limits;
+it does not waive the merge gates in `STD-003`.
+
+These profiles add to the applicable requirements; they do not relax security
+or grant authority for external actions. Cloud-first development (`STD-005`),
+production-like previews and data protection (`STD-007`), and client-specific
+OAuth (`STD-009`) apply at every maturity. The §3.7 cloud verification alternative
+applies where previews are unavailable; no separate staging is required.
 
 ## 4. References
 

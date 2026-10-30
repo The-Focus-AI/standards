@@ -5,20 +5,20 @@ kind: guide
 issued: "2026-07-25"
 author: W. Schenk
 status: Current
-verified: "2026-07-25"
+verified: "2026-10-28"
 ---
 
-> Bootstrap rules are STD-005; this is the package list.
+> Bootstrap rules are `STD-005`; this guide locates the package configuration.
 
 # Pi extensions
 
-Make sure that pi is installed using
-mise use npm:@earendil-works/pi-coding-agent
+The canonical package list is `.pi/settings.json`, under `packages`. Read it
+directly instead of maintaining a second list here:
 
-And then these are installed using pi install -l
+```sh
+node -e 'console.log(JSON.parse(require("node:fs").readFileSync(".pi/settings.json", "utf8")).packages.join("\n"))'
+```
 
-- git:github.com/offline-ant/pi-tmux
-- npm:pi-powerline-footer
-- npm:pi-web-access
-- npm:pi-lens
-- npm:pi-xai
+`mise.toml` declares pi. Run `mise install` to install tools; pi reads its local
+package configuration on startup. The package entries currently have no
+version or commit suffixes: they are declared, not revision-pinned.

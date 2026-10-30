@@ -1,6 +1,10 @@
 # Scene Extension Examples
 
-Creating videos longer than 8 seconds by extending scenes up to 148 seconds total.
+Prompt patterns for extending scenes. Complete `../SKILL.md`'s approval,
+mise, and fnox preflight first; bare commands assume its authorized
+`mise exec -- fnox exec -- bash` shell. Limits and duration labels below are
+historical source guidance, not live-verified provider guarantees. Measure
+actual returned clips before composing them or promising a total runtime.
 
 ## How Scene Extensions Work
 
@@ -41,7 +45,9 @@ Golden hour lighting, paradise aesthetic. Smooth, stabilized movement.
 --output output/island-initial.mp4
 ```
 
-This generates `island-initial.mp4` (8 seconds) and `island-initial.uri` (for extensions).
+The requested video is `island-initial.mp4`. The CLI writes `island-initial.uri`
+only when the provider returns a URI; the bytes-only response path has no
+sidecar and cannot be extended by this CLI. Keep the sidecar private.
 
 ### Step 2: First Extension (~15 seconds total)
 
@@ -72,17 +78,11 @@ Paradise beach documentary style. No subtitles." \
 
 ### Step 4: Optional Post-Processing
 
-If you want seamless playback, concatenate the clips:
-
-```bash
-# Create a file list
-echo "file 'island-initial.mp4'" > filelist.txt
-echo "file 'island-ext1.mp4'" >> filelist.txt
-echo "file 'island-ext2.mp4'" >> filelist.txt
-
-# Concatenate with ffmpeg
-ffmpeg -f concat -safe 0 -i filelist.txt -c copy output/island-complete.mp4
-```
+Inspect the returned clips first: an extension may include the preceding
+footage, so blindly concatenating every output can repeat the scene. If editing
+is needed, check the available ffmpeg version and help, account for overlap and
+matching streams, and inspect the result. Ask before adding an editor or
+renderer; post-processing is not a generation preflight.
 
 ## Complete Extension Examples
 
@@ -193,7 +193,6 @@ Studio lighting creates gleaming reflections on the metal.
 Premium product commercial aesthetic. Clean white background.
 No sound, pure visual. No subtitles." \
 --duration 8 \
---no-audio \
 --output output/watch-01.mp4
 ```
 
@@ -207,7 +206,6 @@ Lighting continues to highlight premium materials and craftsmanship.
 Same studio lighting and white background. Continue smooth orbit motion.
 No sound. No subtitles." \
 --extend output/watch-01.mp4 \
---no-audio \
 --output output/watch-02.mp4
 ```
 
@@ -268,21 +266,15 @@ The last second of each clip becomes the anchor for the next extension.
 
 ## Cost Considerations
 
-Each extension costs the same as initial generation:
-
-- **veo-3.1-fast-generate-preview**: $0.15/second = ~$1.05 per extension
-- **veo-3.1-generate-preview**: $0.50/second = ~$3.50 per extension
-- **With audio enabled**: 1.5x cost multiplier
-
-A 30-second video (4 extensions) with audio costs:
-
-- Fast model: ~$6.30
-- Premium model: ~$21.00
+Confirm current provider pricing and approve a bounded iteration budget.
+Historical per-second rates and audio multipliers are not a quote. Version
+1.0.10 parses audio flags but does not forward them to the API; `--no-audio`
+does not guarantee lower cost or silence.
 
 **Cost optimization tips:**
 
 - Use `--video-fast` for development iterations
-- Use `--no-audio` if audio isn't critical
+- Review the prompt before spending on another extension
 - Test with shorter durations before committing to many extensions
 - Generate separate clips and edit together if budget is tight
 
@@ -300,7 +292,7 @@ A 30-second video (4 extensions) with audio costs:
 
 **Solutions**:
 
-1. Use ffmpeg cross-fade transitions (see post-processing example)
+1. Inspect overlap and use an approved editor for transitions if needed
 2. Ensure final frame of previous clip has smooth motion
 3. Describe continuity more explicitly in extension prompt
 

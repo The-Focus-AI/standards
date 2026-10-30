@@ -2,6 +2,10 @@
 
 This guide covers the principles and techniques for crafting effective prompts for image generation with Google Gemini models.
 
+Before executing examples, complete `SKILL.md`'s mise/fnox preflight and obtain
+generation approval. Bare `nano-banana` commands assume its authorized
+`mise exec -- fnox exec -- bash` shell, not an auto-installing `npx` invocation.
+
 ## Table of Contents
 
 1. [Prompt Structure](#prompt-structure)
@@ -271,13 +275,13 @@ After generating, refine with editing:
 
 ```bash
 # Original generation
-npx @the-focus-ai/nano-banana "mountain sunset" --output v1.png
+nano-banana "mountain sunset" --output v1.png
 
 # Edit to improve
-npx @the-focus-ai/nano-banana "make the sunset colors more vibrant and dramatic" --file v1.png --output v2.png
+nano-banana "make the sunset colors more vibrant and dramatic" --file v1.png --output v2.png
 
 # Further refinement
-npx @the-focus-ai/nano-banana "add a subtle mist in the valley" --file v2.png --output v3.png
+nano-banana "add a subtle mist in the valley" --file v2.png --output v3.png
 ```
 
 ---

@@ -1,100 +1,193 @@
 ---
 number: "005"
-title: "Standards gap register: what is practised but not written"
+title: "Standards gap register: inconsistencies and unresolved decisions"
 kind: note
 issued: "2026-07-25"
 author: W. Schenk
 status: Current
-verified: "2026-10-22"
+verified: "2026-10-30"
 ---
 
 # Standards gap register
 
-An inventory of practice this organisation follows, or has decided to follow,
-that no standard records. Produced while writing `STD-001` through `STD-006`, so
-that the same gaps stop being rediscovered one conversation at a time.
+Review began on 2026-10-28 and was updated by an Amp agent on 2026-10-30:
+12 standards, 14 guides,
+6 notes, 4 decision records, 2 prompts, design document, 15 skill entry points,
+and relevant supporting code/templates. Findings are repository comparisons,
+not an audit of deployed projects. Recommendations are agent judgements under
+`STD-006 §3.8` unless attributed to the maintainer below; no draft was ratified.
 
-Written per `STD-006`. Decided autonomously by an agent from repository evidence
-and flagged as such per `STD-006 §3.8` — every judgement below about what
-"should" be written is a recommendation, not a decision.
+Only `STD-001` is In force. The other standards are Draft: conflicts below need
+resolution before adoption, not claims that the fleet violates binding policy.
+Historical notes and accepted decisions remain evidence of their original dates.
 
-## The distinction that matters
+## Maintainer decisions during review
 
-`STD-001` records **current understanding**. That premise makes two of the three
-categories below safe to write and one of them dangerous.
+On 2026-10-28, the maintainer directed that "the preview should behave like
+production by default" [3], rejecting blanket separation of environment keys
+and vaults. `STD-007` R2 replaces §3.4 accordingly, retaining Draft status and
+the existing database-write and credential-scoping protections. `GDE-003` and
+`GDE-010` now describe production parity with minimal, documented exceptions;
+their isolated-environment layouts are options rather than universal defaults.
+On 2026-10-29, the maintainer also directed [3]:
 
-- **A — practised and unwritten.** The organisation already does it, consistently
-  enough to observe. Writing it down is recording. Low risk.
-- **B — practised inconsistently, or declared and never elaborated.** Writing it
-  requires somebody to decide which way it goes. Cheap to write once decided,
-  impossible to write before.
-- **C — not practised at all.** Writing a standard here would be inventing rules
-  at a desk and binding a fleet to them. That is the cargo-cult failure inverted,
-  and it is worse than the gap.
+- **No mandatory staging:** `STD-012` R2 retains release verification and approval
+  but removes the separate staging environment. Existing client-specific staging
+  plans remain historical examples, not a fleet requirement.
+- **OAuth per client, always:** `STD-009` R3 and `GDE-002` now require client-specific
+  provider registrations and credentials in every environment. Reuse within a client
+  remains distinct from sharing across clients.
+- **Personal retrieval, cloud injection:** `STD-007` R3 describes a person retrieving
+  the project token with their 1Password account and supplying it to scoped cloud
+  secret settings. The agent's interpretation is a project-scoped service-account
+  token, not the person's account password, Secret Key, or login session.
+- **Cloud-first development:** `STD-005` R3 and `GDE-006` make the cloud workspace
+  the development runtime. The laptop provides browser review and authentication;
+  genuine hardware/network exceptions are recorded rather than silently required.
+- **Agents may establish readiness:** `STD-002` R2 permits `ready` after checking
+  specification completeness and unresolved decisions. Merge/deploy authority is
+  unchanged. State labels stay mutually exclusive; maturity is not a ticket label.
+- **Maturity profiles accepted:** on 2026-10-29 the maintainer agreed with the
+  proposed alpha / client-testing / production map [3]. `STD-012` R3 now owns it
+  in §3.20–3.21; templates and the testing guide refer there rather than duplicating
+  it. This accepts the draft's direction, not ratification or a release delegation.
 
-## Since this was written
+On 2026-10-30, the maintainer approved linked duplicate-ticket closure and the
+latest skills CLI upgrade [3]. `STD-002 §3.18` now permits a verified duplicate
+to close while the original stays open; the PR and failure-routing references
+follow that exception. The maintainer also requested an internal-skill inventory.
+The subsequent "fix all of it" request [3] was implemented with the proposed
+smaller internal default: `setup-project` and `work-next-issue`. All 88 external
+selections remain; the other 13 internal sources stay available on demand.
+This is a repository inventory choice, not a new fleet-wide requirement.
 
-`main` consolidated every Focus-authored skill into `skills/` and turned three
-prompts into skills, which resolves two category A rows and changes a third:
+## Corrections in this cleanup
 
-- **Prompt files** — three of the four became skills with enforced frontmatter,
-  validated by `mise run skills:check`. The one remaining prompt now carries
-  `kind: prompt`. The gap is closed by main's work rather than by a standard.
-- **pi extension set** — still a 260-byte guide that does not list the five
-  packages actually pinned. Unchanged.
-- **Testing and deployment** — `STD-012` (Draft) and
-  `best-practices/GDE-014-testing-and-preview-pipeline.md`, written 2026-10-22
-  from practice in the UpperHand repositories and the A+E data-QA work.
-  Incident response stays in category C: `STD-012` covers detection and
-  routing, not rollback.
-- **Skills themselves** became a document class with a validator, so "how a
-  skill is authored" is now a live question rather than a hypothetical one.
+These describe the accompanying working-tree changes, not a deployed release.
 
-## A — Practised and unwritten
+- **Bootstrap safety:** new projects lacked `.gitignore`, so `.fnox/env` was
+  stageable. The template now ignores credentials/caches; repeat bootstrap still
+  preserves an existing ignore file. Existing projects need a separate ignore audit.
+  At the maintainer's request [3], repository and generated-project agent instructions
+  now require a preflight before setup or writing secrets: check ignore coverage,
+  preserve existing rules, and flag already tracked secret files without exposing them.
+- **Install terminology:** `mise install` installs tools; `mise run install`
+  runs project setup. `STD-004`, `STD-005`, and active walkthroughs now distinguish them.
+- **Secret examples:** removed unfiltered Vercel/GSM sync loops and the broken
+  fnox Dockerfile; removed conflicting Vercel token-only instructions. Presence
+  checks no longer print a database URL. `scripts/sync-secrets.mjs` replaces the
+  loops with explicit target/source mappings, runtime allowlists and dry-run by
+  default. Preview and production can intentionally use the same runtime profile.
+  Its 15 offline tests cover wrong-profile/admin-key rejection, exact string
+  transfer, preflight, and partial failures; no provider writes were performed.
+- **Skill restoration:** raw CLI restore still does not enforce hashes [1,4].
+  `scripts/restore-skills.mjs` stages the CLI's output, checks immutable refs,
+  canonical paths, completeness, lock drift and installed hashes, then replaces
+  the canonical directory. Failure preserves the existing installation; unknown
+  skills cause a refusal rather than deletion. Both identical locks were generated
+  through CLI 1.7.4 and now contain 90 pinned entries. A fresh networked restore
+  verified the full set without changing the lock. This does not certify every
+  external skill's behavior.
+- **Authority and metadata:** navigation distinguishes drafts from binding rules;
+  `PRM-002` distinguishes adoption recommendations from nonconformance and lock
+  drift from proven staleness. `STD-006` no longer assigns `Superseded` to standards.
+- **Duplication and stale claims:** `GDE-007` reads the pi package list from
+  configuration; the skill register no longer repeats third-party counts. Navigation
+  includes testing guidance, repository visibility is public [2], and `DESIGN.md`
+  distinguishes the implemented Markdown renderer from the unimplemented MDX design.
+- **Metadata validation:** the renderer and validator now share the same schema,
+  date, identity and replacement-pointer checks. Invalid metadata/duplicates fail
+  before the renderer replaces existing output. Negative parser/CLI fixtures
+  cover these contracts. Mechanical checks still do not prove clauses agree.
+- **Cloud bootstrap:** root and template `setup` check an injected token without
+  writing one to disk. The previously undeclared `op` dependency is mise-managed;
+  installation and CLI help were verified, not access to any real vault.
+- **Readiness and release consumers:** removed the partial claim shell recipes,
+  aligned the issue skill and audit prompt with agent-set readiness, and made the
+  generic testing record independent of UpperHand's provisional thresholds/staging.
+  Acceptance outcomes and the verification plan are now distinguished in `STD-002`.
+  Branch creation refuses an existing branch instead of resetting it.
+- **Bootstrap and tasks:** a brief-driven `--emit-prompt` handoff combines the
+  setup skill with canonical templates without invoking an agent or writing files.
+  Missing project checks/deployments fail clearly; frozen installs never retry
+  unfrozen. Root lint/test work offline without credentials; Docker is a separate
+  integration task. New PR CI and `docs/testing.md` record the actual checks and
+  explicitly unconfigured external gates. Tool pins include the tested fnox
+  1.45.0 and skills 1.7.4; Python and jq are declared.
+- **Optional skills:** removed private Claude-plugin binary assumptions, global
+  PPTX installs, duplicated palettes in deck code, and unpinned Nano Banana
+  commands. Browser/PDF tooling has an executable preflight; deck mechanics map
+  project tokens instead of imposing Focus branding. Research/audit skills use
+  numbered provenance and current standards rather than obsolete workflow files.
+- **Diagnostics and cleanup:** one Clerk diagnostic handles live/test prefixes;
+  six synthetic cases passed. `GDE-013` independently registers each acquired
+  resource's cleanup; success, registration failure and unregister failure were
+  exercised against the upstream substrate. Docker instructions now identify
+  their generator and no longer mount personal authentication directories.
 
-| Gap | Evidence |
-| --- | --- |
-| Repository naming | Client repos prefix by client (`upperhand-ae`, `upperhand-cp`, `upperhand-versant`, `upperhand-landing`); experiments prefix `weekend-`; event repos lead with the date (`2026-04-20-ai-engineering-miami`). A real convention, followed, unwritten. |
-| Commit messages | Agents author nearly all of them. A consistent shape is in use — imperative subject, body explaining why rather than restating the diff, trailers — but nothing specifies it. `git log` is the only record of intent that outlives a tracker. |
-| Prompt files | **Largely resolved.** Three of four became skills under `skills/`, validated by `mise run skills:check`; the remainder carries `kind: prompt`. What a *skill* must contain is now the open question. |
-| pi extension set | `.pi/settings.json` pins five packages. `best-practices/GDE-007-pi-extensions.md` is 260 bytes and does not list them. Belongs in `STD-005`. |
-| Test entry point | **Addressed in draft.** `STD-012` (Draft) specifies when tests run, blocking vs advisory checks, preview verification, benchmarks, release gates and the failure → issue → Slack loop; `best-practices/GDE-014-testing-and-preview-pipeline.md` is the walkthrough. Where tests live inside a repository is still left to `STD-004`. |
-| Lint configuration | `.markdownlint-cli2.jsonc` pins line length 120, disables MD025 and MD033. Covered by `STD-004 §3.9`; no separate standard needed. |
+## Remaining integration and delivery limits
 
-## B — Needs a decision before it can be written
+| Area | What remains | Required next evidence |
+| --- | --- | --- |
+| Secret sync | Real vault/provider permissions and existing target configuration have not been exercised. Upserts/version writes are not atomic and ambiguous failures need reconciliation. | Authorized test targets, then inspected receipts and exact destination values without logging them. No production mutation is authorized by this review. |
+| Published skill pins | Internal entries point to the last published commit, not the corrected local sources. Two removed/renamed external names retain their last available revisions. | Publish only after approval; refresh internal pins through the CLI afterward. Treat replacement of the two external capabilities as an explicit inventory change. |
+| Shared-identity claims | A read-back cannot distinguish sessions using the same GitHub identity. The skill stops for repository-specific coordination. | An approved tracker/session-claim design and concurrency tests; no invented remote locking protocol is presented as working. |
+| CI/release/alerting | Workflow files exist, but GitHub execution, branch protection, owner maturity/release approval and issue/Slack routing are unverified or unconfigured. | Owner-authorized setup and a real failure/recovery exercise. `GDE-014` now labels routing as an outline, not copy-paste automation. See `docs/testing.md`. |
+| Docker | `test:docker` stops because this orb has no reachable Docker daemon. | Build/smoke checks in a Docker-capable cloud workspace; no image pass is claimed. |
+| Optional integrations | Browser commands and pagination readiness were exercised; Nano Banana flags were source-checked. No generated PPTX was rendered and no paid media generation was run. | Approved dependencies/renderers and scoped provider access in a consuming project. Installing skill text does not install its tools. |
 
-| Gap | What is undecided |
-| --- | --- |
-| Repository layout | The zero-byte `organization.md` was deleted rather than written, so the question it stood for is still open: what layout is actually required of a repository? |
-| "Verification plan" | `STD-002 §3.4` requires a `ready` issue to carry one, and the term is defined nowhere. `STD-003 §3.7` separately requires checkable success criteria. These are probably one concept with two names across two standards — **an outright defect in shipped text**, and the first thing to fix. |
-| TypeScript and pnpm | `best-practices/GDE-009-technology-defaults.md` gives it two lines: use TypeScript and pnpm, avoid a build step where possible. Module layout, error handling, and what "avoid a build step" means in practice are unstated. |
-| Database | "Use neon/postgres" is one line. Migrations, schema conventions, connection handling, and what happens in preview environments are unstated — and `STD-003 §3.9` already leans on preview-scoped credentials that no standard defines. |
-| Code review | A `code-review` skill exists and `STD-003` requires human approval, but what a reviewer must check is unwritten. Without it, "approved" means whatever the reviewer felt like that day. |
-| Skill authoring | `best-practices/GDE-008-skills.md` covers installing skills. Nothing covers writing one, though `skill-creator` is installed. |
-| Model selection | `.pi/extensions/gengen.ts`, `pi-local-models`, and the gateway model IDs in `DESIGN.md` all imply a policy. None is written. |
-| Secrets policy | **Resolved.** `STD-007` now covers vaults, service-account scoping, preview isolation, and rotation; `security.md` was absorbed and deleted. |
+## Verification on 2026-10-30
 
-## C — Not practised; writing it would be inventing
+- `mise run --deny-net --deny-env test`: 86 Node tests and 13 bootstrap assertion
+  groups passed. Fixtures exercise actual entry points without real credentials.
+- `mise run --deny-net --deny-env lint`: passed Markdown, 15 registered skills,
+  90 immutable lock entries/parity, design, rendering and 39 document checks.
+- The actual fnox 1.45.0 subprocess preserved quoted/multiline Unicode fixture
+  values, applied a named-profile override and excluded an unselected key.
+- Full 90-skill restoration from GitHub passed content and unchanged-lock checks;
+  provider integration tests use simulated HTTP responses, not live accounts.
+- `mise run test:docker`: blocked by the missing daemon, not passed or skipped
+  silently. No external CI, deployment, OAuth sign-in or real token resolution was run.
 
-Recorded so nobody mistakes the silence for an oversight.
+## Minimize by giving each procedure one owner
 
-- Observability, logging, tracing, error tracking. The design prototypes showed
-  an "Observability" section precisely because nothing exists behind it.
-- Incident response and rollback.
-- Data retention and privacy.
-- Dependency update cadence. `skills update` is documented as a command, not as
-  a policy.
-- Accessibility beyond the standards site, which `DESIGN.md` covers for itself.
+Keep clauses in standards; secret concepts in `GDE-003`; Vercel delivery in
+`GDE-010`; GCP delivery in `GDE-005`; Clerk diagnostics in `GDE-002`; copyable
+scaffolds in `templates/default-project/`; exact skill selection in the lock.
+Guides explain and link to those sources rather than maintaining alternate copies.
+Preserve clause addresses, decision history, and unique working procedures when moving content.
 
-Each of these becomes category B the moment one project does it deliberately.
-The right move is to notice when that happens, not to pre-write the rule.
+The earlier gaps in naming, commit conventions, repository layout, code review,
+database conventions, model selection, and fleet-wide accessibility remain
+unsettled. Do not invent observability, rollback, privacy, or
+dependency-cadence policy merely to fill a section; gather project evidence first.
 
-## Recommended order
+## Sources and limits
 
-1. **Define "verification plan"**, or merge it into success criteria. It is a
-   dangling normative reference in an already-written standard.
-2. **Migrate category A**, which is recording rather than deciding: naming,
-   commit messages, prompts, pi extensions.
-3. **Take the remaining category B decisions** in order of blast radius. Secrets
-   is done (`STD-007`); repository layout and code review are next.
-4. **Leave category C alone** until somebody practises it.
+[1] Previously pinned `skills` v1.5.13 source:
+[runInstallFromLock](https://github.com/vercel-labs/skills/blob/9a7d8acfbf29f9cced7fb5a504da1d65b484aed3/src/install.ts)
+and [runAdd](https://github.com/vercel-labs/skills/blob/9a7d8acfbf29f9cced7fb5a504da1d65b484aed3/src/add.ts).
+Source inspection, not a networked restore or verification of newer releases.
+
+[2] [GitHub repository metadata](https://api.github.com/repos/The-Focus-AI/standards),
+checked 2026-10-28: `private: false`, `visibility: public`.
+
+[3] Maintainer direction in the
+[corpus cleanup discussion](https://ampcode.com/threads/T-01a18374-3137-77e5-a2c3-97f63f600432),
+2026-10-28–30. The draft revisions and agent preflight are requested changes,
+not ratification or authorization to change deployed credentials.
+
+[4] `skills` v1.7.4 [release metadata](https://registry.npmjs.org/skills/1.7.4)
+and [restore source](https://github.com/vercel-labs/skills/blob/a80e4c9d12d607631249d4d7d059f835d4b2f13a/src/install.ts),
+checked 2026-10-30 against the published CLI using isolated Git fixtures.
+Canonical/adapter selection, pinned/moving refs, tampered hashes, missing skills,
+update scope, and removal were exercised. `skills check` was also verified to
+mutate content and locks; `GDE-008` now warns against using it for read-only audits.
+The full public-source inventory was restored separately with the verification
+wrapper. Private-source authentication and individual skill behavior remain outside
+that check.
+
+Other evidence is the local corpus and implementation named in each row, plus
+`mise install --help` and a temporary bootstrap demonstrating `.fnox/env` was
+not ignored. No production credentials were resolved, deployments changed,
+external issues filed, or dependent repositories migrated.

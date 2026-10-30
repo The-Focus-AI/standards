@@ -1,10 +1,9 @@
 # Publishes the rendered corpus to GitHub Pages.
 #
 # The site is built by CI and never from a workstation (STD-008 §3.10), so what
-# is published is always what is on main. The renderer is the conformance check
-# (STD-001 §4): a document that does not satisfy STD-001 or STD-006 makes
-# `standard:render` exit non-zero, the job fails, and nothing deploys. A
-# non-conforming standard cannot reach the site.
+# is published is always what is on main. The renderer and three validators
+# check structure, metadata, skills, and design before publishing. They do not
+# replace a review of requirements, citations, or runnable examples (STD-001 §4).
 name: Publish the standards site
 
 on:

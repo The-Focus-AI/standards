@@ -1,10 +1,12 @@
 # Default Focus.AI CI — runs the same mise tasks a developer runs (STD-012 §3.1, STD-004).
-# Mark the `check` job as required in branch protection. Advisory jobs stay optional.
+# An authorized owner still needs to configure branch protection; this file does not.
 name: ci
 on:
   pull_request:
   push:
     branches: [main]
+permissions:
+  contents: read
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true

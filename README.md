@@ -39,32 +39,34 @@ revised in place.
 | `STD-002` | Issue states, the frontier, claiming, and what an agent comments. | Draft |
 | `STD-003` | Branches, pull requests, the description format, and merge gates. | Draft |
 | `STD-004` | Tooling through mise and the four required tasks. | Draft |
-| `STD-005` | Agent environment bootstrap for Cursor, Copilot, and Claude Code. | Draft |
+| `STD-005` | Cloud-first development and bootstrap for Amp, Cursor, and other agents. | Draft |
 | `STD-006` | Provenance and numbering for every other document class. | Draft |
 | `STD-007` | Secrets, vaults, and credential scoping. | Draft |
 | `STD-008` | Deployment rules common to every platform. | Draft |
 | `STD-009` | Authentication and per-client isolation. | Draft |
 | `STD-010` | Agent services — the seven required patterns. | Draft |
 | `STD-011` | Agent skills: installation, pinning, and updates. | Draft |
+| `STD-012` | Testing, preview verification, release gates, and failure routing. | Draft |
 
 A standard in **Draft** binds nothing. It reflects current understanding and is awaiting
 ratification, which only a person can give (`STD-001 §3.14`).
 
-## Rendering is the conformance check
+## Render and validate
 
 ```bash
 mise run standard:render    # renders the whole corpus to out/standards/
+mise run docs:validate      # checks provenance, numbering, and document classes
+mise run skills:check       # checks skills and their register
+mise run design:validate    # checks design tokens and contrast
 mise run standard:preview   # …and serves it at http://localhost:8900/
 ```
 
-The renderer refuses to emit a page for a document that does not conform — missing
-frontmatter, a clause with no requirement level, a filename that disagrees with its
-number. Conformance is not a separate audit: if it renders, it conforms. `out/standards/`
-also carries `standards.html`, the entire corpus as one self-contained file for sharing.
+The renderer checks clause structure and required metadata; the validators cover
+additional provenance, numbering, skill, and design constraints. Passing these checks
+does not prove that requirements agree or examples work. `out/standards/standards.html`
+bundles the published corpus in one self-contained file for sharing.
 
-The same command runs in CI. A push to `main` that touches a document rebuilds the site
-and publishes it; a document that does not conform fails the job and nothing deploys, so
-the published corpus is always a conforming one.
+CI runs all four checks before publishing changes to the corpus on `main`.
 
 ## Using the standards on a project
 
@@ -72,20 +74,11 @@ Skills are installed from this repository, not from the website — the site is 
 readable rendering, the repo is what the `skills` CLI pulls from. It is public, so no
 authentication is needed.
 
-```bash
-# a new project: empty directory to `mise dev`          — see GDE-011
-skills add The-Focus-AI/standards --skill setup-project -y
-
-# an existing project: where does it stand?             — see GDE-012
-skills add The-Focus-AI/standards --skill standards-map -y
-
-# …then close the gaps
-skills add The-Focus-AI/standards --skill standardize-project -y
-
-# …or paste PRM-002 for the full bring-up-to-current-standards loop
-# (skills-lock diff, every STD/GDE, gap report, draft PRs — no merge)
-# prompts/PRM-002-bring-project-up-to-standards.md  — see GDE-012
-```
+Use the pinned-source installation procedure in `GDE-008`, selecting only the
+capability needed: `setup-project` for a new project (`GDE-011`), `standards-map`
+for an audit, or `standardize-project` for an approved migration (`GDE-012`).
+Defaults retain the external inventory plus `setup-project` and `work-next-issue`;
+other owned skills, including PPTX and Focus branding, remain available on demand.
 
 `standards-map` is read-only and produces a dated report; `standardize-project` changes
 files, after a plan you approve. Run the map first. For a copy-pasteable agent
@@ -94,56 +87,66 @@ guide, writes a gap report, then opens fix PRs without merging, use `PRM-002`.
 
 ## Quick start — this repository's container
 
-Build and run the container:
+Build and run the container in a Docker-capable cloud workspace:
 
 ```bash
 docker build -t focus-ai-standards-agent .
-docker run -it --rm -v ~/.pi:/home/agent/.pi focus-ai-standards-agent
+docker run -it --rm --env OPENAI_API_KEY --env OP_SERVICE_ACCOUNT_TOKEN focus-ai-standards-agent
 ```
 
-Inside the container, install tools and scaffold a project:
+Use the selected model provider's environment variable instead of `OPENAI_API_KEY`
+if different. Forward only scoped credentials injected by the cloud environment;
+do not mount personal authentication directories or bake tokens into the image.
+Installation and offline checks need neither credential.
+
+Inside the container, install tools and prepare a project-specific agent handoff:
 
 ```bash
 cd /standards
 mise install
-pi -p skills/setup-project/SKILL.md
+mise run install
+./scripts/setup-default-project.sh /app --brief /path/to/brief.md --emit-prompt
 ```
 
-The `~/.pi` mount gives the container's pi access to your host's LLM API keys. Sessions
-are ephemeral — lost when the container exits. Mount a volume to `/app` if you need to
-persist project work.
+Give that handoff to the chosen agent; it adapts the reviewed baseline rather than
+inventing a new task contract. Emission alone creates no files and invokes no agent.
+The empty baseline intentionally fails unconfigured checks. Sessions are ephemeral;
+use an approved workspace volume for durable project work, not a personal auth mount.
 
 ## What's inside
 
-| Path                | Purpose                                                                                                                |
-| ------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| `standards/`        | The binding corpus — `STD-001`–`STD-011`, one file per standard                                                        |
-| `best-practices/`   | Guides `GDE-001`–`GDE-013` — project operations, agent services, pluggable components, and hot reloading               |
-| `reports/`          | Research notes `NOTE-001`–`NOTE-006` — fnox secrets, the skills CLI guide, the standards gap register                  |
-| `architecture/`     | Decision records `ADR-001`–`ADR-004` — PRDs and settled questions                                                      |
-| `prompts/`          | Agent prompts — `PRM-001` regenerates this Dockerfile; `PRM-002` brings an existing project up to current standards    |
-| `skills/`           | Every skill we own, numbered `SKL-nnn` in `skills/VENDORED.md`. `work-next-issue` runs the ticket loop end to end.     |
-| `DESIGN.md`         | The design system for the published site: tokens, components, voice                                                    |
-| `AGENTS.md`         | Mandatory tools, constraints, task structure for agents working here                                                   |
-| `scripts/`          | The renderer, the design/document/skill validators, the bootstrap script                                               |
-| `mise.toml`         | Tool declarations (mise is the only dependency — everything else flows from here)                                      |
-| `Dockerfile`        | Minimal container: `debian:stable-slim`, mise, bash, tmux, git, gh. `/app` is left empty for your project.             |
-| `skills-lock.json`  | Company-approved skills (locked hashes for reproducibility)                                                            |
-| `templates/`        | Source templates used by the bootstrap script                                                                          |
-| `tests/`            | Dockerfile integration tests — `mise test` validates the image                                                         |
-| `out/`              | Generated site. Not committed; rebuild with `mise run standard:render`                                                 |
-| `.pi/settings.json` | Project-local pi config (npmCommand routes through mise, sessionDir keeps sessions local)                              |
-| `.agents/skills/`   | Installed skill files (managed by `skills experimental_install`)                                                       |
+| Path | Purpose |
+| --- | --- |
+| `standards/` | Numbered standards; status determines authority |
+| `best-practices/` | Walkthroughs and reference implementations |
+| `reports/` | Dated research; `NOTE-005` tracks corpus gaps |
+| `architecture/` | Decision records and their alternatives |
+| `prompts/` | `PRM-001` regenerates the Dockerfile; `PRM-002` audits and migrates projects |
+| `skills/` | Owned capabilities, registered in `skills/VENDORED.md` |
+| `DESIGN.md` | Published-site tokens, components, and voice |
+| `AGENTS.md` | Instructions for agents working here |
+| `scripts/` | Rendering, validation, bootstrap, verified skill restore, and secret sync |
+| `mise.toml` | Managed tools/tasks; GDE-011 records host prerequisites |
+| `Dockerfile` | Cloud agent container; `/app` is left empty for project work |
+| `skills-lock.json` | Immutable source revisions and verified content hashes |
+| `templates/` | Maintained bootstrap and configuration inputs |
+| `tests/` | Offline regressions; Docker integration is `test:docker` |
+| `docs/testing.md` | Actual checks, release gates, and unconfigured integrations |
+| `out/` | Ignored generated site; rebuild with `standard:render` |
+| `.pi/settings.json` | Project-local pi configuration |
+| `.agents/skills/` | CLI-installed files verified by the restore helper |
 
 ## Tasks
 
 ```bash
 mise install           # Install all tools (one-time, or after mise.toml changes)
-mise lint              # Everything: markdownlint, mise doctor, fnox check, and all four validators
-mise test              # Build and validate the Docker image
+mise run install       # Run the repository's install task (skills in this repo)
+mise lint              # Offline markdown, lock, document, skill and design checks; render corpus
+mise test              # Offline behavior and bootstrap regressions
+mise run test:docker    # Separate image build/smoke test; Docker daemon and network required
 mise dev               # Run lint + test
 
-mise run standard:render    # Render the corpus; refuses to emit a non-conforming document
+mise run standard:render    # Render the corpus and check its structure
 mise run standard:preview   # Render and serve at http://localhost:8900/
 mise run docs:validate      # Guides, notes, decisions and prompts against STD-006
 mise run design:validate    # DESIGN.md: token references, WCAG AA pairs, contrast table
@@ -162,10 +165,12 @@ pi @skills/standards-map/SKILL.md "Target project: ../local-library"  # Map a pr
   hedging. The RFC form is the only one that holds both without flinching.
 - **The undated, unattributed rule is the enemy.** Every clause carries who issued it,
   when, what it obsoletes, and what it binds, or it does not render.
-- **Mise is the only bootstrap dependency.** Node, pi, fnox, and everything else come
-  from `mise install` inside `/standards`.
+- **Mise owns project tools.** Node, pi, and fnox come from `mise install` once
+  the documented cloud host prerequisites exist.
 - **No global installs.** Everything is project-scoped through `mise.toml`.
 - **`/app` is a blank sandbox.** The container makes `/standards` operational; your
   project lives in `/app`, scaffolded by the `setup-project` skill.
-- **Secrets stay on your host.** Mount `~/.pi` for LLM keys. fnox and 1Password are
-  configured per project — see `STD-007` and `GDE-003`.
+- **Development stays in the cloud.** People review and authenticate from their
+  laptops; agents build, test, and serve previews in an orb or equivalent workspace.
+  People supply scoped tokens through cloud secret settings — see `STD-005`,
+  `STD-007`, and `GDE-003`.

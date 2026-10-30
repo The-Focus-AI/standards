@@ -1,16 +1,21 @@
 ---
 standard: "005"
 kind: standard
-title: Agent environment bootstrap
+title: Cloud development and agent bootstrap
 category: Practice
 status: Draft
 issued: "2026-07-25"
-revision: R1
+revision: R3
 applies-to: Every repository worked by a cloud agent
 author: W. Schenk
 ---
 
 ## 1. Introduction
+
+Development happens in a cloud workspace by default: an Amp orb, a Cursor cloud
+environment, or an equivalent reproducible environment. The laptop is a client
+for review, browser access, and a person's authentication, not an undocumented
+build server or a dependency of the development workflow.
 
 Cloud coding agents run in an environment somebody has to configure: a container
 that clones the repository, installs its dependencies, and then hands the agent a
@@ -43,13 +48,13 @@ repositories still running it can find out what replaced it.
 An agent environment's install step MUST be a call to the repository's `install`
 task and nothing else.
 
-`mise install` is the one command, on every platform. A bootstrap that installs
-packages itself is a second, invisible copy of the repository's setup that
-nobody edits when the real one changes — and the first symptom is an agent that
-cannot run the tests it was asked to fix.
+After trusting the repository and installing its declared tools, call
+`mise run install`. `mise install` alone does not run `[tasks.install]`.
+A bootstrap that installs project packages itself duplicates the repository's
+setup and drifts when that setup changes.
 
 ```sh
-mise trust && mise install
+mise trust && mise install && mise run install
 ```
 
 ### 3.2
@@ -86,13 +91,20 @@ See AGENTS.md. It is the entry point for every agent in this repository.
 
 ### 3.5
 
-An agent environment MUST NOT hold production credentials.
+An agent environment MUST receive only the project-scoped credentials needed
+for its authorized work.
 
-Give it preview-scoped or read-only credentials, resolved through fnox from a
-non-production vault. Platforms differ in how well they protect these — at least
-one keeps environment variables visible to anyone who can edit the environment,
-with no dedicated secrets store — so the safe assumption is that anything given
-to an agent environment is disclosed.
+A person retrieves the project's bootstrap token using their own 1Password
+account and supplies it through the cloud environment's secret settings
+(`STD-007 §3.3`). The agent receives the scoped token, not the person's password,
+Secret Key, or interactive login session. Treat any credential exposed to the
+agent process as accessible to that process and its tools.
+
+Production-equivalent runtime access follows `STD-007 §3.4`; it is not permission
+to administer production, run destructive migrations, or bypass `STD-007 §3.5`'s
+database protection. Grant privileged operational access separately for authorized
+work, not as a default development prerequisite. Never bake tokens or login caches
+into reusable images or workspace snapshots.
 
 ### 3.6
 
@@ -130,13 +142,31 @@ Removing it is honest and takes a line; leaving it listed sends the next agent
 into a container that cannot build, and it will spend its round diagnosing the
 environment rather than the ticket.
 
+### 3.10
+
+Development and verification MUST default to a reproducible cloud workspace,
+with any laptop-only work recorded as an explicit exception in `AGENTS.md`.
+
+Edit, install, build, run tests, and serve development previews in that workspace.
+Commit the bootstrap and service configuration so the next workspace can repeat
+them. A browser or portal is how a person reviews the result; asking them to run
+a local server or fix laptop dependencies is not the normal verification path.
+
+An exception names the constraint, owner, and verification path — for example,
+native device hardware or an unavailable network connection. Personal 1Password
+authentication and entering a token into platform secret settings do not require
+moving the development workload onto the laptop. CI still owns deployment builds
+under `STD-008 §3.10`.
+
 ## 4. Platform mapping
 
-Current as of this revision. The platforms own these names and will change them,
-which is why no clause above depends on this table.
+This table describes platform mechanisms, not a claim that this repository has
+verified every platform. Amp and Cursor entries were checked against vendor docs
+on 2026-10-28; other entries retain their original source dates.
 
 | Platform | In-repo configuration | Held outside the repository |
 | --- | --- | --- |
+| Amp orbs | `.agents/setup` for dependencies; `.agents/resume` for activation-time authentication; `.amp/services.yaml` for services | Project-scoped secrets and environment variables; optional thin pre-setup entry point |
 | Cursor cloud agents | `.cursor/environment.json` — `install`, `start`, `terminals`, `snapshot`, `build.dockerfile` | Secrets, in the dashboard, exposed as environment variables |
 | GitHub Copilot coding agent | `.github/workflows/copilot-setup-steps.yml` — job **must** be named `copilot-setup-steps` | Agent variables and secrets |
 | Claude Code on the web | `CLAUDE.md`, `.claude/settings.json` hooks and plugins, `.mcp.json`, `.claude/rules/`, `.claude/skills/` | Network policy, environment variables, **and the setup script** |
@@ -146,11 +176,18 @@ in environment settings rather than in the tree, and it has no dedicated secrets
 store — environment variables are visible to anyone who can edit the
 environment.
 
-Each of the three reduces to the same line:
+The dependency-install entry point reduces to the same line:
 
 ```sh
-mise trust && mise install
+mise trust && mise install && mise run install
 ```
+
+Amp setup may be snapshotted and reused by another project member. Keep personal
+authentication out of it; current runtime identity is available at resume.
+Use managed services and portals rather than a laptop server or a background
+process left by the setup script. In Cursor, check that the saved environment
+actually points at the repository's environment file; saved configuration can
+take precedence over it. Secret provisioning is covered in `GDE-003`.
 
 ## 5. References
 
@@ -166,3 +203,7 @@ BCP 14, RFC 2119, March 1997.
 
 [5] Anthropic, *Use Claude Code on the web*,
 <https://code.claude.com/docs/en/claude-code-on-the-web>.
+
+[6] Amp, *Customizing Orbs* and *Handling Secrets*, checked 2026-10-28,
+<https://ampcode.com/docs/orbs/customizing>,
+<https://ampcode.com/docs/orbs/handling-secrets>.

@@ -15,11 +15,11 @@ record, `PRM` for a prompt, `SKL` for a skill. Cite by number — `STD-008`,
 `GDE-010` — because a number survives a retitling and a slug does not
 (`STD-006 §3.10`).
 
-**Standards** in `standards/` are the only documents that bind anything. Everything
-else is explanation, evidence, or capability. When a guide turns out to contain
-rules, the rules move to a standard and the guide keeps the explanation.
+**Standards** in `standards/` bind only when `In force`; `Draft` documents are
+proposals, not fleet requirements. Everything else is explanation, evidence, or
+capability. When a guide contains a rule, the rule belongs in a standard.
 
-### Standards — binding
+### Standards — check each document's status
 
 | Ref | Covers |
 | --- | --- |
@@ -27,13 +27,14 @@ rules, the rules move to a standard and the guide keeps the explanation.
 | `STD-002` | Issue states, the frontier, claiming, and what an agent comments. |
 | `STD-003` | Branches, pull requests, the description format, and the merge gates. |
 | `STD-004` | Tooling through mise and the four required tasks. |
-| `STD-005` | Agent environment bootstrap for Cursor, Copilot, and Claude Code. |
+| `STD-005` | Cloud-first development and bootstrap for Amp, Cursor, and other agents. |
 | `STD-006` | Provenance for notes, decision records, and guides. |
 | `STD-007` | Secrets, vaults, and credential scoping. |
 | `STD-008` | Deployment rules common to every platform. |
 | `STD-009` | Authentication and per-client isolation. |
 | `STD-010` | Agent services — the seven required patterns. |
 | `STD-011` | Agent skills: installation, pinning, and updates. |
+| `STD-012` | Testing, preview verification, release gates, and failure routing. |
 
 **Deployment pattern:** GitHub Pages, built by GitHub Actions from `main`
 (`.github/workflows/pages.yml`), published at
@@ -41,11 +42,11 @@ rules, the rules move to a standard and the guide keeps the explanation.
 checkout, a node, the renderer, the three validators, and the Pages deploy
 action. `mise run deploy:status` says where it goes and how the last run went.
 
-`mise run standard:render` renders the standards *and* the guides into
-`out/standards/`, and refuses to emit a page for a document that does not
-conform, so rendering *is* the conformance check. `mise run standard:preview`
-serves the result; `out/standards/standards.html` is the whole corpus as one
-shareable file.
+`mise run standard:render` builds the corpus in `out/standards/` and checks its
+structure. Also run `docs:validate`, `skills:check`, and `design:validate`;
+mechanical checks do not establish that requirements agree or examples work.
+`mise run standard:preview` serves the result; `out/standards/standards.html`
+bundles the published corpus in one shareable file.
 
 ### Guides — explanation
 
@@ -58,14 +59,15 @@ Guides live in `best-practices/`, named `GDE-nnn-slug.md`.
 | `GDE-003` | The fnox and 1Password playbook. |
 | `GDE-004` | The GCE Gaia self-hosted runtime. |
 | `GDE-005` | GCP deployment — Cloud Run, App Engine, gcloud configs. |
-| `GDE-006` | Local environment: shell activation, remote servers, pi, tmux. |
-| `GDE-007` | The pinned pi package list. |
+| `GDE-006` | Cloud development: workspaces, shell activation, remote servers, pi, tmux. |
+| `GDE-007` | How to read the canonical pi package configuration. |
 | `GDE-008` | The standard skill set inventory. |
 | `GDE-009` | Default technology choices, and what is still undecided. |
 | `GDE-010` | Vercel deployment — previews, env sync, Neon, Blob. |
 | `GDE-011` | Bootstrapping a new project — empty directory to `mise dev`. |
 | `GDE-012` | Auditing an existing project — the gap report and what to do with it. |
 | `GDE-013` | Pluggable component systems, lifecycle isolation, and hot reloading. |
+| `GDE-014` | Testing and preview pipeline walkthrough and templates. |
 
 ### Skills — capabilities
 
@@ -83,33 +85,15 @@ Four former prompts are now skills: `setup-project`, `standardize-project`,
 
 `work-next-issue` (`SKL-013`) is the one to reach for when the ask is "pick up
 the next thing". It executes `STD-002` and `STD-003` end to end — frontier,
-race-safe claim, branch, pull request — and stops at the merge gate. Which issue
+claim verification, branch, pull request — and stops at the merge gate. Which issue
 is worth the most is the agent's judgement, stated in the claim comment rather
 than derived from a priority scheme; `ADR-004` records why there is no scheme.
 
 ### Document kinds
 
-Every document this repository owns declares `kind` in its frontmatter, and the
-directory it lives in fixes which kind that is. `mise run docs:validate` checks
-all of them.
-
-| `kind` | Lives in | Is |
-| --- | --- | --- |
-| `standard` | `standards/STD-nnn-slug.md` | binding clauses, numbered and citable |
-| `guide` | `best-practices/GDE-nnn-slug.md` | explanation and walkthroughs, no clauses |
-| `note` | `reports/NOTE-nnn-YYYY-MM-DD-slug.md` | research at a point in time, cited and dated |
-| `decision` | `architecture/ADR-nnn-slug.md` | a settled question and its alternatives |
-| `prompt` | `prompts/PRM-nnn-slug.md` | instructions an agent executes |
-| `skill` | `skills/<name>/SKILL.md` | a capability, numbered `SKL-nnn` in the register |
-| `design` | `DESIGN.md` | the design system and its tokens |
-
-A note keeps its date in the filename because it is a capture of a moment and
-staleness is the first thing a reader needs. A guide or a decision record does
-not: it is a topic that gets revised in place.
-
-`AGENTS.md`, `README.md` and `skills/VENDORED.md` are outside the axis — the
-first two are navigation external tooling reads, and the third is the register
-of a class rather than a member of it.
+`STD-006 §4` owns the document classes, paths, status values, and exceptions.
+Read it rather than maintaining another schema here. `mise run docs:validate`
+checks document metadata; `skills:check` checks the separate skill register.
 
 ### Everything else
 
@@ -144,6 +128,18 @@ When auditing or changing another repository, look in this order:
 - A rule goes in a standard, not a guide. If you find yourself writing MUST in `best-practices/`, it
   belongs in `standards/`.
 - Standards are drafted by anyone and ratified only by a person — `STD-001 §3.14`.
+- Develop, run tests, and serve previews in an Amp orb, Cursor cloud environment, or equivalent
+  reproducible cloud workspace (`STD-005 §3.10`). Do not depend on a person's laptop services;
+  record genuine hardware/network exceptions in the target project's `AGENTS.md`.
+- A person retrieves the project-scoped bootstrap token through their own 1Password account
+  and supplies it to the project's cloud secret settings. Do not request their account password,
+  copy their login session, or persist the injected token into reusable workspace snapshots.
+- Before setup or writing secrets, verify that `.fnox/`, `.env`, `.env.*`, and project-specific
+  credential files are gitignored (`STD-004 §3.8`, `STD-007 §3.3`). Preserve existing ignore rules
+  and keep `.env.example` trackable with placeholders only. Check each secret path separately with
+  `git check-ignore -q -- <path>` and check `git ls-files -- <path>` for already tracked files;
+  ignore rules do not untrack them. If a secret file is tracked, stop and report it without
+  printing its contents. Include this preflight in the target project's `AGENTS.md`.
 - Use `skills add` for skills, not manual copying.
 - Use mise for tools and runtimes. Do not recommend global `npm install -g`, `pip install`, or `brew
   install` workflows for project tooling.

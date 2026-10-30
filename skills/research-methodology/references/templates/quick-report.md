@@ -8,6 +8,16 @@ For rapid research with limited time.
 ---
 
 ```markdown
+---
+number: "<next free number>"
+title: "Quick Research: [Topic]"
+kind: note
+issued: "YYYY-MM-DD"
+author: "<actual author or agent identity>"
+status: Current
+verified: "YYYY-MM-DD"
+---
+
 # Quick Research: [Topic]
 
 *Date: [YYYY-MM-DD] | Sources: [N]*

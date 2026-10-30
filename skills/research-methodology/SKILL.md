@@ -1,6 +1,9 @@
 ---
 name: research-methodology
-description: This skill should be used when the user asks about "how to research", "research best practices", "evaluate sources", "source credibility", "academic research", "find reliable information", "cite sources", "research methodology", or needs guidance on conducting thorough web research and evaluating information quality.
+description: >
+  Guides source evaluation, citation, synthesis, and provenance-backed research
+  reports. Use for research methodology, academic or web research, source
+  credibility checks, literature reviews, and choosing a report format.
 version: 1.0.0
 ---
 
@@ -183,15 +186,25 @@ Research from [Organization](URL) indicates that...
 
 ## File Organization
 
-Save research to `./reports/` directory:
+For a saved report in this corpus, read `STD-001` / `STD-006` and choose the
+next unassigned NOTE number. Follow the target project's own convention
+elsewhere; do not claim this corpus's numbering is mandatory across the fleet.
 
 **Naming Convention:**
 
+```text
+reports/NOTE-nnn-YYYY-MM-DD-topic-name.md
 ```
-./reports/YYYY-MM-DD-topic-name.md
-./reports/2024-03-15-ai-trends.md
-./reports/2024-03-15-renewable-energy-analysis.md
-```
+
+Use `number`, `title`, `kind: note`, `issued`, `author`, `status: Current`, and
+`verified` frontmatter as shown in the templates. `issued` is the original
+issue date; `verified` is when claims were actually checked, not a formatting
+date. Identify the actual author (including an agent when appropriate), never
+borrow an example person's name. Preserve known original attribution on
+migration; if unknown, state that honestly rather than guessing. Record which
+claims were not verified and distinguish agent recommendations from decisions
+a person accepted. A request for research alone does not authorize dependency
+installation, provider calls, or implementation.
 
 **Report Structure:** See `references/template-guide.md` for selection guidance. Templates available:
 

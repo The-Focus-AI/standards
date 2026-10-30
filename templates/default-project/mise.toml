@@ -1,86 +1,84 @@
 [tools]
 node = "22"
-"npm:pnpm" = "latest"
-fnox = "latest"
+"npm:pnpm" = "10.34.9"
+fnox = { version = "1.45.0", workflow = "release.yml" }
 gh = "latest"
 ripgrep = "latest"
 fd = "latest"
 "npm:@earendil-works/pi-coding-agent" = "latest"
-"npm:markdownlint-cli2" = "latest"
-"npm:skills" = "1.5.13"
+"npm:markdownlint-cli2" = "0.24.0"
+"npm:skills" = "1.7.4"
+op = "2.41.1"
 
 [env]
 _.file = ".fnox/env"
 
 [tasks.setup]
-description = "First-time local setup"
+description = "Check the bootstrap token injected into this cloud environment"
 run = '''
-set -euo pipefail
-mkdir -p .fnox
-chmod 700 .fnox
-if [ ! -f .fnox/env ]; then
-  touch .fnox/env
-  chmod 600 .fnox/env
-  echo "Created .fnox/env. Add OP_SERVICE_ACCOUNT_TOKEN or other local bootstrap values if needed."
-else
-  echo ".fnox/env already exists"
+set -eu
+if [ ! -f fnox.toml ]; then
+  echo "No fnox configuration yet; no bootstrap token is needed."
+  exit 0
 fi
+if [ -z "${OP_SERVICE_ACCOUNT_TOKEN:-}" ]; then
+  echo "Set OP_SERVICE_ACCOUNT_TOKEN in this project's cloud secret settings using your 1Password account." >&2
+  exit 1
+fi
+echo "Bootstrap token is available; run mise run secrets:check to verify access."
 '''
 
 [tasks.install]
-description = "Install project dependencies, pi packages, and locked agent skills"
+description = "Install project dependencies and restore agent skills"
 run = '''
-set -euo pipefail
+set -eu
 if [ -f package.json ]; then
-  pnpm install --frozen-lockfile || pnpm install
+  if [ -f pnpm-lock.yaml ]; then
+    pnpm install --frozen-lockfile
+  else
+    pnpm install --no-frozen-lockfile
+  fi
 fi
-skills experimental_install
+node scripts/restore-skills.mjs
 '''
 
 [tasks.dev]
-description = "Run development checks"
+description = "Baseline checks; adapt to the project's real development loop"
 run = '''
-set -euo pipefail
+set -eu
 mise run lint
 mise run test
 '''
 
 [tasks.lint]
-description = "Run linters"
+description = "Run the project linter; fail until a real check is configured"
 run = '''
-set -euo pipefail
-if [ -f package.json ] && pnpm run | grep -q "^[[:space:]]*lint"; then
-  pnpm run lint
-elif command -v markdownlint-cli2 >/dev/null 2>&1; then
-  markdownlint-cli2 "**/*.md" "#node_modules" "#.pi" "#.agents"
-else
-  echo "No linter configured yet"
+set -eu
+if [ ! -f package.json ]; then
+  echo "No lint command configured: adapt this baseline to the project brief." >&2
+  exit 1
 fi
-if [ -f fnox.toml ]; then
-  fnox check
-fi
+pnpm run lint
 '''
 
 [tasks.test]
-description = "Run tests/typechecks"
+description = "Run project tests; do not report an untested scaffold as passing"
 run = '''
-set -euo pipefail
-if [ -f package.json ] && pnpm run | grep -q "^[[:space:]]*test"; then
-  pnpm run test
-else
-  echo "No test command configured yet"
+set -eu
+if [ ! -f package.json ]; then
+  echo "No test command configured: add real behavior checks, not placeholder tests." >&2
+  exit 1
 fi
+pnpm run test
 '''
 
 [tasks.deploy]
-description = "Build or deploy the project"
+description = "Unconfigured release path; adapt explicitly before deployment"
 run = '''
-set -euo pipefail
-if [ -f package.json ] && pnpm run | grep -q "^[[:space:]]*build"; then
-  pnpm run build
-else
-  echo "No deploy/build command configured yet"
-fi
+set -eu
+echo "No deployment configured: record the target and approval gate before wiring CI." >&2
+echo "For a non-deploying repository, replace this task with its explicit reason." >&2
+exit 1
 '''
 
 [tasks."secrets:check"]

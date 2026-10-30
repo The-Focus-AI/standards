@@ -40,23 +40,57 @@ carrying a duplicate number.
 | SKL-006 | `nano-banana-videogen` | The-Focus-AI/nano-banana-cli | `42dbef7` | 2026-07-25 |
 | SKL-009 | `research-methodology` | The-Focus-AI/focus-agents | `f684274` | 2026-07-25 |
 
-`browser-automation`, `nano-banana-imagegen`, and `nano-banana-videogen` document CLIs
-that live in their source repos — the skill text moved, the tools did not. Those repos
-remain the home of the binaries the skills invoke.
+These rows record **import provenance**, not a claim that today's text is an
+unmodified upstream copy. Original authors are not inferred from repository
+ownership; retain the source history where an author is not recorded here.
+
+`browser-automation` now targets an available `agent-browser`, with
+version-matched help and explicit dependency preflight. The chrome-driver
+source remains historical provenance, not a required plugin installation.
+The Nano Banana skills still document the CLI maintained in
+`The-Focus-AI/nano-banana-cli`; installing a skill does not install that CLI.
+
+## Maintenance and verification
+
+On 2026-10-30, an Amp agent adapted the owned skills for portability and current
+corpus conventions. This records the maintenance work, not original authorship:
+
+- `browser-automation` / `paged-reports`: replaced plugin-private binaries with
+  `agent-browser` preflight and current-page PDF output. Checked the installed
+  0.38.1 help; retained page-break, component, and magazine procedures. Paged
+  templates expose a completion/error signal instead of printing mid-pagination.
+- `pptx-decks`: project-local, approved PptxGenJS tooling and semantic tokens
+  from the project's design/brand source, not a duplicated Focus palette.
+- `nano-banana-imagegen` / `nano-banana-videogen`: checked published 1.0.10's
+  `package.json` and `cli.ts` against upstream
+  `42dbef71bbf9dfa3aeb6721b7c3adee4adf98573`. Added approval-gated mise pins,
+  fnox declarations, and secret-file preflight. Corrected the audio flag/cost
+  guidance from source; no provider generation or API keys were used.
+- `standards-map` / `standardize-project`: refer to `GDE-012` / `PRM-002`
+  instead of obsolete workflow documents; distinguish proposals from binding
+  standards and mapping from authority to act.
+- `research-methodology` / `tech-research`: `STD-006` NOTE paths and provenance
+  envelopes, preserving source attribution rather than assigning a template author.
+
+These capabilities remain optional named sources. `GDE-008` owns selection of
+the internal defaults (`setup-project` and `work-next-issue`); this register
+does not imply every registered skill is installed by default. Verification
+of instructions and syntax does not establish live provider behavior or visual
+quality of a future generated artifact.
 
 ## Still upstream, deliberately not vendored
 
-The 31 third-party skills in `skills-lock.json` — 22 from `mattpocock/skills`, 9 from
-`firecrawl/cli`, plus `find-skills` and `swiss-design` — stay where they are. Vendoring
-them would mean republishing other people's work and owning their drift; `skills update`
-gives us their fixes for free instead. See `best-practices/GDE-008-skills.md`.
+Third-party skills stay upstream. `skills-lock.json` records the selected names
+and sources; `GDE-008` explains their roles. This register does not repeat that
+inventory or its counts. Updates are reviewed under `STD-011 §3.6`.
 
 They are not numbered. `SKL-nnn` addresses a skill this organisation maintains; numbering
 somebody else's would claim an ownership we do not have.
 
 ## Follow-ups in the source repos
 
-Vendoring copied the files; it did not clean up the originals. Each source repo still
-carries its `skills/` directory, which will drift the moment either side is edited. To
-finish the move, each source repo needs its skill directory removed and its README
-pointed here. That work is outside this repository and has not been done.
+Vendoring copied the files; it did not clean up the originals. At import, the
+source repositories retained their skill directories. Recheck each source
+before proposing removal and a README pointer here; their current cleanup
+status has not been verified as a group. That work is outside this repository
+and was not performed by the portability update.

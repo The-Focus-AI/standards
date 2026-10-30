@@ -16,7 +16,7 @@ verified: "2026-10-23"
 How an agent takes a repository from "has a `test` task" to the full loop
 `STD-012` specifies: PR CI, blocking vs advisory classification, preview status
 checks and Playwright verification against the preview URL, regression
-benchmarks and approved confidence thresholds, stage-first sign-off gates, and
+benchmarks and approved confidence thresholds, recorded release sign-off gates, and
 the failure → GitHub issue → Slack thread → reply/match route-back loop.
 
 For Vercel project setup see `best-practices/GDE-010-vercel-deployment.md`.
@@ -29,51 +29,23 @@ Every repository carries `docs/testing.md` with five required level-two
 headings (`## Checks`, `## Preview verification`, `## Benchmarks and thresholds`,
 `## Sign-off gates`, `## Alerting`). Mark a section `N/A` when it does not apply.
 
-Template (`docs/testing.md`):
+Copy `templates/default-project/docs/testing.md` and fill in the project's
+actual checks, evidence, and approvers. That is the maintained generic template;
+the client-specific thresholds in §5 are not defaults and do not constitute approval.
 
-```markdown
-# Testing
+Use the owner-approved maturity recorded in `AGENTS.md` to select the release
+profile in `STD-012 §3.20–3.21`; keep the actual checks and approval record in
+`docs/testing.md`. The standard owns the profiles, not this walkthrough. Missing
+maturity is an assessment gap, not an implicit `alpha` or permission to release.
 
-## Checks
+No separate staging environment is required. Verify the release candidate in
+preview, or document the cloud build/start alternative for a platform without
+previews (`STD-012 §3.7`), then record the release approval under §3.11. Preview
+behavior follows production by default (`STD-007 §3.4`).
 
-| Check | Workflow / Runner | Trigger | Class | Fingerprint | Owner |
-| --- | --- | --- | --- | --- | --- |
-| `lint` | `.github/workflows/ci.yml` (`check`) | `pull_request`, `push` (`main`) | blocking | `fp:ci:ci.yml:check` | repo |
-| `test` | `.github/workflows/ci.yml` (`check`) | `pull_request`, `push` (`main`) | blocking | `fp:ci:ci.yml:check` | repo |
-| `preview/e2e` | `.github/workflows/preview.yml` (`e2e`) | `deployment_status` (Preview) | blocking | `fp:ci:preview.yml:e2e` | repo |
-| `title-match-eval` | `.github/workflows/eval.yml` (`eval`) | `pull_request`, `push` (`main`) | blocking below baseline | `fp:ci:eval.yml:eval` | data |
-| `null-rate-variance` | scheduled QA runner | cron (`*/15 * * * *`) | advisory | `fp:qa:<feed>:l2-null-variance` | data |
-
-## Preview verification
-
-- Platform: Vercel GitHub integration (`deployment_status` event).
-- Status context published on head SHA: `preview/e2e` with `target_url` set to `environment_url`.
-- Command: `BASE_URL="$PREVIEW_URL" npx playwright test`.
-- Protection bypass secret: `VERCEL_AUTOMATION_BYPASS_SECRET` in `fnox.toml` (`preview` profile).
-
-## Benchmarks and thresholds
-
-- Dataset: `inputs/benchmarks/title-matching-v1.jsonl`
-- Metric: top-1 exact PPL ID match rate (`match_rate`).
-- Baseline floor: `0.90` overall; `0.96` on Samsung cohort (`STD-012 §3.9`).
-- Confidence routing (`STD-012 §3.10`):
-  - `confidence >= 0.80` → `auto_accept`
-  - `0.00 < confidence < 0.80` → `review_queue`
-  - missing candidate / evidence → `insufficient_evidence`
-- Approved by: pending formal sign-off (provisional from 2026-10-21 working session).
-
-## Sign-off gates
-
-1. Stage validation: priority cohort (Amazon, Roku, DTC, Samsung, Tubi) passes L1–L3 blocking checks.
-2. UAT gate: internal QA + business-side sign-off on HOV and revenue value-matching (`STD-012 §3.11`).
-3. Production promotion: stage-first release after all 5 priority feeds pass sign-off.
-
-## Alerting
-
-- Slack channel: `#upperhand-alerts` (`SLACK_CHANNEL_ID` in `fnox.toml`)
-- Bot token secret: `SLACK_BOT_TOKEN` in `fnox.toml`
-- Issue label applied by automation: `automated`, `bug` (never `ready`, per `STD-012 §3.15`)
-```
+Failure reporting starts issues in backlog with `automated` and, where relevant,
+`bug`. A person or agent may add `ready` after assessing specification completeness
+under `STD-002 §3.4–3.5`; a raw failure event does not establish readiness.
 
 An agent auditing a repository checks `docs/testing.md` with:
 
@@ -127,7 +99,12 @@ Mark `check` as required in branch protection; keep advisory jobs non-required
 
 `.github/workflows/preview.yml` triggers on `deployment_status`, runs Playwright
 against the preview URL, and publishes the result as `context=preview/e2e` on
-the head commit SHA:
+the head commit SHA. This is an adaptation example, not a verified drop-in
+workflow: declare Playwright in the project lock and configure the protected
+`preview-verification` environment before enabling it. Its approval gate must
+review the candidate code before it receives a bypass secret or write token;
+the environment name alone creates no protection. Restrict preview destinations
+to the project's platform hostnames, not an arbitrary event-supplied URL.
 
 ```yaml
 name: preview
@@ -138,6 +115,7 @@ jobs:
       github.event.deployment_status.state == 'success' &&
       github.event.deployment.environment != 'Production'
     runs-on: ubuntu-latest
+    environment: preview-verification
     permissions:
       contents: read
       statuses: write
@@ -147,8 +125,8 @@ jobs:
           ref: ${{ github.event.deployment.sha }}
       - uses: jdx/mise-action@v2
       - run: mise run install
-      - run: npx playwright install --with-deps chromium
-      - run: npx playwright test
+      - run: npx --no-install playwright install --with-deps chromium
+      - run: npx --no-install playwright test
         env:
           BASE_URL: ${{ github.event.deployment_status.environment_url }}
           VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
@@ -173,85 +151,70 @@ gh api "repos/:owner/:repo/commits/$SHA/status" \
 
 ## 4. Failure → Issue → Slack → Route-back (`STD-012 §3.12–3.18`)
 
+This is an implementation outline, **not installed automation**. The former
+shell snippets used search's first hit as identity and accepted Slack HTTP 200
+as success; neither establishes correct delivery. Keep one tested integration
+in the consuming repository rather than copying partial scripts from this guide.
+
 ### 4.1 Open or update a deduplicated issue (`STD-012 §3.12–3.15`)
 
 Every automated issue carries `<!-- fp:<scope>:<target>:<rule> -->` on line 1 of
-its body. Run on `if: failure()` for default-branch and scheduled blocking checks:
+its body. The reporter handles failed default-branch and scheduled blocking checks:
 
-```sh
-FP="fp:ci:${GITHUB_WORKFLOW}:${GITHUB_JOB}"
-RUN_URL="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
-NOW="$(date -u +%FT%TZ)"
-
-ISSUE_NUM="$(gh issue list --state open --label automated --search "\"$FP\" in:body" \
-  --json number --jq '.[0].number // empty')"
-
-if [ -n "$ISSUE_NUM" ]; then
-  gh issue comment "$ISSUE_NUM" --body "Latest failure ($NOW): $RUN_URL"
-else
-  ISSUE_URL="$(gh issue create --label automated --label bug \
-    --title "[automated] ${GITHUB_WORKFLOW} / ${GITHUB_JOB} failing" \
-    --body "<!-- ${FP} -->
-- **Check:** \`${GITHUB_WORKFLOW}\` / \`${GITHUB_JOB}\`
-- **Class:** blocking
-- **Where:** \`${GITHUB_REF}\` @ \`${GITHUB_SHA}\`
-- **First seen:** ${NOW}
-- **Latest occurrence:** ${NOW}
-- **Run:** ${RUN_URL}")"
-  ISSUE_NUM="${ISSUE_URL##*/}"
-fi
-echo "issue_number=${ISSUE_NUM}" >> "$GITHUB_OUTPUT"
-```
+1. Read all open `automated` issues, paginating the API, and compare the **exact
+   first-line marker**. Search text is a discovery aid, not an identity check.
+2. Serialize writers for the same repository/fingerprint, then recheck before
+   creating. A list followed by a create is not atomic; if multiple matches
+   already exist, report them for reconciliation rather than choosing one silently.
+3. Comment with the timestamp and run URL on the existing issue, or create one
+   with `automated`/`bug`, check classification, ref/SHA, first/latest occurrence,
+   and run URL. Do not apply `ready` from a failure event alone.
+4. Propagate API errors and retain the failed notification for retry. Do not
+   confuse reporter success with recovery of the original check.
 
 ### 4.2 Post or thread in Slack (`STD-012 §3.16–3.17`)
 
-Store `<!-- slack:channel=<channel-id>;ts=<thread_ts> -->` on the issue the first
-time, then reply in-thread on subsequent failures:
+Keep the exact issue-to-thread mapping
+`<!-- slack:channel=<channel-id>;ts=<thread_ts> -->`; read every comment when
+the mapping lives in comments. Match **both channel and timestamp**, not just
+the first timestamp found. Existing mappings receive replies; an absent mapping
+requires a new root message and persistence of the returned channel/timestamp.
 
-```sh
-BODY_AND_COMMENTS="$(gh issue view "$ISSUE_NUM" --comments --json body,comments \
-  --jq '[.body, (.comments[].body)] | join("\n")')"
-THREAD_TS="$(printf '%s\n' "$BODY_AND_COMMENTS" \
-  | sed -n 's/.*<!-- slack:channel=[^;]*;ts=\([0-9.]*\) -->.*/\1/p' | head -1)"
-
-ISSUE_URL="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/issues/${ISSUE_NUM}"
-TEXT="<${ISSUE_URL}|#${ISSUE_NUM}> \`${GITHUB_WORKFLOW} / ${GITHUB_JOB}\` failed on \`${GITHUB_REF}\`: <${RUN_URL}|run>"
-
-PAYLOAD="$(jq -n \
-  --arg c "$SLACK_CHANNEL_ID" \
-  --arg t "$TEXT" \
-  --arg ts "$THREAD_TS" \
-  '{channel: $c, text: $t} + (if $ts == "" then {} else {thread_ts: $ts} end)')"
-
-RESP="$(curl -fsSL https://slack.com/api/chat.postMessage \
-  -H "Authorization: Bearer $SLACK_BOT_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d "$PAYLOAD")"
-
-if [ -z "$THREAD_TS" ]; then
-  NEW_TS="$(printf '%s' "$RESP" | jq -r '.ts')"
-  gh issue comment "$ISSUE_NUM" \
-    --body "<!-- slack:channel=${SLACK_CHANNEL_ID};ts=${NEW_TS} -->Notified Slack channel \`${SLACK_CHANNEL_ID}\`."
-fi
-```
+Check both HTTP status and JSON `ok === true` before recording delivery. Slack's
+[`chat.postMessage` documentation](https://docs.slack.dev/reference/methods/chat.postMessage/)
+returns `ok: false` for application errors and defines `thread_ts` for replies
+(checked 2026-10-30). Validate the returned channel and timestamp; never persist
+`null` as a thread. Supply the bot token through the runtime's secret handling,
+not a logged command argument. Reconcile an ambiguous timeout before retrying a
+message creation; otherwise a retry can create a second thread.
 
 ### 4.3 Route Slack replies and resolving matches back (`STD-012 §3.18`)
 
-1. **Human Slack reply → GitHub issue comment:** A Slack Events API handler
-   listening to `message` events where `thread_ts` is present searches open
-   `automated` issues for `slack:channel=<channel>;ts=<thread_ts>` and posts:
-   `**@<slack-user> in Slack (<permalink>):** <message text>`.
-2. **Resolving match → Issue + Slack thread:** When a subsequent run of the same
-   `fp:…` fingerprint succeeds on the default branch (or a PR carrying
-   `Closes #<N>` merges), automation finds any open issue with `<!-- fp:… -->`,
-   comments `<!-- resolved-by:${RUN_URL} -->Resolved by passing run: ${RUN_URL}`,
-   and posts the same link to `thread_ts` in Slack.
+Verify incoming Slack event authenticity, deduplicate event IDs, ignore bot
+echoes, and resolve the exact channel/thread mapping before posting a reply to
+the issue. Treat message text as data, not instructions to the reporter.
+
+A subsequent successful run of the same fingerprint, or a merged linked fix,
+adds a recovery comment with its run URL to both surfaces. It does not silently
+close an implementation issue before its fix merges. See the explicit duplicate
+exception in `STD-002 §3.18` rather than treating every recovery as that exception.
+
+Before claiming the loop works, exercise repeated and concurrent failures,
+near-match fingerprints, pagination, Slack `ok: false`, ambiguous timeouts,
+replayed events, and recovery in an authorized test repository/channel. None of
+those external integrations is configured or verified merely by this outline.
 
 ## 5. Worked example: UpperHand × A+E STACI data QA
 
 Source: UpperHand / A+E QA working sessions, 2026-06-23 through 2026-10-21
 (Granola meeting records). A data pipeline is a deployment whose checks run on a
 schedule (`STD-012 §3.2`, `§3.9–3.18`).
+
+This is a historical, client-specific example, not the default project policy.
+Its staging sequence records that project's plan; it does not require other
+projects to add staging. Thresholds from the 2026-10-21 session were provisional,
+pending formal sign-off: do not enable automatic acceptance from these values
+without recorded approval under `STD-012 §3.10`.
 
 ### 5.1 STACI L1–L4 layer specification
 
@@ -368,11 +331,12 @@ New repositories scaffolded from `templates/default-project/` (via
 `scripts/setup-default-project.sh` or `setup-project`) receive:
 
 - `docs/testing.md` — the five required headings, with preview / benchmarks /
-  gates / alerting marked `N/A` until enabled.
+  gates assessed for applicability and alerting explicitly unconfigured.
 - `.github/workflows/ci.yml` — `mise run install`, `mise run lint`, `mise run test`
   on pull requests and pushes to `main`.
 
-Fill in the `N/A` sections as the project grows; do not delete the headings.
+Fill in the project evidence as it grows; do not delete the headings or use
+`N/A` to conceal a missing applicable check.
 
 ## 6. Agent execution checklist
 
@@ -381,15 +345,16 @@ When bringing a repository into conformance with `STD-012`, execute in order:
 1. Create `docs/testing.md` with all five required sections (`## Checks`,
    `## Preview verification`, `## Benchmarks and thresholds`, `## Sign-off gates`,
    `## Alerting`).
-2. Ensure `mise.toml` defines `install`, `dev`, `lint`, and `test` (`STD-004 §3.1`).
+2. Ensure `mise.toml` defines `install`, `dev`, `lint`, and `test` (`STD-004 §3.3`).
 3. Add `.github/workflows/ci.yml` calling `mise run install`, `mise run lint`, and
    `mise run test` on `pull_request` and `push` to `main`.
-4. Add `.github/workflows/preview.yml` on `deployment_status` to run smoke/e2e
-   tests against `environment_url` and post the `preview/e2e` commit status.
+4. For platforms with previews, add `.github/workflows/preview.yml` on
+   `deployment_status` to run smoke/e2e tests against `environment_url` and post
+   `preview/e2e`. Otherwise document and exercise the §3.7 cloud alternative.
 5. If the repository produces data or model output, wire the benchmark task into
    CI so scores below the committed baseline exit non-zero (`STD-012 §3.9`).
 6. Add the failure step (`fp:<scope>:<target>:<rule>`) and Slack thread step
    (`slack:channel=<id>;ts=<ts>`) to default-branch and scheduled blocking workflows.
-7. Run `mise run lint` and `mise run test` locally, open the pull request with
+7. Run `mise run lint` and `mise run test` in the cloud workspace, open the pull request with
    evidence (`STD-003 §3.5`), and verify the `preview/e2e` status attaches to the
    head commit.

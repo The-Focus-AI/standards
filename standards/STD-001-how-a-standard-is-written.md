@@ -5,7 +5,7 @@ title: How a standard is written
 category: Process
 status: In force
 issued: "2026-07-25"
-revision: R4
+revision: R5
 applies-to: Every document in standards/
 author: W. Schenk
 ---
@@ -162,7 +162,7 @@ the end of the introduction, in bold.
 
 A standard SHOULD cite other standards by reference, not by file path.
 
-`STD-007 §2.1` survives a file being renamed; `@security.md` does not. The
+`STD-007 §3.1` survives a file being renamed; `@security.md` does not. The
 `@file.md` form currently used across `best-practices/` is an agent-tool
 convention and SHOULD be replaced during migration.
 
@@ -210,19 +210,21 @@ A standard MUST NOT be moved from `Draft` to `In force` by an agent.
 
 Ratification is the act of a person deciding the fleet will be bound by
 something. An agent that promotes its own draft binds every repository to rules
-nobody accepted, which is the same failure as `STD-002 §3.5` one level up. An
-agent that believes a draft is ready says so and leaves the field alone.
+nobody accepted. Unlike ticket readiness under `STD-002 §3.5`, ratification
+changes fleet policy. An agent that believes a draft is ready says so and leaves
+the field alone.
 
 ### 3.15
 
 A standard MUST render without error before it is moved to `In force`.
 
-Rendering is the conformance check, so a standard that will not render is a
-standard whose own format is broken. This is mechanical and belongs in the same
-change as the status edit.
+Rendering checks the document's structure; it does not establish that its
+requirements agree or its examples work. Run the metadata validator too, then
+review the content before ratification.
 
 ```sh
 mise run standard:render
+mise run docs:validate
 ```
 
 ### 3.16
@@ -280,14 +282,16 @@ reference implementations. When a guide turns out to contain rules, the rules
 move to a standard and the guide keeps the explanation — that migration is what
 produced `STD-007` through `STD-011`.
 
-Render and check conformance with:
+Render and check structure and metadata with:
 
 ```sh
 mise run standard:render
+mise run docs:validate
 ```
 
-The renderer refuses to emit a page for a document that does not satisfy this
-standard. Conformance is not a separate audit — if it renders, it conforms.
+The renderer rejects malformed clauses and missing metadata; the document
+validator adds provenance and numbering checks. Neither replaces review of
+meaning, citations, or runnable examples.
 
 Guides, research notes, decision records, prompts and skills render alongside
 the standards, checked against `STD-006` rather than against this document, and

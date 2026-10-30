@@ -1,6 +1,9 @@
 ---
 name: nano-banana-imagegen
-description: Generate and edit images using Google Gemini image models. Use this skill when the user asks to create, generate, make, or edit images with AI. Supports text-to-image, image editing, style transfer, and multi-image composition. Trigger on requests like "create an image", "generate a picture", "make me a logo", "edit this photo", "add X to this image".
+description: >
+  Generates and edits images with the nano-banana CLI and Google Gemini models.
+  Use for text-to-image, single-image editing, style transfer, logos, and
+  illustrations after project tooling, credentials, and spending are authorized.
 ---
 
 # Nano Banana Image Generation
@@ -9,23 +12,86 @@ Generate and edit images using Google's Gemini image models via the `nano-banana
 
 ## Prerequisites
 
-- `GEMINI_API_KEY` environment variable must be set
-- The CLI is installed via `npx @the-focus-ai/nano-banana`
+Read the project's agent instructions, `mise.toml`, and secret declarations.
+Use its cloud workspace. No install, key provisioning, or generation is implied
+by loading this skill; ask before adding dependencies or making billable calls.
+
+The published `@the-focus-ai/nano-banana` **1.0.10** package was checked against
+upstream commit `42dbef71bbf9dfa3aeb6721b7c3adee4adf98573` on 2026-10-30.
+Its `package.json` and `cli.ts` match the npm tarball. This verifies command
+syntax/source, not current provider availability or successful generation.
+
+If missing, propose this **optional, approval-gated** project pin (plus any
+missing Node, fnox, or 1Password CLI tooling through mise):
+
+```sh
+mise use --pin npm:@the-focus-ai/nano-banana@1.0.10
+```
+
+After installation, check the declared version and local help, without keys:
+
+```sh
+mise ls --current
+mise exec -- nano-banana --help
+```
+
+There is no `--version` option in this release. `--list-models` calls Google
+and is **not** an offline preflight. The CLI also uses the system `file` command
+for image inputs; check `command -v file` and ask before adding it if missing.
+
+### Secrets preflight
+
+Before setup or secret writes, check **each** intended secret path with
+`git check-ignore -q -- <path>` and `git ls-files -- <path>`: `.fnox/`, `.env`,
+`.env.*`, and project credential paths. Stop if a secret file is tracked;
+report the path without opening it. Preserve existing ignores and keep
+`.env.example` trackable with placeholders only.
+
+Follow `GDE-003` / `STD-007` for a project-scoped vault and service account.
+A person injects `OP_SERVICE_ACCOUNT_TOKEN` through cloud secret settings, not
+chat, a reusable image, or a copied personal login. Do not write the injected
+token to `.fnox/env`; that file is only a documented local exception.
+Merge a declaration like this into the project's existing `fnox.toml`, using
+the approved provider/vault/item names (these are placeholders, not keys):
+
+```toml
+[providers.op]
+type = "1password"
+vault = "<project vault>"
+
+[secrets.GEMINI_API_KEY]
+provider = "op"
+value = "GEMINI_API_KEY"
+description = "Gemini API; managed in the project vault"
+```
+
+When secret access is authorized, check resolution without printing a value:
+
+```sh
+test -n "${OP_SERVICE_ACCOUNT_TOKEN:-}"
+mise exec -- fnox exec -- sh -c 'test -n "$GEMINI_API_KEY"'
+```
+
+Run a generation as `mise exec -- fnox exec -- nano-banana ...`. For the bare
+`nano-banana` examples below and in the prompting guide, use an authorized
+`mise exec -- fnox exec -- bash` shell, then exit it when finished. Never paste
+keys into shell commands or create a plaintext `.env` as the setup shortcut.
+The CLI reads `.env` automatically; fnox is still the credential source here.
 
 ## Quick Reference
 
 ```bash
 # Generate a new image
-npx @the-focus-ai/nano-banana "a serene mountain landscape at sunset"
+nano-banana "a serene mountain landscape at sunset"
 
 # Edit an existing image
-npx @the-focus-ai/nano-banana "add a hot air balloon to the sky" --file photo.jpg
+nano-banana "add a hot air balloon to the sky" --file photo.jpg
 
 # Specify output path
-npx @the-focus-ai/nano-banana "a minimalist logo" --output logo.png
+nano-banana "a minimalist logo" --output logo.png
 
 # Use a specific model
-npx @the-focus-ai/nano-banana "detailed illustration" --model gemini-2.5-flash-image
+nano-banana "detailed illustration" --model gemini-2.5-flash-image
 ```
 
 ## Workflow
@@ -66,7 +132,7 @@ See [prompting-guide.md](prompting-guide.md) for comprehensive guidance.
 ### Step 3: Generate the Image
 
 ```bash
-npx @the-focus-ai/nano-banana "your detailed prompt here"
+nano-banana "your detailed prompt here"
 ```
 
 Default output: `output/generated-<timestamp>.png`
@@ -84,13 +150,13 @@ If the result isn't right:
 ### Text-to-Image Generation
 
 ```bash
-npx @the-focus-ai/nano-banana "<prompt>"
+nano-banana "<prompt>"
 ```
 
 ### Image Editing
 
 ```bash
-npx @the-focus-ai/nano-banana "<edit instruction>" --file <input-image>
+nano-banana "<edit instruction>" --file input-image.png
 ```
 
 Edit instructions should describe the change:
@@ -109,7 +175,13 @@ Edit instructions should describe the change:
 | `--model <name>` | Specific Gemini model |
 | `--flash` | Use gemini-2.5-flash-image (faster, simpler images) |
 | `--prompt-file <path>` | Read prompt from file |
-| `--list-models` | Show available models |
+| `--list-models` | Query the provider for models; requires authorized API access |
+
+The checked default image model is `gemini-3.1-flash-image-preview`; `--flash`
+selects `gemini-2.5-flash-image`. Confirm model access and price before generating.
+Use a fresh explicit output path for edits: the default `<input>-edited.png`
+can overwrite a previous iteration. Only use trusted input filenames: this
+CLI shells out to `file` for MIME detection without robust shell escaping.
 
 ## Best Practices
 
@@ -137,7 +209,7 @@ When creating multiple related images:
 
 ## Example Prompts
 
-See the [examples/](../../prompts/) directory for full prompt examples.
+See the [examples/](examples/) directory for full prompt examples.
 
 ### Header/Hero Images
 
@@ -182,7 +254,7 @@ modern and calming aesthetic."
 ### Poor quality results
 
 - Add more specific style guidance
-- Use a more capable model (`gemini-2.5-flash-image`)
+- Check the selected model's capabilities rather than assuming `--flash` is better
 - Be more explicit about what you want
 
 ### Image doesn't match description
@@ -191,16 +263,12 @@ modern and calming aesthetic."
 - Add negative constraints ("no X, no Y")
 - Try breaking complex prompts into simpler parts
 
-## Environment Setup
+## Verification and sources
 
-Ensure `GEMINI_API_KEY` is set:
+Use local `--help` for syntax checks. Do not run real generation merely to test
+skill installation. After an authorized request, inspect the output image and
+report the model, output path, and limitations; a successful process exit is
+not sufficient evidence (the launcher can mask signal exits).
 
-```bash
-export GEMINI_API_KEY="your-api-key-here"
-```
-
-Or create a `.env` file in your project:
-
-```
-GEMINI_API_KEY=your-api-key-here
-```
+- [CLI parser and help at the checked revision](https://github.com/The-Focus-AI/nano-banana-cli/blob/42dbef71bbf9dfa3aeb6721b7c3adee4adf98573/cli.ts)
+- [Package and executable mapping](https://github.com/The-Focus-AI/nano-banana-cli/blob/42dbef71bbf9dfa3aeb6721b7c3adee4adf98573/package.json)

@@ -5,7 +5,7 @@ title: Documents and provenance
 category: Process
 status: Draft
 issued: "2026-07-25"
-revision: R2
+revision: R3
 applies-to: Every document in this repository
 author: W. Schenk
 ---
@@ -24,17 +24,16 @@ provenance contract without pretending they are standards. A note has no
 clauses; a decision binds nothing. What they share is that an undated,
 unattributed one is worse than none, because it will be believed.
 
-The existing corpus shows the cost of not having this. Of five documents in
-`reports/`, two carry frontmatter with a title, date, and topic, one has a dated
-filename and nothing else, and two have neither. Nothing distinguishes a note
-verified last week from one written against a tool that has since changed twice.
+Before the provenance migration, reports mixed partial frontmatter, dated
+filenames, and unattributed prose. Nothing distinguished a note verified last
+week from one written against a tool that had since changed twice.
 
 Guides belong here for the same reason: they are read long after they were
 written, by someone deciding whether they are still true.
 
-**Out of scope.** Standards themselves are `STD-001`. This standard does not say
-what research is worth doing or how a decision is reached, only what the
-resulting document must declare about itself.
+**Out of scope.** Clause structure and the additional fields a standard needs
+are `STD-001`; shared provenance is defined here. This standard does not say
+what research is worth doing or how a decision is reached.
 
 ## 2. Requirements language
 
@@ -118,11 +117,13 @@ is usually the most valuable thing in the file.
 
 ### 3.7
 
-A superseded document MUST carry `status: Superseded` and name what replaced it.
+A superseded non-standard document MUST carry `status: Superseded` and name what replaced it.
 
 The replacement is what a reader landed on the old document actually needs. A
 document marked superseded with no forward pointer sends them to search, and
 they will find the old one again.
+
+Standards use `Obsoleted`, per `STD-001 §3.3` and `§3.16`.
 
 ### 3.8
 
@@ -204,9 +205,10 @@ mise run skills:check
 | `skill` | `skills/<name>/` | `SKILL.md`, numbered `SKL-nnn` in the register | — |
 | `design` | repository root | `DESIGN.md` | `Current`, `Superseded` |
 
-A standard carries four more fields on top of these — `standard`, `category`,
-`revision`, `applies-to` — specified by `STD-001 §3.18`. Everything else in the
-table needs only the five plus `number`.
+A standard carries four more fields on top of the shared five — `standard`,
+`category`, `revision`, `applies-to` — specified by `STD-001 §3.18`. Guides,
+notes, decisions and prompts also carry `number`; notes add `verified`.
+The design document needs only the shared five. Skills use the register below.
 
 **Skills are numbered but not on the frontmatter axis.** `skills/<name>/SKILL.md`
 carries the frontmatter the skills CLI requires (`name`, `description`), and

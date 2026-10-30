@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
 # Integration tests: build the standards agent image, then run checks inside it.
-# Run: ./tests/test-dockerfile.sh [--keep] [--verbose]
+# Run: mise run test:docker -- [--keep] [--verbose]
 set -euo pipefail
 
-IMAGE="focus-ai-standards-agent"
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+IMAGE="focus-ai-standards-agent-test-$$"
+CONTAINER=""
 KEEP=false
 VERBOSE=false
 
@@ -11,14 +13,22 @@ for arg in "$@"; do
   case "$arg" in
     --keep) KEEP=true ;;
     --verbose|-v) VERBOSE=true ;;
+    *) echo "Unknown argument: $arg" >&2; exit 2 ;;
   esac
 done
+
+if ! command -v docker >/dev/null 2>&1 || ! docker info >/dev/null 2>&1; then
+  echo "Docker integration requires a reachable daemon in a Docker-capable cloud workspace." >&2
+  exit 1
+fi
 
 cleanup() {
   if [ "$KEEP" = false ]; then
     echo ""
     echo "==> Cleaning up..."
-    docker rm -f "$CONTAINER" 2>/dev/null || true
+    if [ -n "$CONTAINER" ]; then
+      docker rm -f "$CONTAINER" 2>/dev/null || true
+    fi
     docker rmi "$IMAGE" 2>/dev/null || true
   else
     echo ""
@@ -68,7 +78,7 @@ docker_run() {
 # Step 1: Build
 # ============================================================
 echo "==> Building image: $IMAGE"
-docker build -t "$IMAGE" . || { echo "BUILD FAILED"; exit 1; }
+docker build -t "$IMAGE" "$ROOT_DIR" || { echo "BUILD FAILED"; exit 1; }
 echo ""
 
 # ============================================================
@@ -204,6 +214,12 @@ check_not "No npm install -g in Dockerfile" \
 
 check_not "No pip install in Dockerfile" \
           bash -c 'docker exec "$1" grep -q "pip install" /standards/Dockerfile' -- "$CONTAINER"
+
+check     "Dockerfile declares its generator" \
+          bash -c 'docker exec "$1" grep -q "Generated from prompts/PRM-001-generate-dockerfile.md" /standards/Dockerfile' -- "$CONTAINER"
+
+check_not "No personal pi auth mount example" \
+          bash -c 'docker exec "$1" grep -q -- "-v ~/.pi:" /standards/Dockerfile' -- "$CONTAINER"
 
 check_not "/app has no .gitignore (intentionally bare)" \
           bash -c 'docker exec "$1" test -f /app/.gitignore' -- "$CONTAINER"

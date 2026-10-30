@@ -1,6 +1,10 @@
 ---
 name: nano-banana-videogen
-description: Generate videos using Google Veo models via the nano-banana CLI. Use this skill when the user asks to create, generate, animate, or produce videos with AI. Supports text-to-video, image-to-video animation, dialogue with lip-sync, and scene extensions. Trigger on requests like "create a video", "animate this image", "make a video clip", "generate footage", "produce a short film", "add motion to this".
+description: >
+  Generates video with the nano-banana CLI and Google Veo models. Use for
+  text-to-video, animating an image, prompted dialogue/audio, or scene extensions
+  after project tooling, credentials, and spending are authorized. Model output
+  and audio controls need verification rather than assumed guarantees.
 ---
 
 # Nano Banana Video Generation
@@ -9,8 +13,83 @@ Generate videos using Google Veo 3.1 models via the `nano-banana` CLI.
 
 ## Prerequisites
 
-- `GEMINI_API_KEY` environment variable must be set
-- The CLI is installed via `npx @the-focus-ai/nano-banana`
+Read the project's agent instructions, `mise.toml`, and secret declarations.
+Use its cloud workspace. Ask before adding tools, provisioning keys, or making
+billable calls. Loading this skill does not authorize any of those actions.
+
+Published `@the-focus-ai/nano-banana` **1.0.10** was source-checked against
+commit `42dbef71bbf9dfa3aeb6721b7c3adee4adf98573` on 2026-10-30; its
+`package.json` and `cli.ts` match the npm tarball. Provider calls were not tested.
+If missing, propose this **optional, approval-gated** project pin, plus any
+missing Node/fnox/1Password CLI through mise:
+
+```sh
+mise use --pin npm:@the-focus-ai/nano-banana@1.0.10
+```
+
+After installation, inspect the version declaration and local help without keys:
+
+```sh
+mise ls --current
+mise exec -- nano-banana --help
+```
+
+This release has no `--version`. `--list-models` calls Google, and even
+`--estimate-cost` requires a key before reaching its local estimate branch;
+neither is the no-credential preflight. For image inputs check `command -v file`
+and ask before adding it. Use trusted filenames: MIME detection shells out to
+`file` without robust shell escaping.
+
+### Secrets preflight
+
+Before setup or writing secrets, check **each** intended `.fnox/`, `.env`,
+`.env.*`, and credential path with `git check-ignore -q -- <path>` and
+`git ls-files -- <path>`. Stop for tracked secret files, reporting only the
+path. Preserve ignore rules; keep `.env.example` trackable and placeholder-only.
+
+Follow `GDE-003` / `STD-007`: an approved project vault/service account,
+and a person injecting `OP_SERVICE_ACCOUNT_TOKEN` into cloud secret settings.
+Never request personal account credentials or persist the injected token into
+`.fnox/env`, reusable images, or snapshots. A local token file is an exception.
+Merge these declarations using the approved provider and vault, not duplicate
+tables in an existing `fnox.toml`:
+
+```toml
+[providers.op]
+type = "1password"
+vault = "<project vault>"
+
+[secrets.GEMINI_API_KEY]
+provider = "op"
+value = "GEMINI_API_KEY"
+description = "Gemini/Veo API; managed in the project vault"
+```
+
+Once secret access is authorized, check presence without printing values:
+
+```sh
+test -n "${OP_SERVICE_ACCOUNT_TOKEN:-}"
+mise exec -- fnox exec -- sh -c 'test -n "$GEMINI_API_KEY"'
+```
+
+Execute generations as `mise exec -- fnox exec -- nano-banana ...`. The bare
+commands below and in the examples assume an authorized
+`mise exec -- fnox exec -- bash` shell; exit it after the task. Do not use manual
+key exports or plaintext `.env` setup. The CLI reads `.env` automatically, but
+fnox remains the credential source here.
+
+### Known source limitations
+
+- `--audio` / `--no-audio` are parsed, but **not sent to the generation API**
+  in 1.0.10. They do not guarantee silence or lower cost. Describe desired sound
+  in the prompt, inspect the result, and use separately approved post-processing
+  if silence is required.
+- `--resolution 4K` is accepted, but help restricts it to preview models. Check
+  current provider support rather than assuming every parsed combination works.
+- Cost figures in the CLI are static estimates, not a current quote. Confirm
+  price, model access, iteration budget, and permission before generation.
+- A timeout can follow a submitted billable operation. Inspect available state
+  before retrying, and report uncertainty rather than automatically paying again.
 
 ## Quick Reference
 
@@ -21,8 +100,8 @@ nano-banana --video "A sunset over mountains, slow dolly-in, cinematic lighting"
 # Animate an existing image
 nano-banana --video "The character slowly turns and smiles" --file portrait.png
 
-# Cost-optimized development mode
-nano-banana --video "Quick test scene" --video-fast --no-audio --resolution 720p
+# A lower-resolution fast-model iteration, only within an approved budget
+nano-banana --video "Quick test scene" --video-fast --resolution 720p
 
 # Specify output path
 nano-banana --video "A cat playing" --output cat-video.mp4
@@ -83,18 +162,15 @@ Use the [prompting-guide.md](prompting-guide.md) for comprehensive guidance.
 
 ### Step 2: Consider Cost
 
-Video generation is significantly more expensive than images:
-
-| Model | Cost per Second | 8-Second Video |
-|-------|-----------------|----------------|
-| `veo-3.1-generate-001` | $0.40 | $3.20 |
-| `veo-3.1-fast-generate-001` | $0.15 | $1.20 |
+Check current provider pricing for the selected model and bound the number of
+iterations. Do not treat historical per-second prices or the local estimate
+table as a billing guarantee.
 
 **Development workflow:**
 
-1. Iterate with `--video-fast --no-audio` (cheapest)
-2. Test with `--video-fast` (add audio when needed)
-3. Final render with default model (premium quality)
+1. Review prompts before spending on a generation
+2. Use `--video-fast` when suitable and approved; inspect both image and sound
+3. Use another model for the final render only if its benefit and cost justify it
 
 ### Step 3: Generate
 
@@ -124,7 +200,7 @@ nano-banana --video "<prompt>"
 ### Image-to-Video (Animation)
 
 ```bash
-nano-banana --video "<motion description>" --file <input-image>
+nano-banana --video "<motion description>" --file input-image.png
 ```
 
 The motion description should describe how the image should animate:
@@ -142,12 +218,19 @@ The motion description should describe how the image should animate:
 | `--video-fast` | Use fast/cheap model | (premium model) |
 | `--duration <sec>` | 4, 6, or 8 seconds | 8 |
 | `--aspect <ratio>` | 16:9 or 9:16 | 16:9 |
-| `--resolution <res>` | 720p, 1080p, or 4K | 1080p |
-| `--audio` | Generate audio | (enabled) |
-| `--no-audio` | Disable audio | - |
+| `--resolution <res>` | 720p / 1080p; 4K needs a supported preview model | 1080p |
+| `--audio`, `--no-audio` | Parsed but not forwarded to API in 1.0.10; do not rely on them | - |
 | `--seed <number>` | Reproducibility seed | (random) |
 | `--output <file>` | Output path | output/video-<timestamp>.mp4 |
 | `--file <image>` | Input image to animate | - |
+
+1080p requires `--duration 8`; choose 720p for 4/6-second clips. Reference
+images (at most three) and extensions also require 8 seconds. `--extend`
+requires the prior video and its `.uri` sidecar, forces 720p, and cannot be
+combined with `--file` or `--reference`. Keep sidecars private. Always choose
+a fresh output filename; image-to-video's default `<input>-animated.mp4` can
+overwrite a previous iteration. Availability and output duration need a real
+authorized provider check; parser acceptance is not proof of support.
 
 ## Camera Movement Reference
 
@@ -263,13 +346,13 @@ When creating multiple related videos:
 ## Cost Optimization
 
 ```bash
-# Development (cheapest): ~$1.20 per video
-nano-banana --video "test prompt" --video-fast --no-audio --resolution 720p
+# Short fast-model iteration after current price/budget approval
+nano-banana --video "test prompt" --video-fast --resolution 720p --duration 4
 
-# Testing with audio: ~$1.20 per video
+# Full-duration fast-model review
 nano-banana --video "test prompt" --video-fast
 
-# Production quality: ~$3.20 per video
+# Final render only if authorized
 nano-banana --video "final prompt" --resolution 1080p
 ```
 
@@ -281,16 +364,13 @@ See the [examples/](examples/) directory for complete prompt examples:
 - [dialogue-and-audio.md](examples/dialogue-and-audio.md) - Speech and sound
 - [image-to-video.md](examples/image-to-video.md) - Animating images
 
-## Environment Setup
+## Verification and sources
 
-Ensure `GEMINI_API_KEY` is set:
+Use local `--help` for installation checks, not a paid sample generation. After
+an authorized call, verify the output exists and inspect its duration, frames,
+audio, and continuity. A successful exit alone is insufficient (the launcher
+can mask signal exits). Report the selected model and any unverified limits.
 
-```bash
-export GEMINI_API_KEY="your-api-key-here"
-```
-
-Or create a `.env` file in your project:
-
-```
-GEMINI_API_KEY=your-api-key-here
-```
+- [CLI parser, help, and request construction](https://github.com/The-Focus-AI/nano-banana-cli/blob/42dbef71bbf9dfa3aeb6721b7c3adee4adf98573/cli.ts)
+- [Version and executable mapping](https://github.com/The-Focus-AI/nano-banana-cli/blob/42dbef71bbf9dfa3aeb6721b7c3adee4adf98573/package.json)
+- [Static cost estimates, not provider quotes](https://github.com/The-Focus-AI/nano-banana-cli/blob/42dbef71bbf9dfa3aeb6721b7c3adee4adf98573/lib/cost.ts)

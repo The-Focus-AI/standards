@@ -1,30 +1,29 @@
 [tools]
-fnox = "latest"
+fnox = { version = "1.45.0", workflow = "release.yml" }
 node = "24.18.0"
 ripgrep = "latest"
 fd = "latest"
 "npm:firecrawl-cli" = "1.16.2"
 "npm:@earendil-works/pi-coding-agent" = "latest"
-"npm:markdownlint-cli2" = "latest"
-"npm:skills" = "1.5.13"
+"npm:markdownlint-cli2" = "0.24.0"
+"npm:skills" = "1.7.4"
 gh = "latest"
+op = "2.41.1"
+python = "3.13.18"
+jq = "1.8.1"
 
 [env]
 _.file = ".fnox/env"
 
 [tasks.setup]
-description = "First-time onboarding: pulls SA token from 1Password into .fnox/env"
+description = "Check the bootstrap token injected into this cloud environment"
 run = '''
-set -euo pipefail
-mkdir -p .fnox && chmod 700 .fnox
-if [ -f .fnox/env ]; then
-  echo "✓ .fnox/env already exists — skipping"
-  exit 0
+set -eu
+if [ -z "${OP_SERVICE_ACCOUNT_TOKEN:-}" ]; then
+  echo "Set OP_SERVICE_ACCOUNT_TOKEN in this project's cloud secret settings using your 1Password account." >&2
+  exit 1
 fi
-TOKEN="$(op read 'op://thefocus/standards service account token/credential')"
-printf 'OP_SERVICE_ACCOUNT_TOKEN=%s\n' "$TOKEN" > .fnox/env
-chmod 600 .fnox/env
-echo "✓ .fnox/env written. Open a new shell tab."
+echo "Bootstrap token is available; run mise run secrets:check to verify access."
 '''
 
 [tasks."secrets:check"]
@@ -36,9 +35,17 @@ description = "List all declared secrets and where they resolve from"
 run = "fnox list"
 
 [tasks."secrets:rotate-token"]
-description = "Re-pull SA token from 1Password (overwrites .fnox/env)"
+description = "Local exception only: refresh .fnox/env from personal 1Password access"
 run = '''
-set -euo pipefail
+set -eu
+git check-ignore -q -- .fnox/env || { echo "Ignore .fnox/env before writing it" >&2; exit 1; }
+if [ -n "$(git ls-files -- .fnox/env)" ]; then
+  echo "STOP: .fnox/env is tracked; do not write credentials" >&2
+  exit 1
+fi
+umask 077
+mkdir -p .fnox
+chmod 700 .fnox
 TOKEN="$(op read 'op://thefocus/standards service account token/credential')"
 printf 'OP_SERVICE_ACCOUNT_TOKEN=%s\n' "$TOKEN" > .fnox/env
 chmod 600 .fnox/env
@@ -46,23 +53,23 @@ echo "✓ .fnox/env refreshed."
 '''
 
 [tasks.install]
-description = "Install tools and skills needed for the project"
-run = "skills experimental_install"
+description = "Restore agent skills from the committed lock"
+run = "node scripts/restore-skills.mjs"
 
 [tasks.dev]
 description = "Run lint + test in development mode"
 run = '''
-set -euo pipefail
+set -eu
 mise run lint
 mise run test
 '''
 
 [tasks.lint]
-description = "Everything: markdownlint, skills, mise doctor, fnox, DESIGN.md, the renderer, STD-006"
+description = "Offline static checks: markdown, skills, DESIGN.md, renderer, and STD-006"
 run = '''
-set -euo pipefail
+set -eu
 echo "==> Linting markdown..."
-npx markdownlint-cli2 "**/*.md" "#node_modules" "#.pi" "#.agents" || {
+markdownlint-cli2 "**/*.md" "#node_modules" "#.pi" "#.agents" || {
   echo "  ✗ Markdown lint failed"
   exit 1
 }
@@ -73,14 +80,8 @@ node scripts/check-skills.mjs || {
   echo "  ✗ Skill validation failed"
   exit 1
 }
-echo ""
-echo "==> Validating mise config..."
-mise doctor
-echo "  ✓ mise config OK"
-echo ""
-echo "==> Checking fnox secrets..."
-fnox check
-echo "  ✓ fnox secrets OK"
+node scripts/restore-skills.mjs --validate-lock
+cmp skills-lock.json templates/default-project/skills-lock.json
 echo ""
 echo "==> Validating DESIGN.md..."
 node scripts/validate-design.mjs
@@ -99,38 +100,42 @@ run = "node scripts/check-skills.mjs"
 [tasks."lint:fix"]
 description = "Auto-fix markdown lint violations"
 run = '''
-set -euo pipefail
+set -eu
 echo "==> Auto-fixing markdown..."
-npx markdownlint-cli2 --fix "**/*.md" "#node_modules" "#.pi" "#.agents"
+markdownlint-cli2 --fix "**/*.md" "#node_modules" "#.pi" "#.agents"
 echo "  ✓ Fixes applied"
 '''
 
 [tasks.test]
-description = "Run Dockerfile integration tests (docker build + smoke)"
+description = "Run offline behavior and bootstrap tests (no credentials or Docker)"
 run = '''
+set -eu
+node --test tests/test-*.mjs
+bash tests/test-bootstrap.sh
+'''
+
+[tasks."test:docker"]
+description = "Integration: build and smoke-test the agent image (Docker and network required)"
+run = '''
+set -eu
 echo "==> Integration tests (docker build + smoke)..."
 ./tests/test-dockerfile.sh "$@"
 '''
 
 [tasks.deploy]
-description = "Deploy the standards site (built by CI, never from a workstation)"
+description = "Explain the CI-only deployment path; never publish from this workspace"
 run = '''
-set -euo pipefail
-echo "==> The site is deployed by GitHub Actions, not from here (STD-008 3.10)."
-echo "    Push to main, or trigger it by hand:"
-echo ""
-echo "      gh workflow run pages.yml"
-echo ""
-echo "==> Building locally to confirm it would deploy..."
-node scripts/render-standard.mjs
-echo ""
-echo "  ok — this build would publish. Open it with: mise run standard:preview"
+set -eu
+echo "No deployment performed: GitHub Actions pages.yml publishes main (STD-008 §3.10)." >&2
+echo "After the recorded release approval, an authorized operator may dispatch: gh workflow run pages.yml --ref main" >&2
+echo "Use mise run standard:render for a build-only check; it does not verify deployment." >&2
+exit 1
 '''
 
 [tasks."deploy:status"]
 description = "Which target the site deploys to, and the state of the last run"
 run = '''
-set -euo pipefail
+set -eu
 echo "target:  github-pages environment on The-Focus-AI/standards"
 echo "url:     https://the-focus-ai.github.io/standards/"
 echo ""
@@ -145,7 +150,7 @@ run = "node scripts/render-standard.mjs"
 [tasks."standard:preview"]
 description = "Render the corpus and serve the site at http://localhost:8900/"
 run = '''
-set -euo pipefail
+set -eu
 node scripts/render-standard.mjs
 echo "==> http://localhost:8900/"
 python3 -m http.server -d out/standards 8900
@@ -162,12 +167,13 @@ run = "node scripts/validate-design.mjs"
 [tasks."generate:dockerfile"]
 description = "Run pi in batch mode with the generate-dockerfile prompt"
 run = '''
+#!/usr/bin/env bash
 set -euo pipefail
 
 echo "==> Generating Dockerfile (streaming progress)..."
 echo ""
 
-pi --mode json -p "$(cat prompts/PRM-001-generate-dockerfile.md)" 2>/dev/null | jq -R -r '
+pi --mode json -p "$(cat prompts/PRM-001-generate-dockerfile.md)" | jq -R -r '
   fromjson? |
   if .type == "tool_execution_start" then
     if .toolName == "read" then
@@ -197,5 +203,5 @@ pi --mode json -p "$(cat prompts/PRM-001-generate-dockerfile.md)" 2>/dev/null | 
 '
 
 echo ""
-echo "Run 'mise test' to validate, or 'docker build -t standards .' to build."
+echo "Run 'mise run test:docker' to build and smoke-test the image (requires Docker and network)."
 '''

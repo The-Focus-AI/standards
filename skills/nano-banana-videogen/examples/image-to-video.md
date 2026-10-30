@@ -2,6 +2,10 @@
 
 Prompt examples for animating still images with the `--file` flag.
 
+Complete `../SKILL.md`'s approval, mise, and fnox preflight first. Bare commands
+assume its authorized `mise exec -- fnox exec -- bash` shell. Use trusted image
+paths and fresh output names; inspect actual results rather than promising motion.
+
 ## Basic Usage
 
 ```bash

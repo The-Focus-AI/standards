@@ -1,6 +1,6 @@
 ---
 number: "006"
-title: "Local development environment"
+title: "Cloud-first development environment"
 kind: guide
 issued: "2026-07-25"
 author: W. Schenk
@@ -11,12 +11,38 @@ verified: "2026-07-26"
 > Was `deployment.md`, which was named for deployment but contained none of it.
 > The deployment routing it used to carry is now `STD-008`; the binding rules
 > for tooling are `STD-004`, for agent environments `STD-005`, and for secrets
-> `STD-007`. Everything below is the walkthrough, preserved as it was.
+> `STD-007`. The shell and server recipes below apply inside the cloud workspace
+> unless a project records a local-development exception.
 
-# Local development environment
+# Cloud-first development environment
 
-Setting up a working machine: mise and fnox activation, remote servers, pi, and
-tmux. This is explanation — the rules it satisfies live in the standards above.
+The default working machine is an Amp orb, a Cursor cloud environment, or an
+equivalent reproducible remote workspace (`STD-005 §3.10`). Edit code, install
+dependencies, run tests, and serve the app there. The laptop supplies a browser
+and a person's authentication; it is not a prerequisite build or database host.
+
+## Start in the cloud
+
+1. Create the workspace from the repository and use its committed bootstrap.
+   Keep project installation in the mise tasks rather than vendor dashboard scripts.
+2. Retrieve the project bootstrap token through your own 1Password account and
+   add it to that project's cloud secret settings as `OP_SERVICE_ACCOUNT_TOKEN`
+   (`GDE-003`). Do not give the agent your account password or personal session.
+3. Run the repository's install, dev, lint, and test tasks in the workspace.
+   Use a portal or the platform preview URL to review the running application.
+4. Preserve environment fixes in the repository. Do not ask the next developer
+   to reconstruct an unrecorded laptop setup.
+
+In Amp, `.agents/setup` installs dependencies before snapshots;
+`.agents/resume` handles activation-time authentication; `.amp/services.yaml`
+declares managed services and portals. Do not bake tokens into a snapshot or
+leave a server running from setup. In Cursor, verify that the saved environment
+points at the committed `.cursor/environment.json` before assuming it is used.
+`STD-005 §4` links the checked platform documentation.
+
+Native hardware or another genuine local-only requirement is an exception:
+record the reason, owner, and verification path in `AGENTS.md`. Browser review
+and entering a token retrieved from 1Password are not local-development exceptions.
 
 # mise and fnox setup
 
@@ -49,7 +75,8 @@ the long-running confusion where a task works in one terminal and not another.
 `STD-004 §3.7` requires this; the two `eval` lines are how it is satisfied.
 
 Note that fnox activation is **separate** from mise activation — mise loads
-`.fnox/env`, fnox resolves the secrets themselves.
+declared tools and environment settings; the cloud platform injects the bootstrap
+token; fnox resolves application secrets. `.fnox/env` loading is a local fallback.
 
 # remote server setup
 
@@ -73,12 +100,6 @@ Add Node and pi to the project's mise.toml:
 ```bash
 mise use node
 mise use npm:@earendil-works/pi-coding-agent
-```
-
-Alternative: install pi globally with the install script:
-
-```bash
-curl -fsSL https://pi.dev/install.sh | sh
 ```
 
 ## Project-local pi configuration
