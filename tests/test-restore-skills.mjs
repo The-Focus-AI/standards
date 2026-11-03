@@ -13,6 +13,8 @@ const hash = createHash("sha256").update("SKILL.md").update(skill).digest("hex")
 function fixture(t) {
   const cwd = mkdtempSync(join(tmpdir(), "restore-test-"));
   t.after(() => rmSync(cwd, { recursive: true, force: true }));
+  const copiedScript = join(cwd, "project restore.mjs");
+  writeFileSync(copiedScript, readFileSync(script));
   mkdirSync(join(cwd, "bin"));
   const cli = join(cwd, "bin", "skills");
   writeFileSync(cli, `#!${process.execPath}
@@ -36,7 +38,7 @@ if (mode === 'failure') process.exit(1);
   const save = () => writeFileSync(join(cwd, "skills-lock.json"), JSON.stringify(lock, null, 2) + "\n");
   save();
   return { cwd, lock, save, run(mode = "valid", args = []) {
-    return spawnSync(process.execPath, [script, ...args], {
+    return spawnSync(process.execPath, [copiedScript, ...args], {
       cwd, encoding: "utf8", env: { ...process.env, PATH: `${cwd}/bin:${process.env.PATH}`, FIXTURE_MODE: mode },
     });
   } };

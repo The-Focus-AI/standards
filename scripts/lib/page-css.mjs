@@ -95,6 +95,21 @@ table.reg { min-width: 38rem; }
 table.reg td:first-child { font-family: var(--font-mono); white-space: nowrap; }
 td.num { font-family: var(--font-mono); text-align: right; font-variant-numeric: tabular-nums; }
 
+/* --- register navigation and skill inventory --- */
+.register-nav, .skill-sources {
+  display: flex; flex-wrap: wrap; gap: .25rem 1rem; margin-bottom: 1.5rem;
+  font-size: var(--size-small);
+}
+.register-nav a, .skill-sources a { display: inline-flex; align-items: center; min-height: 44px; }
+.skill-group { scroll-margin-top: 1rem; }
+.skill-group h3 { margin-bottom: .5rem; overflow-wrap: anywhere; }
+.skill-count { color: var(--color-muted); font-weight: 400; }
+.skill-group table { min-width: 0; table-layout: fixed; }
+.skill-group th:first-child { width: 78%; }
+.skill-group td:first-child { font-family: var(--font-mono); overflow-wrap: anywhere; }
+.skill-group td:last-child { white-space: nowrap; }
+.skill-group caption { text-align: left; color: var(--color-muted); padding-bottom: .5rem; }
+
 /* --- clause: the level band --- */
 .clause { margin: 1.5rem 0; border: 1px solid var(--color-line); }
 .band {
@@ -132,6 +147,23 @@ pre.cmd {
   padding: .6rem .75rem; overflow-x: auto;
 }
 
+/* --- repository update prompt --- */
+.quick-start { border: 1px solid var(--color-line); padding: 1rem; margin-bottom: 1.5rem; }
+.quick-start-head { display: flex; flex-wrap: wrap; gap: .75rem 1rem; align-items: center; justify-content: space-between; margin-bottom: .75rem; }
+.quick-start h2 { margin: 0; }
+.quick-start button {
+  font-family: var(--font-display); font-size: var(--size-body); font-weight: var(--fw-display);
+  letter-spacing: var(--ls-display); text-transform: uppercase; min-height: 44px;
+  padding: .5rem 1rem; border: 0; border-radius: var(--radius-control); cursor: pointer;
+  background: var(--color-action); color: var(--color-action-text);
+}
+.quick-start button:hover { filter: brightness(1.08); }
+.quick-start button:disabled { opacity: .5; cursor: wait; }
+.quick-start pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.quick-start code { font-size: inherit; }
+.quick-start-foot { display: flex; flex-wrap: wrap; gap: .5rem 1rem; justify-content: space-between; margin-top: .75rem; font-size: var(--size-small); }
+.quick-start [role="status"] { color: var(--color-agent); }
+
 /* --- memos and labels --- */
 .status-memo { border: 1px solid var(--color-line); background: rgba(20,26,23,.03); padding: .9rem 1.05rem; margin-bottom: 1.5rem; }
 .status-memo p:last-child { margin-bottom: 0; }
@@ -161,11 +193,14 @@ pre.cmd {
   .rfc-head { grid-template-columns: 1fr; }
   .rfc-head .right { text-align: left; }
   .sheet { padding: 1.4rem 1.15rem 2rem; }
+  .skill-group th:first-child { width: 70%; }
 }
 
 @media print {
   body { background: #fff; color: #000; padding: 0; }
   .sheet { border: none; max-width: none; padding: 0; background: #fff; }
+  .register-nav, .skill-sources { display: none; }
+  .quick-start button, .quick-start [role="status"] { display: none; }
   .band { background: transparent; }
   .band .tab { color: #000 !important; background: transparent !important; border: 1.5px solid #000; margin: .3rem; padding: .3rem .55rem; }
   .stamp { color: #000 !important; background: transparent !important; border: 1.5px solid #000; }

@@ -47,6 +47,7 @@ function fixture(t) {
   };
   write("DESIGN.md", document("design"));
   write("standards/STD-001-fixture.md", document("standard"));
+  write("skills-lock.json", JSON.stringify({ version: 1, skills: {} }));
   return { root, write };
 }
 
@@ -235,4 +236,88 @@ test("renderer leaves an existing build untouched when validation fails", (t) =>
   assert.equal(second.status, 1, second.output);
   assert.match(second.output, /no pages written/i);
   assert.equal(readFileSync(join(root, "out/standards/index.html"), "utf8"), index);
+});
+
+test("register and bundle show the current PRM-002 quick-start text before the document list", (t) => {
+  const { root, write } = fixture(t);
+  for (const text of ["Audit <this repo> & preserve behavior.\n\nDo not merge.", "Use the revised workflow."]) {
+    write("prompts/PRM-002-fixture.md", document("prompt", { number: "002" },
+      `# Update a repository\n\n## Quick-start prompt\n\n\`\`\`text\n${text}\n\`\`\`\n\n# Agent prompt\n\nFull instructions.\n`));
+    const result = run(root, "render-standard.mjs");
+    assert.equal(result.status, 0, result.output);
+    for (const [file, href] of [["index.html", "prm-002.html"], ["standards.html", "#PRM-002"]]) {
+      const html = readFileSync(join(root, "out/standards", file), "utf8");
+      const prompt = html.match(/<pre[^>]*aria-label="Repository update prompt"[^>]*><code>([\s\S]*?)<\/code><\/pre>/);
+      assert.ok(prompt, `${file} exposes a labeled, selectable prompt without JavaScript`);
+      const decoded = prompt[1].replaceAll("&lt;", "<").replaceAll("&gt;", ">").replaceAll("&amp;", "&");
+      assert.equal(decoded, text);
+      assert.ok(!prompt[1].includes("<this repo>"), "prompt text is escaped, not rendered as markup");
+      assert.ok(prompt.index < html.indexOf('id="register-standards"'));
+      assert.ok(html.includes(`href="${href}">Read the full workflow (PRM-002)</a>`));
+    }
+  }
+});
+
+test("skill inventory includes locked upstream skills and optional local skills, grouped by source", (t) => {
+  const { root, write } = fixture(t);
+  const names = ["setup-project", "shared-name", "pptx-decks"];
+  write("skills/VENDORED.md", "## Authored here\n\n" + names.map((name, i) =>
+    `| SKL-00${i + 1} | \`${name}\` | Fixture |`).join("\n"));
+  for (const name of names) {
+    write(`skills/${name}/SKILL.md`, `---\nname: ${name}\ndescription: Fixture skill\n---\n\nSkill content.\n`);
+  }
+  write(".agents/skills/not-in-the-lock/SKILL.md", "Must not appear in the published inventory.");
+  const entry = (source, skillPath) => ({ source, skillPath, sourceType: "github", ref: "a".repeat(40), computedHash: "b".repeat(64) });
+  const skills = {
+    architect: entry("cursor/plugins", "pstack/skills/architect/SKILL.md"),
+    "setup-project": entry("The-Focus-AI/standards", "skills/setup-project/SKILL.md"),
+    "shared-name": entry("other/skills", "canonical/shared-name/SKILL.md"),
+  };
+  write("skills-lock.json", JSON.stringify({ version: 1, skills }));
+  const first = run(root, "render-standard.mjs");
+  assert.equal(first.status, 0, first.output);
+  for (const file of ["index.html", "standards.html"]) {
+    const html = readFileSync(join(root, "out/standards", file), "utf8");
+    assert.match(html, /5 skills: <b>3 default<\/b>, <b>2 optional<\/b>/);
+    for (const [label, count] of [["pstack", 1], ["The Focus AI", 3], ["other/skills", 1]]) {
+      assert.ok(html.includes(`>${label} (${count})</a>`), label);
+    }
+    assert.ok(html.includes('href="#register-skills"'));
+    const rows = [...html.matchAll(/<tr>([\s\S]*?)<\/tr>/g)].map((m) => m[1]);
+    const local = (id) => file === "index.html" ? `skl-${id}.html` : `#SKL-${id}`;
+    for (const [name, href, selection] of [
+      ["architect", `https://github.com/cursor/plugins/blob/${"a".repeat(40)}/pstack/skills/architect/SKILL.md`, "Default"],
+      ["setup-project", local("001"), "Default"],
+      ["shared-name", `https://github.com/other/skills/blob/${"a".repeat(40)}/canonical/shared-name/SKILL.md`, "Default"],
+      ["shared-name", local("002"), "Optional"],
+      ["pptx-decks", local("003"), "Optional"],
+    ]) {
+      const matches = rows.filter((row) => row.includes(`<a href="${href}">${name}</a>`));
+      assert.equal(matches.length, 1, `${file}: ${name} at ${href} appears once`);
+      assert.ok(matches[0].includes(`>${selection}</td>`));
+    }
+    assert.ok(!html.includes("not-in-the-lock"));
+  }
+  delete skills.architect;
+  skills["shared-name"] = entry("The-Focus-AI/standards", "skills/shared-name/SKILL.md");
+  write("skills-lock.json", JSON.stringify({ version: 1, skills }));
+  const second = run(root, "render-standard.mjs");
+  assert.equal(second.status, 0, second.output);
+  const updated = readFileSync(join(root, "out/standards/index.html"), "utf8");
+  assert.match(updated, /3 skills: <b>2 default<\/b>, <b>1 optional<\/b>/);
+  assert.ok(!updated.includes("cursor/plugins") && !updated.includes("other/skills"));
+});
+
+test("renderer preserves the published output when the skill lock is missing or invalid", (t) => {
+  const { root, write } = fixture(t);
+  assert.equal(run(root, "render-standard.mjs").status, 0);
+  const before = readFileSync(join(root, "out/standards/index.html"), "utf8");
+  for (const source of [null, "{", JSON.stringify({ version: 1, skills: { bad: {} } })]) {
+    if (source === null) rmSync(join(root, "skills-lock.json"));
+    else write("skills-lock.json", source);
+    const result = run(root, "render-standard.mjs");
+    assert.equal(result.status, 1, result.output);
+    assert.match(result.output, /skills-lock\.json.*cannot render/);
+    assert.equal(readFileSync(join(root, "out/standards/index.html"), "utf8"), before);
+  }
 });

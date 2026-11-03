@@ -8,9 +8,10 @@ import {
   readdirSync, renameSync, rmSync, writeFileSync,
 } from "node:fs";
 import { join, relative } from "node:path";
+import { pathToFileURL } from "node:url";
 import { isDeepStrictEqual } from "node:util";
 
-function readLock(path) {
+export function readLock(path) {
   const lock = JSON.parse(readFileSync(path, "utf8"));
   if (lock.version !== 1 || !lock.skills || Array.isArray(lock.skills) || typeof lock.skills !== "object") {
     throw new Error("Expected a version 1 skills-lock.json with a skills object");
@@ -136,7 +137,9 @@ function main() {
   }
 }
 
-try { main(); } catch (error) {
-  console.error(`Skill restore: ${error.message}`);
-  process.exitCode = 1;
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  try { main(); } catch (error) {
+    console.error(`Skill restore: ${error.message}`);
+    process.exitCode = 1;
+  }
 }

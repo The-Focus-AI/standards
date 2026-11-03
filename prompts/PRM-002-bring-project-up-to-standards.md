@@ -25,6 +25,16 @@ Find it at `prompts/PRM-002-bring-project-up-to-standards.md` in
 `The-Focus-AI/standards`, or as `prm-002` on the published standards site.
 Companion guide: `GDE-012`.
 
+## Quick-start prompt
+
+```text
+Bring this repository up to date with https://github.com/The-Focus-AI/standards.
+
+Fetch main and follow prompts/PRM-002-bring-project-up-to-standards.md. Audit first, then implement the smallest safe, applicable fixes. Preserve product behavior and documented exceptions. Distinguish Draft recommendations from binding standards; do not ratify anything.
+
+Work in a cloud workspace. Run lint, tests, and relevant preview checks. Open draft PRs with verification evidence and list remaining gaps. Ask before changing credentials, production infrastructure, or product-maturity policy. Do not merge.
+```
+
 ---
 
 # Agent prompt
@@ -51,18 +61,20 @@ Follow this prompt exactly. Do not invent standards from memory.
 
 Run (adapt paths):
 
-    TARGET="$(pwd)"   # the project being updated
-    STANDARDS="${STANDARDS:-/tmp/focus-standards}"
-    if [ ! -d "$STANDARDS/.git" ]; then
-      git clone --depth 1 https://github.com/The-Focus-AI/standards.git "$STANDARDS"
-    else
-      git -C "$STANDARDS" fetch origin
-      git -C "$STANDARDS" checkout main
-      git -C "$STANDARDS" pull --ff-only
-    fi
-    STANDARDS_SHA=$(git -C "$STANDARDS" rev-parse HEAD)
-    STANDARDS_DATE=$(git -C "$STANDARDS" show -s --format=%ci HEAD)
-    echo "standards=$STANDARDS_SHA at $STANDARDS_DATE"
+```sh
+TARGET="$(pwd)"   # the project being updated
+STANDARDS="${STANDARDS:-/tmp/focus-standards}"
+if [ ! -d "$STANDARDS/.git" ]; then
+  git clone --depth 1 https://github.com/The-Focus-AI/standards.git "$STANDARDS"
+else
+  git -C "$STANDARDS" fetch origin
+  git -C "$STANDARDS" checkout main
+  git -C "$STANDARDS" pull --ff-only
+fi
+STANDARDS_SHA=$(git -C "$STANDARDS" rev-parse HEAD)
+STANDARDS_DATE=$(git -C "$STANDARDS" show -s --format=%ci HEAD)
+echo "standards=$STANDARDS_SHA at $STANDARDS_DATE"
+```
 
 Record `STANDARDS_SHA` in every report and PR body. Optionally also list open
 PRs on `The-Focus-AI/standards` that add Draft STDs/GDEs (for example testing)
@@ -85,9 +97,11 @@ Read before judging anything:
 Canonical lock: `$STANDARDS/templates/default-project/skills-lock.json`
 (fallback: `$STANDARDS/skills-lock.json` if the template lock is absent).
 
-    CANON="$STANDARDS/templates/default-project/skills-lock.json"
-    [ -f "$CANON" ] || CANON="$STANDARDS/skills-lock.json"
-    PROJ="$TARGET/skills-lock.json"
+```sh
+CANON="$STANDARDS/templates/default-project/skills-lock.json"
+[ -f "$CANON" ] || CANON="$STANDARDS/skills-lock.json"
+PROJ="$TARGET/skills-lock.json"
+```
 
 Produce a machine-readable and human-readable diff:
 

@@ -22,6 +22,7 @@ import { DOCUMENT_CLASSES, parseDocumentMetadata, duplicateIdentityErrors } from
 import { tokensToCss, ROOT } from "./lib/design-tokens.mjs";
 import { pageCss } from "./lib/page-css.mjs";
 import { blocks, renderBlock, inline, esc } from "./lib/markdown.mjs";
+import { readLock as readSkillLock } from "./restore-skills.mjs";
 
 const STD_DIR = join(ROOT, "standards");
 const SKILLS_DIR = join(ROOT, "skills");
@@ -434,7 +435,103 @@ const regTable = (heads, rows) => `<div class="table-scroll"><table class="reg">
   <tbody>${rows.join("")}</tbody>
 </table></div>`;
 
-function renderRegister(standards, docs, skills, cssVars) {
+function renderQuickStart(doc) {
+  if (!doc) return "";
+  const start = doc.parsed.nodes.findIndex((n) => n.type === "heading" && n.text === "Quick-start prompt");
+  const prompt = doc.parsed.nodes[start + 1];
+  if (start < 0 || prompt?.type !== "code" || prompt.lang !== "text") return "";
+
+  return `<section class="quick-start" aria-labelledby="repo-update-title">
+  <div class="quick-start-head">
+    <h2 id="repo-update-title">Update a repository</h2>
+    <button type="button" id="copy-update-prompt" hidden>Copy prompt</button>
+  </div>
+  <p>Paste this into an agent working in the repository you want to update.</p>
+  <pre class="cmd" id="repo-update-prompt" tabindex="0" aria-label="Repository update prompt"><code>${esc(prompt.text)}</code></pre>
+  <div class="quick-start-foot">
+    <a href="${esc(doc.file)}">Read the full workflow (${esc(doc.id)})</a>
+    <span id="copy-prompt-status" role="status"></span>
+  </div>
+</section>
+<script>
+(() => {
+  const button = document.getElementById("copy-update-prompt");
+  const prompt = document.getElementById("repo-update-prompt");
+  const status = document.getElementById("copy-prompt-status");
+  button.hidden = false;
+  button.addEventListener("click", async () => {
+    button.disabled = true;
+    status.textContent = "";
+    try {
+      await navigator.clipboard.writeText(prompt.textContent);
+      status.textContent = "Prompt copied.";
+    } catch {
+      prompt.focus();
+      const range = document.createRange();
+      range.selectNodeContents(prompt);
+      const selection = window.getSelection();
+      selection.removeAllRanges();
+      selection.addRange(range);
+      status.textContent = "Copy unavailable. The prompt is selected; copy it manually.";
+    } finally {
+      button.disabled = false;
+    }
+  });
+})();
+</script>`;
+}
+
+function skillInventory(skills, selection) {
+  const source = "The-Focus-AI/standards";
+  const local = new Map(skills.map((s) => [s.name, s]));
+  const matches = (name, entry) => entry?.source === source && entry.skillPath === `skills/${name}/SKILL.md`;
+  const inventory = Object.entries(selection).map(([name, entry]) => ({
+    name, source: entry.source, selection: "Default",
+    href: matches(name, entry) && local.has(name)
+      ? local.get(name).file
+      : `https://github.com/${entry.source}/blob/${entry.ref}/${entry.skillPath.split("/").map(encodeURIComponent).join("/")}`,
+  }));
+  for (const s of skills) {
+    if (!matches(s.name, selection[s.name])) {
+      inventory.push({ name: s.name, source, selection: "Optional", href: s.file });
+    }
+  }
+  return inventory.sort((a, b) => a.source.localeCompare(b.source) || a.name.localeCompare(b.name));
+}
+
+function renderSkillInventory(inventory) {
+  if (!inventory.length) return "";
+  const labels = { "cursor/plugins": "pstack", "mattpocock/skills": "Matt Pocock", "The-Focus-AI/standards": "The Focus AI", "firecrawl/cli": "Firecrawl" };
+  const groups = new Map();
+  for (const skill of inventory) {
+    if (!groups.has(skill.source)) {
+      groups.set(skill.source, { source: skill.source, id: `register-skills-${skill.source}`, label: labels[skill.source] ?? skill.source, skills: [] });
+    }
+    groups.get(skill.source).skills.push(skill);
+  }
+  const defaults = inventory.filter((s) => s.selection === "Default").length;
+  return `<section aria-labelledby="register-skills">
+<h2 id="register-skills">Skills</h2>
+<p>${inventory.length} skills: <b>${defaults} default</b>, <b>${inventory.length - defaults} optional</b>.
+   Defaults come from <code>skills-lock.json</code>; optional skills are maintained here but not selected by default.
+   Local links open this corpus; external links open the recorded upstream revision.</p>
+<nav class="skill-sources" aria-label="Skill sources">${[...groups.values()].map((g) =>
+    `<a href="#${esc(g.id)}">${esc(g.label)} (${g.skills.length})</a>`).join("")}</nav>
+${[...groups.values()].map((g) => `<section class="skill-group" aria-labelledby="${esc(g.id)}">
+  <h3 id="${esc(g.id)}">${esc(g.label)} <span class="skill-count">· ${g.skills.length} skills</span></h3>
+  <table>
+    <caption>Source: <a href="https://github.com/${esc(g.source)}">${esc(g.source)}</a></caption>
+    <thead><tr><th scope="col">Skill</th><th scope="col">Selection</th></tr></thead>
+    <tbody>${g.skills.map((s) => `<tr>
+      <td><a href="${esc(s.href)}">${esc(s.name)}</a></td>
+      <td class="${s.selection === "Default" ? "is-agent" : "is-muted"}">${s.selection}</td>
+    </tr>`).join("")}</tbody>
+  </table>
+</section>`).join("\n")}
+</section>`;
+}
+
+function renderRegister(standards, docs, inventory, cssVars) {
   const stdRows = standards.map((e) => `<tr>
       <td><a href="${esc(e.file)}">${esc(e.id)}</a></td>
       <td>${esc(e.title)}</td>
@@ -459,17 +556,8 @@ function renderRegister(standards, docs, skills, cssVars) {
     return `<h2>${esc(cls.plural)}</h2>\n<p>${cls.blurb} They are <b>not standards</b> and bind nothing (<code>STD-001 §4</code>).</p>\n${regTable(heads, rows)}`;
   }).join("\n");
 
-  const skillSection = skills.length ? `<h2>Skills</h2>
-<p>Capabilities an agent loads when its triggers match, installable with
-   <code>skills add</code>. A skill is cited by name and numbered here;
-   <code>STD-011</code> governs how one is installed and pinned.</p>
-${regTable(["Ref", "Skill", "Provenance", "Relates to"], skills.map((k) => `<tr>
-      <td><a href="${esc(k.file)}">${esc(k.id)}</a></td>
-      <td>${esc(k.name)}</td>
-      <td><span class="pip ${k.provenance === "Vendored" ? "is-muted" : "is-agent"}">${esc(k.provenance)}</span></td>
-      <td>${k.relates.length ? k.relates.map(esc).join(", ") : "—"}</td>
-    </tr>`))}` : "";
-
+  const defaults = inventory.filter((s) => s.selection === "Default").length;
+  const skillCounts = `${defaults} default, ${inventory.length - defaults} optional`;
   const inForce = standards.filter((e) => e.status === "In force").length;
   const drafts = standards.filter((e) => e.status === "Draft").length;
   const counts = PROSE_CLASSES
@@ -482,9 +570,14 @@ ${regTable(["Ref", "Skill", "Provenance", "Relates to"], skills.map((k) => `<tr>
     cssVars,
     bodyHtml: `<div class="rfc-head">
   <div><b>The Focus AI Standards</b><br>The register<br>Standards: ${standards.length}<br>In force: ${inForce}<br>Draft: ${drafts}</div>
-  <div class="right">The Focus AI<br>standards.thefocus.ai<br>${counts.join("<br>")}${skills.length ? `<br>Skills: ${skills.length}` : ""}</div>
+  <div class="right">The Focus AI<br>standards.thefocus.ai<br>${counts.join("<br>")}${inventory.length ? `<br>Skills: ${skillCounts}` : ""}</div>
 </div>
 <h1>The register</h1>
+<nav class="register-nav" aria-label="Register sections">
+  <a href="#register-standards">Standards (${standards.length})</a>
+  ${inventory.length ? `<a href="#register-skills">Skills (${skillCounts})</a>` : ""}
+</nav>
+${renderQuickStart(docs.find((d) => d.id === "PRM-002"))}
 <div class="status-memo">
   <span class="lbl">Status of this register</span>
   <p>Every document The Focus AI has issued, with what it binds and whether it is
@@ -496,10 +589,10 @@ ${regTable(["Ref", "Skill", "Provenance", "Relates to"], skills.map((k) => `<tr>
      renderer and the document, skill, and design validators. These check
      structure and metadata, not whether requirements agree or examples work.</p>
 </div>
-<h2>Standards</h2>
+<h2 id="register-standards">Standards</h2>
 ${regTable(["Ref", "Title", "Category", "Applies to", "Status", "Clauses"], stdRows)}
 ${sections}
-${skillSection}`,
+${renderSkillInventory(inventory)}`,
   });
 }
 
@@ -521,7 +614,7 @@ function renderBundle(standards, docs, skills, cssVars, registerHtml) {
     : "";
   const subNav = [
     ...PROSE_CLASSES.map((c) => railFor(c.plural, docs.filter((d) => d.cls.kind === c.kind))),
-    railFor("Skills", skills),
+    railFor("Focus skills", skills),
   ].join("\n");
 
   // Inside one page every document is a fragment, so links to another
@@ -571,7 +664,7 @@ body { padding: 0 1rem 3rem; }
 ${pageCss(cssVars, extraCss)}
 </style>
 </head><body>
-<nav class="railbar"><a class="home" href="#register">The Focus AI Standards</a>${nav}</nav>
+<nav class="railbar"><a class="home" href="#register">The Focus AI Standards</a><a class="reg-link" href="#register-skills">All skills</a>${nav}</nav>
 ${subNav}
 <main class="sheet">
 <div class="panel" id="register">${registerBody}</div>
@@ -581,12 +674,14 @@ ${panels}
 const panels = [...document.querySelectorAll(".panel")];
 function show() {
   const id = (location.hash || "#register").slice(1);
-  const target = document.getElementById(id) ? id : "register";
-  panels.forEach((p) => { p.hidden = p.id !== target; });
+  const anchor = document.getElementById(id);
+  const target = anchor?.closest(".panel") || document.getElementById("register");
+  panels.forEach((p) => { p.hidden = p !== target; });
   document.querySelectorAll(".reg-link").forEach((a) => {
-    a.setAttribute("aria-current", String(a.dataset.doc === target));
+    a.setAttribute("aria-current", String(a.dataset.doc === target.id));
   });
-  window.scrollTo(0, 0);
+  if (anchor && anchor !== target) anchor.scrollIntoView();
+  else window.scrollTo(0, 0);
 }
 addEventListener("hashchange", show);
 show();
@@ -709,6 +804,12 @@ function main() {
     }
   }
 
+  let selection = {};
+  if (!args.length) {
+    try { selection = readSkillLock(join(ROOT, "skills-lock.json")).skills; }
+    catch (error) { report("skills-lock.json", "cannot render the default skill inventory", [error.message]); }
+  }
+
   const standards = [];
   for (const f of stdFiles) {
     const parsed = parseStandard(readFileSync(f, "utf8"), basename(f));
@@ -784,12 +885,13 @@ function main() {
     console.log(`  ok ${k.id}  Skill            ${k.name}`);
   }
 
-  const registerHtml = wire(renderRegister(standards, docs, skills, cssVars), "index.html");
+  const inventory = skillInventory(skills, selection);
+  const registerHtml = wire(renderRegister(standards, docs, inventory, cssVars), "index.html");
   writeFileSync(join(OUT_DIR, "index.html"), registerHtml);
   writeFileSync(join(OUT_DIR, "standards.html"), renderBundle(standards, docs, skills, cssVars, registerHtml));
   console.log(
     `\n  rendered to out/standards/ — index.html lists ${standards.length} standard(s), ` +
-    `${docs.length} document(s) and ${skills.length} skill(s); standards.html bundles them`
+    `${docs.length} document(s) and ${inventory.length} skill(s); standards.html bundles ${skills.length} owned skill pages`
   );
 }
 
