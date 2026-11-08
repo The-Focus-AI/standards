@@ -1,4 +1,4 @@
-# Default Focus.AI CI — runs the same mise tasks a developer runs (STD-012 §3.1, STD-004).
+# Default Focus.AI CI — runs the same mise tasks a developer runs (handbook/release.md, handbook/development.md).
 # An authorized owner still needs to configure branch protection; this file does not.
 name: ci
 on:

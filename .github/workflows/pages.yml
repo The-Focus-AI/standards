@@ -1,26 +1,26 @@
 # Publishes the rendered corpus to GitHub Pages.
 #
-# The site is built by CI and never from a workstation (STD-008 §3.10), so what
+# The site is built by CI and never from a workstation (handbook/release.md), so what
 # is published is always what is on main. The renderer and three validators
 # check structure, metadata, skills, and design before publishing. They do not
-# replace a review of requirements, citations, or runnable examples (STD-001 §4).
-name: Publish the standards site
+# replace a review of requirements, citations, or runnable examples (handbook/maintaining.md).
+name: Publish the handbook
 
 on:
   push:
     branches: [main]
-    # Path-filtered, per STD-008 §3.13. The lock supplies the homepage's
+    # Path-filtered, per handbook/release.md. The lock supplies the homepage's
     # default skill inventory, so changing it must rebuild the site.
     paths:
-      - "standards/**"
-      - "best-practices/**"
-      - "reports/**"
-      - "architecture/**"
-      - "prompts/**"
+      - "handbook/**"
+      - "recipes/**"
+      - "evidence/**"
       - "skills/**"
       - "skills-lock.json"
       - "DESIGN.md"
       - "scripts/**"
+      - "templates/**"
+      - "tests/**"
       - ".github/workflows/pages.yml"
   workflow_dispatch:
 
@@ -29,7 +29,7 @@ permissions:
   pages: write
   id-token: write
 
-# STD-008 §3.7 — a half-finished deploy interrupted by the next one leaves the
+# handbook/release.md — a half-finished deploy interrupted by the next one leaves the
 # site in a state neither deploy intended.
 concurrency:
   group: pages
@@ -48,21 +48,24 @@ jobs:
           node-version: "24.18.0"
 
       - name: Render the corpus
-        run: node scripts/render-standard.mjs
+        run: node scripts/build-handbook.mjs
 
-      - name: Check every document against STD-006
+      - name: Check every document against handbook/maintaining.md
         run: node scripts/validate-documents.mjs
 
       - name: Check DESIGN.md
         run: node scripts/validate-design.mjs
 
-      - name: Check the skills and the SKL register
+      - name: Check skills and attribution
         run: node scripts/check-skills.mjs
+
+      - name: Test handbook behavior
+        run: node --test tests/test-handbook.mjs
 
       # Pages serves the artifact as-is, but a leading underscore in a future
       # filename would be dropped by Jekyll if it ever ran.
       - name: Mark as not Jekyll
-        run: touch out/standards/.nojekyll
+        run: touch out/handbook/.nojekyll
 
       # The custom domain is configured in Pages settings; shipping it in the
       # artifact too makes the binding deterministic rather than dependent on a
@@ -70,16 +73,16 @@ jobs:
       # CNAME — standards → the-focus-ai.github.io, DNS-only through Cloudflare,
       # since proxying blocks certificate issuance.
       - name: Claim the custom domain
-        run: echo standards.thefocus.ai > out/standards/CNAME
+        run: echo standards.thefocus.ai > out/handbook/CNAME
 
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: out/standards
+          path: out/handbook
 
   deploy:
     needs: build
     runs-on: ubuntu-latest
-    # STD-008 §3.1 — the target is named, not inherited from ambient state.
+    # handbook/release.md — the target is named, not inherited from ambient state.
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}

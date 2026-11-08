@@ -9,13 +9,11 @@ For rapid research with limited time.
 
 ```markdown
 ---
-number: "<next free number>"
 title: "Quick Research: [Topic]"
-kind: note
-issued: "YYYY-MM-DD"
+summary: "<The question and principal finding>"
 author: "<actual author or agent identity>"
-status: Current
-verified: "YYYY-MM-DD"
+status: Evidence
+checked: "YYYY-MM-DD"
 ---
 
 # Quick Research: [Topic]

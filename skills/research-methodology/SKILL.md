@@ -186,19 +186,17 @@ Research from [Organization](URL) indicates that...
 
 ## File Organization
 
-For a saved report in this corpus, read `STD-001` / `STD-006` and choose the
-next unassigned NOTE number. Follow the target project's own convention
-elsewhere; do not claim this corpus's numbering is mandatory across the fleet.
+For a saved report in this corpus, read `handbook/maintaining.md`.
+Follow the target project's own convention elsewhere.
 
 **Naming Convention:**
 
 ```text
-reports/NOTE-nnn-YYYY-MM-DD-topic-name.md
+evidence/topic-name.md
 ```
 
-Use `number`, `title`, `kind: note`, `issued`, `author`, `status: Current`, and
-`verified` frontmatter as shown in the templates. `issued` is the original
-issue date; `verified` is when claims were actually checked, not a formatting
+Use `title`, `summary`, `status: Evidence`, and `checked` frontmatter as shown
+in the templates. `checked` is when claims were actually checked, not a formatting
 date. Identify the actual author (including an agent when appropriate), never
 borrow an example person's name. Preserve known original attribution on
 migration; if unknown, state that honestly rather than guessing. Record which

@@ -47,7 +47,7 @@ Before setup or secret writes, check **each** intended secret path with
 report the path without opening it. Preserve existing ignores and keep
 `.env.example` trackable with placeholders only.
 
-Follow `GDE-003` / `STD-007` for a project-scoped vault and service account.
+Follow `recipes/fnox.md` / `handbook/secrets.md` for a project-scoped vault and service account.
 A person injects `OP_SERVICE_ACCOUNT_TOKEN` through cloud secret settings, not
 chat, a reusable image, or a copied personal login. Do not write the injected
 token to `.fnox/env`; that file is only a documented local exception.

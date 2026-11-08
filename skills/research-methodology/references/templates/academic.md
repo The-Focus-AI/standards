@@ -9,13 +9,11 @@ For comprehensive topic analysis requiring thorough coverage.
 
 ```markdown
 ---
-number: "<next free number>"
 title: "[Topic Title]"
-kind: note
-issued: "YYYY-MM-DD"
+summary: "<The question and principal finding>"
 author: "<actual author or agent identity>"
-status: Current
-verified: "YYYY-MM-DD"
+status: Evidence
+checked: "YYYY-MM-DD"
 ---
 
 # [Topic Title]

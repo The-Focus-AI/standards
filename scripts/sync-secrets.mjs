@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// No dependencies; dry-run never invokes fnox or the network. See GDE-003/005/010.
+// No dependencies; dry-run never invokes fnox or the network. See recipes/fnox.md.
 import { execFile } from "node:child_process";
 import { mkdtemp, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";

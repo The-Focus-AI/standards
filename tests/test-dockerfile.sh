@@ -196,7 +196,7 @@ for file in AGENTS.md mise.toml skills-lock.json README.md Dockerfile .dockerign
             bash -c 'docker exec "$1" test -f "/standards/'"$file"'"' -- "$CONTAINER"
 done
 
-for dir in best-practices reports prompts tests; do
+for dir in handbook recipes evidence tests; do
   check     "/standards/$dir present" \
             bash -c 'docker exec "$1" test -d "/standards/'"$dir"'"' -- "$CONTAINER"
 done
@@ -216,7 +216,7 @@ check_not "No pip install in Dockerfile" \
           bash -c 'docker exec "$1" grep -q "pip install" /standards/Dockerfile' -- "$CONTAINER"
 
 check     "Dockerfile declares its generator" \
-          bash -c 'docker exec "$1" grep -q "Generated from prompts/PRM-001-generate-dockerfile.md" /standards/Dockerfile' -- "$CONTAINER"
+          bash -c 'docker exec "$1" grep -q "Generated from recipes/generate-dockerfile.md" /standards/Dockerfile' -- "$CONTAINER"
 
 check_not "No personal pi auth mount example" \
           bash -c 'docker exec "$1" grep -q -- "-v ~/.pi:" /standards/Dockerfile' -- "$CONTAINER"

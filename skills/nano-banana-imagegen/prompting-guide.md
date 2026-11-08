@@ -307,7 +307,6 @@ nano-banana "add a subtle mist in the valley" --file v2.png --output v3.png
 ### Community Examples
 
 - Check the [examples/](examples/) directory for categorized prompt templates
-- Review the [prompts/](../../prompts/) directory for real-world use cases
 
 ---
 

@@ -11,7 +11,7 @@ description: >
 Use the installed `agent-browser`, not a plugin-private binary. This skill keeps
 the snapshot → interaction → verification workflow; the installed CLI's help
 owns the command syntax. Historical chrome-driver provenance is in
-`The-Focus-AI/standards`'s `skills/VENDORED.md` (`SKL-002`).
+`The-Focus-AI/standards`'s `skills/VENDORED.md`.
 
 ## Preflight
 

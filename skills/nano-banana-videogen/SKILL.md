@@ -47,7 +47,7 @@ Before setup or writing secrets, check **each** intended `.fnox/`, `.env`,
 `git ls-files -- <path>`. Stop for tracked secret files, reporting only the
 path. Preserve ignore rules; keep `.env.example` trackable and placeholder-only.
 
-Follow `GDE-003` / `STD-007`: an approved project vault/service account,
+Follow `recipes/fnox.md` / `handbook/secrets.md`: an approved project vault/service account,
 and a person injecting `OP_SERVICE_ACCOUNT_TOKEN` into cloud secret settings.
 Never request personal account credentials or persist the injected token into
 `.fnox/env`, reusable images, or snapshots. A local token file is an exception.

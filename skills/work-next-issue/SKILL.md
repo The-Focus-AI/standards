@@ -16,8 +16,8 @@ description: >
 
 One pass: frontier → choose → claim → branch → build → pull request → stop.
 
-This skill executes `STD-002` (issues and agent workflow) and `STD-003` (pull requests
-and branches). Where this file and a standard disagree, the standard wins.
+This skill executes `handbook/work.md`. Respect its status and the project's
+adopted policy; invoking this skill does not ratify a Draft for the organization.
 
 ## The three gates you never cross
 
@@ -25,20 +25,20 @@ Read these before anything else. Each exists because crossing it converts a smal
 mistake into merged code.
 
 1. **You never invent an unresolved decision to make a ticket `ready`**
-   (`STD-002 §3.4–3.5`). A person or agent may mark a fully specified ticket ready
+   (`handbook/work.md`). A person or agent may mark a fully specified ticket ready
    after checking its acceptance criteria, verification plan, and dependencies.
    Record the assessment; ask for missing product or approval decisions rather
    than assuming them. Readiness grants neither merge nor deployment authority.
-2. **You never merge your own pull request** (`STD-003 §3.12`). Opening it is where your
+2. **You never merge your own pull request** (`handbook/work.md`). Opening it is where your
    pass ends.
-3. **You never take work from outside the frontier** (`STD-002 §3.11`). Outside it, the
+3. **You never take work from outside the frontier** (`handbook/work.md`). Outside it, the
    work is either unaccepted, already claimed, or blocked on something that does not
    exist yet.
 
 ## 1. Read the frontier
 
 The frontier is every open implementation issue that is `ready`, unassigned,
-and has no open blocking relationship (`STD-002 §3.11`, `§3.16`). This query
+and has no open blocking relationship (`handbook/work.md`). This query
 collects candidates, not a complete eligibility decision; paginate when needed:
 
 ```sh
@@ -47,11 +47,11 @@ gh issue list --label ready --state open --json number,title,body,labels,assigne
 ```
 
 Read native blocking relationships where the tracker supports them; otherwise
-resolve the references in its `## Blocked by` section (`STD-002 §3.10`). Exclude
+resolve the references in its `## Blocked by` section (`handbook/work.md`). Exclude
 open blockers, `type:spec`, `type:epic`, and `wayfinder:map` planning containers.
 If blocker state cannot be read, do not assume the issue is unblocked.
 
-If the frontier is empty, assess close-to-ready backlog items against §3.4–3.5.
+If the frontier is empty, assess close-to-ready backlog items against the readiness criteria.
 An agent may prepare and mark a genuinely complete issue ready, then recompute
 the frontier. If a decision is missing, stop and name it instead of creating
 work for its own sake.
@@ -60,7 +60,7 @@ work for its own sake.
 
 **This is your judgement.** There is no priority label and no ordering rule; the
 organisation decided deliberately that picking the next piece of work is a reading of the
-situation rather than a sort (`ADR-004`). What is required is not a particular answer but
+situation rather than a sort (`handbook/work.md`). What is required is not a particular answer but
 a stated one.
 
 Weigh, roughly in this order:
@@ -86,9 +86,9 @@ whether the choice was considered.
 
 Several agents read the same frontier at the same time, so what you learned in step 1 is
 already stale. Re-read at the moment of claiming, and read back after writing
-(`STD-002 §3.7`, `§3.8`).
+(`handbook/work.md`).
 
-Follow the complete claim contract in `STD-002 §3.7–3.8`: recheck all frontier
+Follow the complete claim contract in `handbook/work.md`: recheck all frontier
 conditions, replace `ready` with `active` while assigning, and verify the result
 before branching. The old assignee-only shell snippet was not a complete check.
 
@@ -99,7 +99,7 @@ a read-after-write alone. If eligibility or ownership is unclear, do not start
 work or remove another session's claim.
 
 Once the claim holds, comment. State what happened and what happens next, in one or two
-sentences, with the reason from step 2 (`STD-002 §3.12`, `§3.13`). No preamble, no
+sentences, with the reason from step 2 (`handbook/work.md`). No preamble, no
 enthusiasm, no emoji.
 
 > Claimed. Taking this ahead of #98 and #103 because both of those are blocked by it.
@@ -109,7 +109,7 @@ enthusiasm, no emoji.
 ## 4. Cut the branch
 
 Named `<issue-number>-<slug>`, from the default branch, at the moment work starts
-(`STD-003 §3.1`, `§3.2`). Not from another feature branch and not from a stale local copy.
+(`handbook/work.md`). Not from another feature branch and not from a stale local copy.
 
 ```sh
 set -eu
@@ -131,7 +131,7 @@ working a ticket:
 
 - **If the issue turns out not to be ready** — the criteria contradict, a decision is
   missing, the approach needs an answer only a person has — stop and move it to `blocked`
-  with a comment naming exactly what you need and who from (`STD-002 §3.9`). `blocked`
+  with a comment naming exactly what you need and who from (`handbook/work.md`). `blocked`
   means waiting on a person. Waiting on another issue is a blocking relationship, not a
   label.
 - **If it grows past one pass**, say so on the issue and open the pull request for what is
@@ -140,10 +140,10 @@ working a ticket:
 ## 6. Open the pull request
 
 Success criteria first — above the why, above the diff summary, above everything
-(`STD-003 §3.6`). A reviewer who has to scroll to find out what the change was supposed to
+(`handbook/work.md`). A reviewer who has to scroll to find out what the change was supposed to
 achieve reviews the code instead of the outcome.
 
-Four sections, in this order (`STD-003 §4`):
+Four sections, in this order (`handbook/work.md`):
 
 ```text
 ## Success criteria     — checkable statements, one per box
@@ -161,15 +161,15 @@ build, evidence may reduce to the check that proves it.
 Say what you took, why you took it over what else was there, and what state it is in.
 Then stop.
 
-A person merges (`STD-003 §3.12`). If the repository uses the `auto-merge` opt-in
-(`STD-003 §3.13`), a person still applies it.
+A person merges (`handbook/work.md`). If the repository uses the `auto-merge` opt-in
+(`handbook/work.md`), a person still applies it.
 
 Running this again is a fresh pass: back to step 1, against a frontier that has changed.
 
 ## What this skill does not do
 
 - It does not invent product scope or approval decisions during triage. It may
-  prepare a complete ticket and mark it ready under `STD-002 §3.5`.
-- It does not decide the ordering rule. There isn't one. See `ADR-004` for why, and for
+  prepare a complete ticket and mark it ready under `handbook/work.md`.
+- It does not decide the ordering rule. There isn't one. See `handbook/work.md` for why, and for
   what would change the answer.
 - It does not review or merge. Both need someone other than the author.

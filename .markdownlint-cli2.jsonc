@@ -1,19 +1,18 @@
 {
-  // Markdownlint config for Focus.AI Standards
+  // Markdownlint config for the Focus engineering handbook
   "config": {
     "default": true,
     // Line length: 120 is practical for docs with URLs and tables
     "MD013": { "line_length": 120, "code_blocks": false, "tables": false },
-    // Allow multiple H1 headings (AGENTS.md, best-practices use them)
+    // Templates may contain example H1 headings.
     "MD025": false,
     // Allow inline HTML in markdown
     "MD033": false
   },
-  // Skip generated and cached content only. `reports/` and `architecture/` used
-  // to be skipped too; they are published documents now, so they are linted like
-  // everything else this repository writes.
+  // Skip generated and cached content, plus attributed vendored prose below.
   "ignores": [
     ".firecrawl/**",
+    ".amp/**",
     "node_modules/**",
     ".pi/**",
     ".agents/skills/**",

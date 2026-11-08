@@ -16,16 +16,14 @@ Adapt the reviewed baseline to a project's actual requirements. Scaffolding,
 configuration, and tooling only — **do not write application source code** or
 invent application tests to make an empty project look finished.
 
-## Where the standards live
+## Read the handbook
 
-The normative rules are in the standards repository, `The-Focus-AI/standards`:
-`STD-004` (tooling and tasks), `STD-005` (cloud workspaces), `STD-007` (secrets), and `STD-011` (skills). The
-walkthroughs are `best-practices/GDE-006-local-environment.md` (mise + fnox + pi),
-`best-practices/GDE-003-fnox-secrets.md` (the full secrets reference),
-`best-practices/GDE-008-skills.md` (the locked skill set), and
-`best-practices/GDE-007-pi-extensions.md`. If you are running inside that repo, read them directly. If not, and you
-have `gh` access, fetch them. If neither, the sequence below is the minimum bar — say
-in your summary that you worked without the full standards.
+In `The-Focus-AI/standards`, read `handbook/project-setup.md`,
+`handbook/development.md`, `handbook/secrets.md`, and `handbook/skills.md`.
+Follow linked recipes when needed. Check each page's status and project adoption;
+invoking this skill does not ratify Draft guidance for the organization.
+If working elsewhere, fetch the handbook separately without changing another
+working tree. If unavailable, report the limitation instead of inventing guidance.
 
 There is a bootstrap script for the mechanical parts:
 `./scripts/setup-default-project.sh ../my-project`.
@@ -66,13 +64,13 @@ the scaffold depend on laptop services. Record genuine local-only exceptions.
 
 ### 2. Install tools via mise (never edit mise.toml by hand)
 
-- `mise use node@22`
+- Select the reviewed Node version from the baseline, unless the project requires another runtime.
 - Declare pnpm and `npm:markdownlint-cli2` at the pinned versions in the template
   with `mise use --pin`, not a floating linter or an ad-hoc `npx` download.
 - `mise use fnox`
 - Declare `op` and `npm:skills` through `mise use`, using the versions in the
   maintained default-project template. Use its canonical restore helper rather
-  than assuming the upstream skills CLI enforces locked content (`GDE-008`).
+  than assuming the upstream skills CLI enforces locked content (`handbook/skills.md`).
 - `mise use "npm:@earendil-works/pi-coding-agent"`
 - Add any other runtimes the project needs now (ripgrep, fd, gh).
 
@@ -83,12 +81,13 @@ Write `.pi/settings.json` with `npmCommand: ["mise", "exec", "node", "--", "npm"
 
 ### 4. Install pi extensions
 
-Always `-l` for project-local. The required set is in `best-practices/GDE-007-pi-extensions.md`.
+Always `-l` for project-local. The required set is in `handbook/development.md`.
 
 ### 5. Write mise.toml tasks
 
 Adapt `mise.toml` from the standards repository's default-project template
-(`GDE-011`), rather than maintaining a second setup recipe. Keep `install`, `dev`, `lint`, `test`, `deploy`, `setup`,
+(`handbook/project-setup.md`), rather than maintaining a second setup recipe.
+Keep `install`, `dev`, `lint`, `test`, `deploy`, `setup`,
 `secrets:check`, and `secrets:list`. `setup` checks the injected bootstrap token;
 it does not retrieve a person's login or write a token file. `.fnox/env` loading
 is only a local-development fallback, not a cloud prerequisite.
@@ -129,16 +128,16 @@ Copy the locked `skills-lock.json` from the standards repo's default-project tem
 and `scripts/restore-skills.mjs` from the standards repo's `scripts/` directory (the
 bootstrap script does both). Then `mise run install` runs
 `node scripts/restore-skills.mjs`; `mise install` only installs tools. For additions
-or updates, follow `GDE-008`: select a reviewed published full commit SHA, install
+or updates, follow `handbook/skills.md`: select a reviewed published full commit SHA, install
 only named skills with `skills add` from that immutable tree URL, and verify the
 result before committing the lock. Moving branch refs are rejected by the helper.
 Do not run `skills add mattpocock/skills -y` or `skills add cursor/plugins -y` bare —
-both pull extras outside the standard set (`STD-011 §3.7`). The locked set includes
+both pull extras outside the standard set (`handbook/skills.md`). The locked set includes
 Focus-owned skills, Matt Pocock's planning workflow, firecrawl, and canonical
 pstack skills. For `tdd`/`teach` collisions, retain the lock's chosen source and
-follow `GDE-008`'s explicit alternative-selection procedure (`STD-011 §3.9`).
+follow `handbook/skills.md`'s explicit alternative-selection procedure.
 
-### 10. Testing record and CI (`STD-012`)
+### 10. Testing record and CI (`handbook/release.md`)
 
 Copy from the standards default-project template (or write them by hand):
 
@@ -151,7 +150,7 @@ Copy from the standards default-project template (or write them by hand):
 
 When the project later adds a web preview or data/model evals, fill those sections
 and add `preview.yml` / eval workflows per
-`best-practices/GDE-014-testing-and-preview-pipeline.md`.
+`recipes/ci.md`.
 Do not claim branch protections are configured merely because a workflow exists.
 Keep maturity unassessed until an owner approves its value, date, and rationale.
 Use production-like previews with documented differences and protected data;
@@ -179,7 +178,7 @@ config (electron-vite, next.config). Do not apply bundler settings to a plain No
 
 - [ ] `mise ls --current` shows all tools
 - [ ] `mise tasks` shows install/dev/lint/test/deploy
-- [ ] `.pi/settings.json` lists the extensions selected from `GDE-007` in `packages`
+- [ ] `.pi/settings.json` lists the extensions selected from `handbook/development.md` in `packages`
 - [ ] `.agents/skills/` has the locked skills
 - [ ] `AGENTS.md` exists and is adapted for this project
 - [ ] `fnox.toml` declares provider and secrets when needed, with no values

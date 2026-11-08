@@ -96,11 +96,8 @@ for (const skill of skills) {
 }
 
 /* ---- the skill register ---- */
-// skills/VENDORED.md assigns every skill its SKL-nnn number, because SKILL.md's
-// frontmatter belongs to the skills CLI. That makes the file authoritative, and
-// an authoritative file that nothing checks is one that drifts. Two things are
-// verified here: every skill on disk is registered exactly once with a unique
-// number, and the vendored half agrees with the markdownlint ignore list —
+// Attribution belongs outside CLI-owned frontmatter. Every owned skill must
+// appear once, and the vendored half must agree with the lint ignore list:
 // vendored skills are exempt from lint because they are somebody else's prose,
 // and that exemption is only honest while the two lists match.
 {
@@ -109,28 +106,23 @@ for (const skill of skills) {
   if (existsSync(vendoredDoc)) {
     const doc = readFileSync(vendoredDoc, "utf8");
     const sectionOf = (h) => doc.split(new RegExp(`^## ${h}\\s*$`, "m"))[1]?.split(/^## /m)[0] ?? "";
-    const rows = (s) => [...s.matchAll(/^\|\s*SKL-(\d{3})\s*\|\s*`([a-z0-9-]+)`\s*\|/gm)]
-      .map((m) => ({ num: m[1], name: m[2] }));
+    const rows = (s) => [...s.matchAll(/^\|\s*`([a-z0-9-]+)`\s*\|/gm)]
+      .map((m) => ({ name: m[1] }));
 
     const authored = rows(sectionOf("Authored here"));
     const vendored = rows(sectionOf("Vendored"));
     const all = [...authored, ...vendored];
 
     const byName = new Map();
-    const byNum = new Map();
     for (const r of all) {
       if (byName.has(r.name)) problems.push(`VENDORED.md registers ${r.name} twice`);
       byName.set(r.name, r);
-      if (byNum.has(r.num)) {
-        problems.push(`VENDORED.md gives SKL-${r.num} to both ${byNum.get(r.num).name} and ${r.name}`);
-      }
-      byNum.set(r.num, r);
     }
     for (const skill of skills) {
-      if (!byName.has(skill)) problems.push(`skills/${skill} is not registered in VENDORED.md — it has no SKL number`);
+      if (!byName.has(skill)) problems.push(`skills/${skill} has no attribution in VENDORED.md`);
     }
     for (const r of all) {
-      if (!skills.includes(r.name)) problems.push(`VENDORED.md registers ${r.name} (SKL-${r.num}), which is not a directory under skills/`);
+      if (!skills.includes(r.name)) problems.push(`VENDORED.md registers ${r.name}, which is not a directory under skills/`);
     }
 
     if (existsSync(lintConfig)) {

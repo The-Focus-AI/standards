@@ -21,7 +21,7 @@ When starting work, inspect these files in order:
 
 1. `AGENTS.md` — this project-specific guide.
 2. `README.md` — product and developer overview, if present.
-3. `STD-002` in The-Focus-AI/standards — issue states, the frontier, claiming, and what an agent
+3. `handbook/work.md` in The-Focus-AI/standards — issue states, the frontier, claiming, and what an agent
    comments. Check the adopted revision and status; not copied into this repo.
 4. `docs/adr/` — architecture decisions, if present.
 5. `CONTEXT.md` — domain language and project context, if present.
@@ -30,7 +30,7 @@ When starting work, inspect these files in order:
 8. `skills-lock.json` — locked agent skills for reproducible setup.
 
 If this repository also links to TheFocus.AI standards repository, read its `AGENTS.md` and relevant
-`best-practices/*` files before making broad tooling, security, deployment, or workflow changes.
+`handbook/` pages before making broad tooling, security, deployment, or workflow changes.
 
 ## Product maturity
 
@@ -39,7 +39,7 @@ If this repository also links to TheFocus.AI standards repository, read its `AGE
 - Rationale: not yet recorded.
 
 Ask the project owner to approve `alpha`, `client-testing`, or `production` under
-`STD-012 §3.20–3.21` and replace these placeholders. An agent may recommend a value;
+`handbook/release.md` and replace these placeholders. An agent may recommend a value;
 do not assume `alpha` or infer maturity from a deployment URL. Record owner approval,
 date, and rationale when the value changes too.
 
@@ -50,7 +50,7 @@ Maturity does not change ticket readiness, waive security, or authorize external
 ## Development workspace
 
 Develop, install dependencies, run tests, and serve previews in a reproducible cloud workspace
-such as an Amp orb or Cursor cloud environment (`STD-005 §3.10`). The laptop is for browser
+such as an Amp orb or Cursor cloud environment (`handbook/development.md`). The laptop is for browser
 review and personal authentication, not a required build server or database host.
 Record supported platforms and any genuine local hardware/network exceptions here.
 
@@ -61,7 +61,7 @@ image or snapshot. Keep bootstrap and service configuration in the repository.
 
 ## Secret-file preflight
 
-Before running setup or creating credential files (`STD-004 §3.8`, `STD-007 §3.3`):
+Before running setup or creating credential files (`handbook/development.md`, `handbook/secrets.md`):
 
 - Ensure `.gitignore` excludes `.fnox/`, `.env`, `.env.*`, and any project-specific credential files.
   Merge missing rules without replacing existing entries. Keep `.env.example` trackable with placeholders only.
@@ -89,7 +89,7 @@ Before running setup or creating credential files (`STD-004 §3.8`, `STD-007 §3
 ## Planning and issue workflow
 
 This project uses the Matt Pocock skill set recorded in `skills-lock.json`
-(see `best-practices/GDE-008-skills.md` in the standards repo for the full table).
+(see the generated skills catalog and `handbook/skills.md` in the standards repo).
 Run `setup-matt-pocock-skills` once if tracker/label/domain layout is not set up.
 Use `ask-matt` when unsure which skill fits.
 
@@ -109,7 +109,7 @@ Default planning flow:
 1. Use `wayfinder` first when the work is too large, cross-cutting, or foggy for one agent session.
 2. Use `grill-me`, `grilling`, or `grill-with-docs` to clarify goals, constraints, terminology, risks, and non-goals.
 3. Use `to-spec` to produce a spec when the work is multi-step or ambiguous.
-4. Publish or reference the spec through the issue tracker, per `STD-002 §3.15`.
+4. Publish or reference the spec through the issue tracker, per `handbook/work.md`.
 5. Use `to-tickets` to split the spec into vertical tracer-bullet tickets with explicit blocking
    edges; use `triage` for inbound issues/PRs.
 6. Use `prototype` before implementation when the design has high UX, architecture, or state-model uncertainty.
@@ -121,24 +121,27 @@ Default planning flow:
 This project's `skills-lock.json` also pins the pstack engineering workflow and
 principle skills from `cursor/plugins` (`pstack/skills/…`, MIT). Inventory,
 canonical install URL, and update verification live in
-`best-practices/GDE-008-skills.md` and `STD-011 §3.8–3.9` in The-Focus-AI/standards.
+`handbook/skills.md` in The-Focus-AI/standards.
 
 **Same-name skills (`tdd`, `teach`):** both `mattpocock/skills` and pstack define
 these names. The lock can hold only one entry per name. Defaults:
 
 | Name | Locked default | Use the other when |
 | --- | --- | --- |
-| `tdd` | `mattpocock/skills` (feature / vertical-slice red-green) | Bug fix with a cheap local test under `/poteto-mode` → `skills use https://github.com/cursor/plugins/tree/main/pstack/skills --skill tdd` |
-| `teach` | `mattpocock/skills` (multi-session teaching workspace) | Explain a subsystem/diff via how+why → `skills use https://github.com/cursor/plugins/tree/main/pstack/skills --skill teach` |
+| `tdd` | `mattpocock/skills` (feature / vertical-slice red-green) | Focused regression testing under `/poteto-mode` |
+| `teach` | `mattpocock/skills` (multi-session teaching workspace) | Explain a subsystem or diff via how/why |
+
+Use the immutable-ref alternative-selection command in `handbook/skills.md`.
+Do not resolve a moving `main` when the rest of the project uses reviewed pins.
 
 Do not run `skills add cursor/plugins -y` or `skills add mattpocock/skills -y` bare —
-both repos carry skills outside the standard set (`STD-011 §3.7`).
+both repos carry skills outside the standard set (`handbook/skills.md`).
 
 ## GitHub Issues / tracker expectations
 
 - Prefer GitHub Issues when this repo has a GitHub remote and `gh` is authenticated.
-- A person or agent can mark a fully specified ticket `ready` under `STD-002 §3.4–3.5`.
-  Readiness is not approval to merge or deploy; the label reference lives in `STD-002 §5`.
+- A person or agent can mark a fully specified ticket `ready` under `handbook/work.md`.
+  Readiness is not approval to merge or deploy; the label reference lives in `handbook/work.md`.
 - If GitHub Issues are unavailable, use local markdown under `docs/issues/` and record that choice
   here — tracker configuration is per-repo, the workflow rules are not.
 - Issues should be small enough for an agent to complete independently.
@@ -146,7 +149,7 @@ both repos carry skills outside the standard set (`STD-011 §3.7`).
   blocking edges, and links to the spec or parent issue.
 - Before creating issues, check existing open issues to avoid duplicates.
 
-## Testing and release (`STD-012`)
+## Testing and release (`handbook/release.md`)
 
 - Keep `docs/testing.md` current: checks (blocking vs advisory), preview verification,
   benchmarks/thresholds, sign-off gates, and alerting. Required headings must stay even
@@ -155,11 +158,11 @@ both repos carry skills outside the standard set (`STD-011 §3.7`).
   `mise run test`. Branch protection has not been verified by copying this workflow;
   ask an authorized owner to configure only blocking checks as required.
 - When this project has a web preview, publish the preview URL as a commit status
-  (`preview/e2e`) and run smoke/e2e against it before marking a PR ready (`STD-012 §3.5–3.7`).
+  (`preview/e2e`) and run smoke/e2e against it before marking a PR ready (`handbook/release.md`).
 - Keep previews production-like, with documented differences and protected production data
-  (`STD-007`). Use client-specific OAuth applications (`STD-009`); do not share credentials
+  (`handbook/secrets.md`). Use client-specific OAuth applications (`handbook/sign-in.md`); do not share credentials
   across clients. No separate staging environment is required.
-- Walkthrough and templates: `best-practices/GDE-014-testing-and-preview-pipeline.md` in
+- Walkthrough and templates: `recipes/ci.md` in
   The-Focus-AI/standards.
 
 ## Quality bar

@@ -1,4 +1,4 @@
-# Generated from prompts/PRM-001-generate-dockerfile.md.
+# Generated from recipes/generate-dockerfile.md.
 # Do not hand-edit; edit the prompt and regenerate with mise run generate:dockerfile.
 # Dockerfile for Focus.AI Standards Agent
 #

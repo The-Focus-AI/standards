@@ -9,13 +9,11 @@ For documenting library, tool, or technique recommendations with implementation 
 
 ````markdown
 ---
-number: "<next free number>"
 title: "[Topic]: [Recommendation Name]"
-kind: note
-issued: "YYYY-MM-DD"
+summary: "<The question and principal finding>"
 author: "<actual author or agent identity>"
-status: Current
-verified: "YYYY-MM-DD"
+status: Evidence
+checked: "YYYY-MM-DD"
 topic: [short topic slug]
 recommendation: [library/tool name]
 version_researched: [version number if applicable]

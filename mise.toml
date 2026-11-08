@@ -65,7 +65,7 @@ mise run test
 '''
 
 [tasks.lint]
-description = "Offline static checks: markdown, skills, DESIGN.md, renderer, and STD-006"
+description = "Offline checks: Markdown, skills, design, handbook links and navigation"
 run = '''
 set -eu
 echo "==> Linting markdown..."
@@ -86,10 +86,10 @@ echo ""
 echo "==> Validating DESIGN.md..."
 node scripts/validate-design.mjs
 echo ""
-echo "==> Rendering the site (STD-001 for standards, STD-006 for everything else)..."
-node scripts/render-standard.mjs
+echo "==> Building the handbook..."
+node scripts/build-handbook.mjs
 echo ""
-echo "==> Checking documents conform to STD-006..."
+echo "==> Checking documents conform to handbook/maintaining.md..."
 node scripts/validate-documents.mjs
 '''
 
@@ -126,9 +126,9 @@ echo "==> Integration tests (docker build + smoke)..."
 description = "Explain the CI-only deployment path; never publish from this workspace"
 run = '''
 set -eu
-echo "No deployment performed: GitHub Actions pages.yml publishes main (STD-008 §3.10)." >&2
+echo "No deployment performed: GitHub Actions pages.yml publishes main (handbook/release.md)." >&2
 echo "After the recorded release approval, an authorized operator may dispatch: gh workflow run pages.yml --ref main" >&2
-echo "Use mise run standard:render for a build-only check; it does not verify deployment." >&2
+echo "Use mise run handbook:build for a build-only check; it does not verify deployment." >&2
 exit 1
 '''
 
@@ -143,21 +143,21 @@ gh run list --workflow pages.yml --limit 5 2>/dev/null \
   || echo "(gh not available or not authenticated — see the Actions tab)"
 '''
 
-[tasks."standard:render"]
-description = "Render the whole corpus to out/standards/ and check conformance"
-run = "node scripts/render-standard.mjs"
+[tasks."handbook:build"]
+description = "Render the whole corpus to out/handbook/ and check conformance"
+run = "node scripts/build-handbook.mjs"
 
-[tasks."standard:preview"]
+[tasks."handbook:preview"]
 description = "Render the corpus and serve the site at http://localhost:8900/"
 run = '''
 set -eu
-node scripts/render-standard.mjs
+node scripts/build-handbook.mjs
 echo "==> http://localhost:8900/"
-python3 -m http.server -d out/standards 8900
+python3 -m http.server -d out/handbook 8900
 '''
 
 [tasks."docs:validate"]
-description = "Validate guides, notes, decisions and prompts against STD-006"
+description = "Validate handbook metadata, local links, and navigation coverage"
 run = "node scripts/validate-documents.mjs"
 
 [tasks."design:validate"]
@@ -173,7 +173,7 @@ set -euo pipefail
 echo "==> Generating Dockerfile (streaming progress)..."
 echo ""
 
-pi --mode json -p "$(cat prompts/PRM-001-generate-dockerfile.md)" | jq -R -r '
+pi --mode json -p "$(cat recipes/generate-dockerfile.md)" | jq -R -r '
   fromjson? |
   if .type == "tool_execution_start" then
     if .toolName == "read" then

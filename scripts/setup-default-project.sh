@@ -187,6 +187,6 @@ Lint/test/deploy intentionally fail until adapted. Do not add fake app tests.
 Run mise run setup and mise run secrets:check only when runtime secrets are needed;
 dependency installation does not require a personal login or a bootstrap token.
 
-Issue tracker rules come from STD-002, not from a per-project file. Record only
+Issue tracker rules come from handbook/work.md, not from a per-project file. Record only
 this repo's tracker configuration in AGENTS.md if it is not GitHub Issues.
 EOF

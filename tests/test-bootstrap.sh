@@ -105,6 +105,7 @@ echo "PASS: brief handoff is complete, read-only, literal, and validates argumen
 # /bin/sh. These fixtures test task orchestration, not a fabricated application.
 export REAL_NODE="$(command -v node)"
 export CALLS="$TARGET/calls.log"
+export PROMPT_CAPTURE="$TARGET/generated-prompt.md"
 mkdir -p "$TARGET/bin"
 cat > "$TARGET/bin/pnpm" <<'EOF'
 #!/usr/bin/env node
@@ -133,6 +134,7 @@ EOF
 cat > "$TARGET/bin/pi" <<'EOF'
 #!/bin/sh
 echo 'pi fixture invoked' >&2
+printf '%s\n' "${4-}" > "$PROMPT_CAPTURE"
 exit 7
 EOF
 cat > "$TARGET/bin/jq" <<'EOF'
@@ -220,10 +222,11 @@ cmp "$TARGET/expected-calls" "$CALLS"
 RESTORE_EXIT=24 expect_task_failure install
 expect_task_failure deploy
 grep -q 'No deployment performed' "$TARGET/task.log"
-mkdir -p "$TARGET/prompts"
-cp "$ROOT_DIR/prompts/PRM-001-generate-dockerfile.md" "$TARGET/prompts/"
+mkdir -p "$TARGET/recipes"
+cp "$ROOT_DIR/recipes/generate-dockerfile.md" "$TARGET/recipes/"
 expect_task_failure generate:dockerfile
 grep -q 'pi fixture invoked' "$TARGET/task.log"
+cmp "$ROOT_DIR/recipes/generate-dockerfile.md" "$PROMPT_CAPTURE"
 echo "PASS: root install uses the canonical helper, deploy refuses, and generator preserves upstream failure with Bash pipefail"
 
 # Repeat runs preserve project-specific helper changes; --force is explicit.
@@ -235,7 +238,7 @@ bash "$ROOT_DIR/scripts/setup-default-project.sh" "$TARGET" --no-install --force
 cmp "$ROOT_DIR/scripts/restore-skills.mjs" "$TARGET/scripts/restore-skills.mjs"
 echo "PASS: existing files are preserved unless overwrite is explicitly requested"
 
-grep -q '^# Generated from prompts/PRM-001-generate-dockerfile.md' "$ROOT_DIR/Dockerfile"
+grep -q '^# Generated from recipes/generate-dockerfile.md' "$ROOT_DIR/Dockerfile"
 if grep -Eq -- '-v ~/.pi:|prompts/setup-project.md' "$ROOT_DIR/Dockerfile"; then
   fail "Docker runtime instructions contain personal auth mounts or stale paths"
 fi

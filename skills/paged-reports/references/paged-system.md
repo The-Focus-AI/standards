@@ -419,7 +419,7 @@ Every paged report starts with a cover:
 The cover uses `page: cover` (suppresses headers) and `break-after: page` (forces content to next page).
 Copy real provenance from the source document, not a template author's name.
 For notes in this corpus, preserve `number`, `kind`, `issued`, `author`,
-`status`, and `verified` from `STD-006` in the source markdown and include the
+`status`, and `verified` from `handbook/maintaining.md` in the source markdown and include the
 NOTE identifier and verification date in the report. Do not invent an original
 author or advance `verified` merely because the layout was regenerated.
 

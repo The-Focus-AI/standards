@@ -1,6 +1,6 @@
 # Testing and release record
 
-This is the repository-specific operational record for `STD-012`, not a claim
+This is the repository-specific operational record for `handbook/release.md`, not a claim
 that the draft standard has been ratified or every external gate is configured.
 
 ## Checks
@@ -8,7 +8,7 @@ that the draft standard has been ratified or every external gate is configured.
 | Check | Runner / trigger | Class | Coverage |
 | --- | --- | --- | --- |
 | `mise run lint` | `ci.yml`, job `check`; every PR and push to `main` | blocking | Markdown, skill register and immutable lock metadata/parity, design, corpus rendering, document metadata |
-| `mise run test` | `ci.yml`, job `check`; every PR and push to `main` | blocking | Document metadata, skill restoration, secret sync, bootstrap and task-contract regressions with disposable fixtures |
+| `mise run test` | `ci.yml`, job `check`; every PR and push to `main` | blocking | Handbook build/link/navigation/catalog behavior, skill restoration, secret sync, bootstrap and task-contract regressions with disposable fixtures |
 | Pages build validators | `pages.yml`; configured paths on `main` or authorized manual dispatch | blocking for that deployment | Renderer, document, design, and skill validation |
 | `mise run test:docker` | Explicit integration run in a Docker-capable cloud workspace | blocking for image changes; not a required PR job | Image build and container smoke checks |
 | `mise run secrets:check` | Explicit authorized runtime check | operational; outside offline CI | Real project-vault access, not static correctness |
@@ -29,15 +29,16 @@ GitHub Pages publishes the static corpus from `main`; the current workflow does
 not provide per-PR deployments or a `preview/e2e` status. This is an explicit
 preview gap, not an assertion that all possible Pages preview mechanisms are
 impossible. Until one is configured, render the release candidate with
-`mise run standard:render`, serve `out/standards/` through a managed cloud service,
-and smoke-test navigation, links, and representative rendered documents. Record
+`mise run handbook:build`, serve `out/handbook/` through a managed cloud service,
+and test desktop/narrow navigation, prompt copying, search/no-results, skill filters,
+and representative rendered documents. Record
 the SHA, commands, results, and browser evidence in the PR before review.
 
 Cloud-served output exercises the same static artifact, but does not verify
 GitHub Pages deployment, its custom domain, CDN, or permissions. Those remain
 deployment checks. There are no application secrets, OAuth clients, or databases
 in the static site; introducing any requires a new parity and data-protection
-review under `STD-007` and `STD-009`.
+review under `handbook/secrets.md` and `handbook/sign-in.md`.
 
 ## Benchmarks and thresholds
 
@@ -71,7 +72,7 @@ Not configured — default-branch CI and Pages failures currently have no verifi
 issue/Slack feedback loop. No Slack channel, bot-token mapping, fingerprint
 deduplication, notification threading, reply routing, or recovery comments have
 been configured by this change. These are applicable open gaps under
-`STD-012 §3.12–3.18`, not `N/A`.
+`handbook/release.md`, not `N/A`.
 
 Until an owner provisions that loop, an authorized operator needs to monitor
 Actions and open or link failure issues manually. Do not infer working alerting
