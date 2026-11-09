@@ -68,6 +68,24 @@ test("build emits linked pages, source-derived prompt, search content and readab
   assert.ok(!read("index.html").includes("Audit &lt;this repo&gt;"));
 });
 
+test("build ships the local display font and license, and keeps prior output if the font is missing", t => {
+  const { root, read } = fixture(t);
+  const result = run(root);
+  assert.equal(result.status, 0, result.output);
+  const fontUrl = read("handbook.css").match(/src: url\("([^"]+\.woff2)"\)/)[1];
+  assert.ok(fontUrl.startsWith("fonts/"), "font loads from the site, not a third party");
+  const font = readFileSync(join(root, "out/handbook", fontUrl));
+  assert.equal(font.subarray(0, 4).toString(), "wOF2");
+  const source = join(root, "scripts/assets", fontUrl);
+  assert.deepEqual(font, readFileSync(source));
+  assert.match(read("fonts/OFL.txt"), /SIL OPEN FONT LICENSE Version 1\.1/);
+  const before = read("index.html");
+  rmSync(source);
+  assert.equal(run(root).status, 1);
+  assert.equal(read("index.html"), before);
+  assert.deepEqual(readFileSync(join(root, "out/handbook", fontUrl)), font);
+});
+
 test("catalog shows canonical upstream pins and optional same-name owned skills without using installed caches", t => {
   const { root, read, write } = fixture(t);
   const skills = { architect: entry("cursor/plugins", "pstack/skills/architect/SKILL.md"),

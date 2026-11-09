@@ -91,6 +91,9 @@ const outputs = new Map([["index.html", shell("index.html", "Start with the work
   ["skills.html", shell("skills.html", "Skills", catalogBody)], ["handbook.css", css], ["handbook-client.js", script],
   ["handbook.md", bundle]]);
 for (const page of corpus.pages) outputs.set(pageUrl(page.path), renderPage(page));
+for (const file of ["barlow-condensed-latin-600-normal.woff2", "OFL.txt"]) {
+  outputs.set(`fonts/${file}`, readFileSync(join(ROOT, "scripts/assets/fonts", file)));
+}
 rmSync(OUT, { recursive: true, force: true });
 for (const [file, value] of outputs) {
   mkdirSync(dirname(join(OUT, file)), { recursive: true });

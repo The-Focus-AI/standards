@@ -13,12 +13,17 @@ colors:
   attention: "#a8451c"
   focus-ring: "{colors.action}"
 typography:
+  display:
+    fontFamily: '"Barlow Condensed", "Arial Narrow", "Liberation Sans Narrow", system-ui, sans-serif'
+    fontWeight: 600
+    letterSpacing: "0.03em"
+    lineHeight: 0.95
   body:
     fontFamily: "system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif"
     lineHeight: 1.6
   mono:
     fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace"
-    letterSpacing: "0"
+    letterSpacing: "0.1em"
 rounded:
   sheet: "0"
   control: "0"
@@ -52,10 +57,22 @@ and `attention` for proposal/limit notices. Pair every status with words.
 Use `line` and `line-strong` for separation, not decoration. `focus-ring` is
 visible on keyboard focus; `action-text` is button text.
 
-Use system fonts without downloads. Body text stays in sentence case, with
-generous line spacing and bounded line length. Large titles establish hierarchy;
-small mono labels provide context. Use square controls, flat backgrounds, and
-rules instead of shadows. Do not render every requirement as a separate card.
+Use Barlow Condensed 600 for level-one and level-two headings and buttons, with
+uppercase text and the display tracking. Small labels use bold, uppercase
+monospace with the mono tracking. Level-three headings stay in bold body sans.
+Body text stays in system sans and sentence case, with generous line spacing
+and bounded line length. Commands, paths, source names, and input values keep
+their natural case and normal tracking.
+
+Self-host the Latin WOFF2 from
+[`@fontsource/barlow-condensed` 5.3.0](https://registry.npmjs.org/@fontsource/barlow-condensed/5.3.0),
+unmodified, with its SIL Open Font License. The build copies the font and license from
+`scripts/assets/fonts/` without a network request or package installation.
+Use `font-display: swap` and the display fallback stack if the font cannot load
+or lacks a glyph. Do not load fonts from a third-party service.
+
+Use square controls, flat backgrounds, and rules instead of shadows. Do not
+render every requirement as a separate card.
 
 ## Measured contrast
 
