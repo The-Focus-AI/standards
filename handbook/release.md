@@ -58,19 +58,40 @@ environment, region/team where relevant, runtime identity, and artifact revision
 Do not rely on an ambient CLI target. Serialize releases to a destination;
 do not cancel a half-finished deployment to start another.
 
-| State | Guard and owner | Failure and recovery |
+## Integration cutover and recovery
+
+This proposed release state machine applies to the combined code, schema, and
+identity configuration, not code alone. It does not grant deployment or access
+approval. The [state-machine index](agent-services.md#find-the-integration-state-machine)
+links the request and view lifecycles affected by a cutover.
+
+| Transition | Guard, owner and effect | Failure and recovery |
 | --- | --- | --- |
-| Planned | Engineer records code, schema, identity mapping, and rollback compatibility | Missing approval or credential provisioning stops promotion. |
-| Candidate verified | CI and cloud checks exercise the chosen release artifact | Fixture interoperability is not genuine issuance or deployed acceptance. |
-| Migration ready | Operator approves target, backup, compatibility, and recovery | Apply migrations separately from application boot; stop on failure. |
-| Deployed, not accepted | Authorized pipeline publishes the candidate | Check runtime health and actual authenticated paths, not only discovery. |
-| Accepted | Recorded gate passes on the deployed candidate | Observe errors and retain release evidence. |
-| Rollback or repair | Owner chooses a compatible code/schema/identity pair | A code rollback does not undo schema changes, data writes, grants, or secret sync. |
+| Planned to candidate verified | Engineer records code, schema, identity mapping and rollback compatibility; CI and cloud checks exercise that candidate | Fixture interoperability is not genuine issuance or deployed acceptance. Missing evidence stays an open gate. |
+| Candidate verified to schema and configuration ready | Approved operator verifies target, backup and recovery, applies compatible schema, and confirms required credential and entitlement setup | Apply migrations separately from application boot and before readers. A failed migration, missing grant or absent provisioning stops promotion. |
+| Ready to deployed, not accepted | Release owner authorizes the recorded code and registry cutover; pipeline publishes that candidate | Check runtime health and actual authenticated paths separately from discovery. Build success is not acceptance. |
+| Deployed to accepted | Recorded acceptance gate passes on the deployed candidate, including direct and routed identity, negative auth cases, next turns and saved views | A failed gate blocks acceptance. The owner chooses repair or rollback; never mark blocked checks passed. |
+| Deployed or accepted to dispatch paused | On failed acceptance or an incident, operator blocks new dispatch under the recovery plan and records known task/context ids | Pausing dispatch does not cancel in-flight work. Reconcile its actual outcome through supported reads or operator investigation; do not replay blindly. |
+| Paused to rolled back or repaired | Owner selects a tested compatible code, schema and identity configuration; operator restores it while dispatch remains paused | Keep additive schema and saved history unless a separate migration is approved. Rollback does not undo data writes, grants or secret sync, or revoke issued tokens. |
+| Rolled back or repaired to deployed, not accepted | Operator verifies compatibility and obtains approval for bounded acceptance traffic | Repeat the affected acceptance checks before general dispatch resumes. No rollback by disabling auth or restoring demo operator privileges. |
+
+Workbench `c302e20` follow-up turns query `mcp_app_views` even when no view opens.
+Apply and verify that schema before deploying code that reads it. Test a text-only
+follow-up as well as view reopen; hiding the view UI does not remove the schema
+dependency. The [source record](../evidence/workbench-integration.md#conversation-and-view-sources)
+pins the implementation, not a current deployment.
 
 For integration cutovers, preserve valid existing access only through a separately
 approved, bounded coexistence profile. Never retry a failed machine/JWT/grant
 request as a demo identity. Test stored contexts and snapshots against the chosen
 rollback pair before release. See [service access](service-access.md).
+
+| Recovery check | Observable acceptance criterion |
+| --- | --- |
+| Schema before readers | A failed or missing migration blocks the candidate's traffic. With the approved schema, text-only follow-ups and saved-view reopen both work. |
+| Dispatch pause | New specialist calls stop, while an already accepted task is tracked separately. The operator records whether its outcome is known or unresolved, without claiming cancellation. |
+| Compatible rollback | The selected old-code/new-schema pair can read retained contexts and snapshots. Code rollback neither drops additive schema/history nor weakens authorization. |
+| Resume gate | Approved acceptance calls pass for the restored revision before general dispatch resumes. A public card alone cannot pass this gate. |
 
 Platform procedures: [Vercel](../recipes/vercel.md), [GCP](../recipes/gcp.md),
 and the dated [Gaia runtime record](../evidence/gaia-runtime.md).

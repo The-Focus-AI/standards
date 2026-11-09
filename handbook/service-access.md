@@ -57,9 +57,18 @@ can change task provenance, not signed authority. Task ids, parent-agent names,
 context ids and recap text are attribution or input, not credentials. See
 [conversation checks](conversations.md#verify-the-configured-paths).
 
-The lifecycle below records inspected Workbench and Roblox behavior separately
-from this selected policy. Clerk's category, clock skew and grant lifetime caps
-are application-profile details, not A2A or MCP mandates.
+## Bind credentials to the approved destination
+
+Resolve the destination from trusted registry configuration, not a URL supplied
+by the browser, model, or renderer. Before attaching credentials, check the
+current target, identity binding, and policy revision. Keep service credentials
+and human grants server-side.
+
+Reject credential-bearing redirects rather than forwarding either credential
+to the redirect target. A target change requires fresh policy resolution and
+credentials bound to the approved destination, not reuse of the previous
+request's headers. This applies to A2A dispatch and MCP tool or protected-resource
+calls. Trusting a renderer does not waive destination checks.
 
 ## Issue native Clerk tokens without inventing an OAuth flow
 
@@ -99,18 +108,54 @@ then supported metadata documents, then the deprecated DCR compatibility path
 
 These tables describe this integration, not every possible authentication flow.
 The caller owns issuance and caching; the provider owns verification, entitlement
-and data ownership. Desired guarantees beyond these observations need a separate
-implementation and acceptance test.
+and data ownership. Use the [state-machine index](agent-services.md#find-the-integration-state-machine)
+for the adjacent registry, task, view, and release lifecycles. Desired guarantees
+beyond these observations need a separate implementation and acceptance test.
+Clerk's category, clock skew and grant lifetime caps are application-profile
+details, not A2A or MCP mandates.
 
-| Machine | Transition and guard | Owner and effect | Failure, retry or recovery |
-| --- | --- | --- | --- |
-| Browser session | Signed out to signed in after Clerk sign-in; signed in to signed out on logout or expiry | Workbench derives the human subject from the server session, never from request metadata | No signed-in human means no delegated grant. Reauthenticate in the browser; do not substitute a machine subject. Logout does not revoke an already signed grant. |
-| Machine credential | Unprovisioned to configured after approved sender/receiver provisioning and scoped secret delivery | Operator records issuer, receiver, sender, scope, TTL and credential reference | Stop on missing resources or access. Administrative credentials do not stand in for the missing token. Preview uses the same flow, with only documented differences under `handbook/secrets.md`. |
-| Token cache | Empty or within 30 seconds of expiry to minting; successful native mint to cached for the requested 300-second lifetime | Workbench `bearerFor` caches server-side by auth configuration; changing the machine secret changes its cache key | Mint errors stop dispatch. It does not use an old token as a fallback and implements no automatic unauthorized retry. Multiple processes have separate caches. |
-| Token verification | Presented to verified only after the selected class, signature, issuer, audience, sender, time and permission checks | Specialist constructs the machine principal | Invalid credentials remain authentication failures. JWKS or config failures fail closed. A valid token without permission is denied, not retried as another credential class. |
-| Human delegation | Verified session to signed grant for a pinned target and sender; paired credentials to bound principal | Inspected Workbench signs a 300-second grant. Roblox verifies its issuer, audience, signature and timestamps, caps accepted grant lifetime at 600 seconds, and requires `human.azp === machine.sub`. The selected Workbench policy requires bound grants for every external specialist; Versant acceptance remains pending | Missing, expired or mismatched grant fails without shared-service downgrade. A new grant requires a valid session and current target policy. This custom header is not ID-JAG. |
-| Entitlement | Bound principal to authorized when the provider finds the exact sender/human row; removal to denied on the next checked request | Roblox checks local entitlement and scopes task, context, history and feedback to the resulting owner | Valid signatures without entitlement yield 403. No shadow user, automatic enrollment or operator privilege. Existing in-flight work is not known to stop when a row is removed. |
-| Rotation and revocation | Secret rotation changes future minting; entitlement or policy changes deny later checks; expiry ends token validity | Issuer, Workbench operator and provider each own a different control | Clerk JWTs are offline-verified and not individually revocable through its opaque-token revocation API. Scope changes affect newly minted tokens. Immediate invalidation, key overlap and in-flight cancellation need a separate tested design. |
+### Browser session
+
+The session establishes who may request a new human grant, not whether a
+specialist will authorize that human.
+
+| Transition | Trigger, guard, owner and effect | Failure or recovery |
+| --- | --- | --- |
+| Signed out to signed in | Clerk sign-in establishes the session; Workbench derives the human subject from its verified server session | No session means no new delegated grant. Reauthenticate in the browser; never substitute request metadata or a machine subject. |
+| Signed in to signed out | Logout or expiry ends the session used to issue new grants | Logout does not revoke an already signed grant. Its expiry and provider checks still govern acceptance. |
+
+### Machine credential and token
+
+Provisioning, the caller's cache, and the receiver's verification are separate
+states. A cached token does not mean that the receiver accepted a request.
+
+| Transition | Trigger, guard, owner and effect | Failure or recovery |
+| --- | --- | --- |
+| Unprovisioned to configured | Approved operator provisions sender and receiver, delivers a scoped secret, and records issuer, audience, sender, permission, TTL and credential reference | Stop on missing resources or access. Administrative credentials do not substitute for application credentials. [Preview parity](secrets.md#match-production-behavior-in-previews) still applies. |
+| Empty or near-expiry cache to minting | Workbench `bearerFor` requests a new token when none is usable or it is within 30 seconds of expiry | Mint errors stop dispatch, with no old-token fallback. Repair issuance before a new attempt. |
+| Minting to cached | Successful native mint returns `token` for the requested 300-second lifetime; Workbench caches it server-side by auth configuration | Changing the machine secret changes the cache key. Multiple processes have separate caches; a cached token still needs receiver verification. |
+| Presented to verified or denied | Specialist checks the declared token class, signature, issuer, audience, sender, time and permission before constructing the machine principal | Invalid credentials, JWKS failures and missing configuration fail closed. Missing permission denies access. Workbench implements no automatic unauthorized retry or switch to another credential class. |
+
+### Human delegation and entitlement
+
+Each new request needs both credentials and the receiver's current authorization
+decision. This is the selected Workbench policy; the inspected Roblox behavior
+below is not proof that Versant or every dispatch path already implements it.
+
+| Transition | Trigger, guard, owner and effect | Failure or recovery |
+| --- | --- | --- |
+| Verified session to signed grant | Workbench signs a 300-second grant for the current human, pinned target and sender | A new grant requires a valid session and current target policy. No machine-only or demo fallback. |
+| Paired credentials to bound principal | Receiver verifies the grant independently, then requires `human.azp === machine.sub`. Roblox checks issuer, audience, signature and timestamps, with a 600-second maximum grant lifetime | Missing, invalid, expired, wrong-target or sender-mismatched grants fail before execution. A configured sender alias cannot replace the verified token subject. |
+| Bound principal to authorized or denied | Roblox finds the exact sender/human entitlement row and scopes task, context, history and feedback to its owner | Valid signatures without entitlement yield 403. No shadow user, automatic enrollment or operator privilege. Versant's revised acceptance remains pending. |
+| Previously authorized to denied on a later check | Provider removes entitlement, policy disables the connection, or credentials expire | Deny the next applicable check. Removal is not known to stop in-flight work. Correct the cause through the owning operator, not by replaying under another identity. |
+
+### Rotation and revocation limits
+
+The issuer, Workbench operator, and provider own different controls. Secret
+rotation changes future minting; it does not revoke all issued tokens. Clerk
+JWTs are offline-verified and not individually revocable through its opaque-token
+revocation API. Scope changes affect newly minted tokens. Immediate invalidation,
+key overlap, and in-flight cancellation need a separately tested design.
 
 Roblox's native verifier requires `RS256`, the protected M2M category, a machine
 `sub`, audience, application scope, and a maximum machine age and lifetime of
@@ -133,12 +178,12 @@ legacy path: restoring the old privilege would expose other owners' analytics.
 This recorded standalone demo path is not a Workbench connection profile. The
 mandatory delegation policy does not select it or revoke it by implication.
 
-| State or event | Guard and effect | Recovery and approval boundary |
+| Transition | Guard, owner and effect | Recovery and approval boundary |
 | --- | --- | --- |
-| Legacy path disabled | All requests use the configured primary profile | Enabling coexistence is a separately approved access change, not an automatic rollback. |
-| Coexistence enabled | `LEGACY_DEMO_ENABLED=true`, no identity-grant header, token has no JWT separator, exact SHA-256 digest match, and current time before recorded expiry | The matching request owns only `shared-demo` data and has `operator=false`. Any failed guard stays on the strict path or is denied. |
-| Wrong JWT, wrong grant or no entitlement | Primary profile fails without selecting demo | Never catch a primary-profile failure and try the demo credential. |
-| Original expiry reached | Recorded recovery retained `2026-11-19T23:59:59Z`; at or after the cutoff, demo denies | Retirement owner removes the opt-in after checking outstanding users. This proposal does not extend that date or authorize deletion of saved history. |
+| Disabled to coexistence enabled | Provider operator explicitly enables the approved legacy path; the primary machine profile remains active | Enabling coexistence is a separately approved access change, not an automatic rollback. |
+| Eligible request to shared-demo access | Verifier requires `LEGACY_DEMO_ENABLED=true`, no identity-grant header, no JWT separator, exact SHA-256 digest match, and time before recorded expiry | The matching request owns only `shared-demo` data and has `operator=false`. Any failed guard stays on the strict path or is denied. |
+| Invalid primary request to denied | Primary verifier rejects a wrong JWT, wrong grant or missing entitlement without selecting demo | Never catch a primary-profile failure and try the demo credential. |
+| Enabled to expired | At the original cutoff, `2026-11-19T23:59:59Z`, the verifier denies demo access | Retirement owner removes the opt-in after checking outstanding users. This proposal does not extend that date or authorize deletion of saved history. |
 
 ## Agent and operator acceptance checks
 
@@ -156,6 +201,7 @@ operators approve production machines, grants, entitlements and cutover.
 | Delegation binding | A valid machine A plus a valid grant bound to machine B fails. Test the actual token `sub` differing from a configured sender alias. Removing the exact entitlement denies the next request. |
 | Direct and routed identity | For the same user, sender and target, direct relay and coordinator-routed calls resolve to the same verified principal and entitlement outcome. A second human remains distinct. |
 | Provenance is not authority | Changing task, context, parent-agent or claimed-user metadata cannot change the verified principal, bypass a denied entitlement or replace a missing grant. |
+| Credential destination | A credential-bearing A2A or MCP endpoint returns a redirect to a second test server. The caller rejects it and the second server receives neither credential. A changed registry target also rejects the old binding before dispatch; a browser-supplied replacement URL cannot override it. |
 | Route boundary | Correct credentials reach a well-formed A2A response; no-token calls get the selected API auth error, not HTML. Session-protected pages and neighboring routes retain protection. |
 | Delegated owner isolation | For delegated/per-human profiles such as Roblox's sender/human pair, two humans under one machine and one human under two machines cannot read each other's context, task, history or feedback. Test the same context id under both owners. |
 | Approved nonhuman workload | Outside Workbench specialist connections, a separately approved machine-only profile checks its service boundary without claiming per-human segregation. Its existence cannot enable a downgrade on a delegated route. |

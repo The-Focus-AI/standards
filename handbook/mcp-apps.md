@@ -33,6 +33,9 @@ The host resolves associations from the signed-in user's stored transcript,
 checking provider origin and machine-client binding. It does not accept a
 browser-supplied endpoint, HTML document or substitute result. Historical answers
 without an acceptable binding stay readable but cannot invoke an app.
+Apply the same [credential destination checks](service-access.md#bind-credentials-to-the-approved-destination)
+to MCP requests; a trusted starting endpoint does not authorize redirecting its
+credentials elsewhere.
 
 Under the selected [Workbench delegation policy](service-access.md#require-human-delegation-for-workbench-specialists),
 provider tool and protected-resource calls on the user's behalf also carry the
@@ -61,16 +64,23 @@ still work in a host that implements the full standard security contract.
 The following states describe the inspected Workbench implementation. Saved
 snapshots and concurrency control are its application contract, not standard
 durable widget state. Provider compatibility remains an integration test.
+The [state-machine index](agent-services.md#find-the-integration-state-machine)
+links the separate credential, conversation, and release lifecycles.
+
+The host controls closed, resolving, initializing, ready, updating, and uncertain
+view states. A committed snapshot revision is stored data, not a new model turn.
+Restoring or refreshing a view returns it to ready; neither reopens the original
+A2A task or changes its answer.
 
 | Transition | Trigger, guard and owner | Failure or recovery |
 | --- | --- | --- |
 | Closed to resolving | User opens a saved result; host verifies transcript ownership and binding, current registry policy, same-origin endpoint and matching app-visible tool | Missing, disabled, rebound or inaccessible result is denied. Keep the original text answer. |
 | Resolving to initializing | Host reads the matching `ui://` resource with the Apps MIME, connects the bridge before loading HTML, then waits for `ui/initialize` and `ui/notifications/initialized` | Missing resource, invalid MIME or handshake timeout shows an error. Close/reopen retries resource loading, not the original analysis. |
 | Initialized to ready | Host sends tool input before tool result, using a saved snapshot or the original result | Check whether updated renderer code can read old snapshots; old-renderer retention is not established. A cached result does not justify skipping current authorization. |
-| Ready to updated snapshot | App calls an allowed tool for the same resource; host locks the view row and checks expected revision before calling the provider | Stale revision yields 409 before tool execution. Provider `isError` retains old state. Success saves arguments/result, increments revision and clears stale selected context. |
-| Ready to context saved | App sends supported text `ui/update-model-context`; host saves it at the next revision | No model turn starts. Latest authorized text is added as untrusted selected data on the next user turn, not as system instructions or replayed chat history. |
-| Closed to restored | Reopen loads current snapshot and re-resolves the renderer resource | No tool execution occurs on reopen. Resource reads still use the provider. Unsubmitted in-memory selections are not restored. |
-| Ready to refreshed | User explicitly refreshes or changes a selection that calls a provider tool | This is a new provider call and view revision, not a rewrite of the original answer. No automatic call retry. |
+| Ready to updating | Explicit refresh or selection requests an allowed tool for the same resource; host locks the view row and checks expected revision before calling the provider | Stale revision yields 409 before tool execution. This is a new provider call, not restoration of the snapshot. No automatic call retry. |
+| Updating to ready | Successful provider call and persistence save arguments/result, increment revision and clear stale selected context | Provider `isError` retains old state. The original answer stays unchanged. Failure after possible execution follows the uncertain path below. |
+| Ready to ready with new context revision | App sends supported text `ui/update-model-context`; host saves it at the next revision | No model turn starts. Latest authorized text is added as untrusted selected data on the next user turn, not as system instructions or replayed chat history. |
+| Closed through resolving and initializing to ready | Reopen loads current snapshot and re-resolves the renderer resource | No tool execution occurs on reopen. Resource reads still use the provider. Unsubmitted in-memory selections are not restored. |
 | Updating to uncertain | Network or persistence fails after a provider call may have executed | Reopen to reconcile saved state before choosing an action. A database rollback cannot undo the provider call; do not promise exactly-once behavior. |
 | Open to closed | User closes, component unmounts or navigation removes the view; host aborts its browser request and closes the bridge | Abort is not proof of provider cancellation. Current cleanup does not establish full protocol teardown conformance. |
 

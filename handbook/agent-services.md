@@ -1,6 +1,6 @@
 ---
 title: Build an agent service
-summary: One model entry point, one tool catalog, and explicit ownership across the wire.
+summary: Find the integration state machines, their owners, and the checks between them.
 status: Draft
 ---
 
@@ -8,6 +8,50 @@ A2A carries conversations. MCP exposes tools, resources, and interactive Apps.
 Neither protocol decides who can access a client's data, which database to use,
 or who may approve a release. Record the adopted protocol version, local
 application profile, and policy choices separately.
+
+## Find the integration state machine
+
+These nine state machines describe the Workbench integration with external
+specialists. They are separate lifecycles, not one shared status. A discovered
+card can coexist with a denied invocation; a disconnected stream can coexist
+with a running task. The linked tables own the transitions, guards, effects,
+failures, and recovery rules. State labels describe behavior, not necessarily
+literal database values or SDK enums.
+
+| State machine | Who controls it | Question the transition table answers |
+| --- | --- | --- |
+| [Discovery and readiness](conversations.md#discovery-is-not-invocation-readiness) | Host card fetcher and acceptance runner | Did discovery succeed, or did an authenticated invocation pass? |
+| [Registry and dispatch](conversations.md#registry-policy-and-dispatch) | Operator, policy store, and dispatcher | Does the current revision still permit this target and identity? |
+| [Browser session](service-access.md#browser-session) | Clerk and host backend | Can the host establish a human for a new grant? |
+| [Machine credential and token](service-access.md#machine-credential-and-token) | Operator, issuer, caller cache, and receiver | Can the caller mint a token, and does the receiver accept it? |
+| [Human delegation and entitlement](service-access.md#human-delegation-and-entitlement) | Grant issuer and receiving specialist | Is the human bound to this sender and allowed this operation? |
+| [Bounded demo access](service-access.md#preserve-bounded-demo-access-during-cutover) | Provider operator and verifier | Does the separate, approved demo path still permit access? |
+| [A2A task and transport](conversations.md#conversations-tasks-and-transport) | Provider task store and caller recovery code | Is the task finished, paused, or merely no longer observable? |
+| [MCP view and snapshot](mcp-apps.md#view-transitions) | Host bridge, view store, and provider | Does the action restore a snapshot, call a tool, or update future-turn context? |
+| [Cutover and recovery](release.md#integration-cutover-and-recovery) | Release owner and approved operator | Can this code, schema, and identity configuration receive traffic or roll back? |
+
+## Read transitions without inventing guarantees
+
+A transition needs an event, a guard that permits it, and an owner that applies
+its effects. A failed guard follows the stated failure path, not a weaker
+authorization profile. Recovery can be a supported read, reauthentication,
+configuration repair, or an operator decision; it is not automatically a retry.
+
+Keep each statement's basis explicit:
+
+- Protocol requirements apply to the named version and supported operations.
+- Inspected behavior is bounded to the revisions in the [source record](../evidence/workbench-integration.md),
+  not a claim about today's deployment.
+- Selected policy states what this integration requires, including a human grant
+  on every Workbench specialist call. Implementation acceptance remains separate.
+- Proposed gates, such as live-probe enablement, are not implemented guarantees
+  or release approval.
+
+Before changing a transition, name its guard and failure outcome in the change
+description. Exercise both an allowed transition and a rejected one using the
+owning page's acceptance checks. Record unsupported recovery operations and
+unverified deployment behavior instead of marking them passed. These tables are
+an operational description, not an exhaustive protocol model or a formal proof.
 
 ## Put responsibility on the owning service
 
@@ -64,13 +108,6 @@ unsupported operations explicit rather than retrying through another dialect.
 The [server recipe](../recipes/a2a-server.md) gives the versioned layout and event
 ordering. Test task-before-update and artifact-before-terminal ordering only
 on task-producing paths; a standalone Message need not create a task.
-
-Continue with the topics that own the runtime decisions:
-
-- [Service access](service-access.md): credential profiles, grants, and entitlements.
-- [Conversations](conversations.md): discovery, registry, tasks, interruption, and next turns.
-- [Interactive views](mcp-apps.md): initialization, ownership, snapshots, and refresh.
-- [Release](release.md): schema/code cutover, acceptance, and recovery.
 
 The [component lifecycle evidence](../evidence/component-lifecycle.md) covers
 local resource ownership behind these interfaces. It is not a protocol contract.
