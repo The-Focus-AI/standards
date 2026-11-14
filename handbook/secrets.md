@@ -5,8 +5,13 @@ status: Draft
 ---
 
 Use one project vault in 1Password and a service account scoped to that vault.
-`fnox.toml` declares references, not values. A fnox profile selects values; it is
-not an access boundary or a deployment destination.
+The vault supplies development environments and previews; production values are
+set where the deployment runs. `fnox.toml` declares references, not values. A
+fnox profile selects values; it is not an access boundary or a deployment destination.
+
+The vault, its service account, and the saved token belong to the organization
+account. [Give and remove access](access.md) owns who can reach them and what
+to rotate when that changes.
 
 ## Bootstrap without taking a person's identity
 
@@ -16,12 +21,13 @@ Do not request their password, Secret Key, or login cache. Never save an injecte
 token into a reusable image or snapshot.
 
 Record the token item's location, recovery owner, scope, and receiving environments.
-Recovery uses the person's own 1Password access. There is no universal requirement
-for the saved token to live in either the same vault or a different one.
+Recovery uses the person's own 1Password access. Save the token in the project
+vault it unlocks, so one grant gives a developer both.
 
-For a documented local exception, `.fnox/env` may be a mode-600 ignored file.
-It is not a prerequisite for cloud injection. Check token presence separately
-from successful vault access.
+On a person's own machine, `mise run setup` fetches the token with their
+1Password sign-in and writes it to `.fnox/env`, a mode-600 ignored file. It is
+not a prerequisite for cloud injection. Setup checks that the token actually
+reads the vault, not merely that one is present, and replaces one that does not.
 
 ## Check before writing a credential file
 
@@ -46,6 +52,10 @@ credentials, usage-report admin keys, and personal account sessions do not belon
 in application profiles, model context, renderer HTML, command arguments, or logs.
 Record an expiry and renewal owner for expiring credentials.
 
+Sync from the project vault only to development and preview destinations. An
+owner sets production values in the deployment platform directly, from the
+provider that issued them; see [what stays out of the project vault](access.md#keep-production-out-of-the-project-vault).
+
 Use a named sync target tying together project, destination, source profile,
 credential environment names, and runtime-key allowlist. Dry-run first, apply
 only with approval. Parse structured values; never split dotenv lines or pass
@@ -57,9 +67,11 @@ The [fnox procedure](../recipes/fnox.md) owns setup and the common sync behavior
 
 ## Match production behavior in previews
 
-Start previews from production configuration and integrations. Share appropriately
-scoped runtime keys within the same client when supported. Separate vaults or
-provider accounts for every environment are not the default requirement.
+Give previews the same integrations and configuration shape as production,
+using the project vault's development and preview values. Separate vaults or
+provider accounts for every environment are not the default requirement. Where
+a preview can only work with a production value, record that exception in the
+access map and use the narrowest role the provider offers.
 
 Keep preview database writes off production. Isolate storage writes, webhooks,
 and other harmful effects as needed. Record each configuration difference, its

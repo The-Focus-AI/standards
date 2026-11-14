@@ -67,7 +67,7 @@ tasks; they are not deployment tasks for this standards website:
 
 | Task | Purpose |
 | --- | --- |
-| `mise run setup` | Check the project bootstrap token injected into the cloud workspace (`recipes/fnox.md`) |
+| `mise run setup` | Get a checkout ready: a token that reads the project vault, then a secrets check (`recipes/fnox.md`) |
 | `mise run secrets:check` / `secrets:list` | Resolve required keys / list declarations without values |
 | **`mise run vercel:sync`** | Run `node scripts/sync-secrets.mjs --config secret-sync.json`; forward explicit `--target` and optional `--apply` |
 | `mise run vercel:deploy` | Trigger the approved CI/Git production deployment for the recorded project/team |

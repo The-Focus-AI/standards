@@ -1,7 +1,7 @@
 [
   { "title": "Projects & development", "summary": "Start with a reproducible workspace and tasks that tell the truth.", "pages": ["project-setup", "update-project", "development"] },
   { "title": "Work & review", "summary": "Take an actionable issue through implementation and independent review.", "pages": ["work"] },
-  { "title": "Identity & credentials", "summary": "Separate client sign-in, machine access, and operational authority.", "pages": ["secrets", "sign-in", "service-access"] },
+  { "title": "Identity & credentials", "summary": "Separate client sign-in, machine access, and operational authority.", "pages": ["secrets", "access", "sign-in", "service-access"] },
   { "title": "Agent integration", "summary": "Connect agents without confusing discovery, conversation, and interactive views.", "pages": ["agent-services", "conversations", "mcp-apps"] },
   { "title": "Verification & release", "summary": "Verify the candidate, approve the change, and make recovery explicit.", "pages": ["release"] },
   { "title": "Skills & handbook", "summary": "Find installed capabilities and keep one home for each decision.", "pages": ["skills", "maintaining"] }

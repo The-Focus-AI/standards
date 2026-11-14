@@ -11,7 +11,8 @@ Goals:
 
 1. **Project isolation** — each project's secrets live in its own 1Password vault,
    accessed by a service account scoped to that vault.
-2. **1Password is the source of truth** — the scoped bootstrap token enters through
+2. **1Password is the source of truth for development and preview values** — production
+   values are set in the deployment platform by an owner. The scoped bootstrap token enters through
    cloud secret settings; application credentials resolve through fnox. Platform
    write credentials belong only in authorized sync jobs, not the application.
    Nothing is committed or baked into a reusable image. A local token file is an exception.
@@ -206,10 +207,19 @@ application environment. Without activation, wrap the application command in
 To run a workspace binary rather than a package script, use
 `pnpm --filter web exec tsx ...`, not `pnpm --filter web tsx ...`.
 
-Use the maintained `setup` task in `templates/default-project/mise.toml`: it
-checks that the cloud token is present without printing or saving it. Presence
-is not proof of vault access; run `secrets:check` for that. The operations tasks
-are:
+Use the maintained `setup` task in `templates/default-project/mise.toml`. It is
+the one command that gets a checkout ready, and it is safe to run again at any time:
+
+- If the token in the environment can read the project vault, it changes nothing.
+- If there is no token, or the token no longer reads the vault, it fetches the
+  saved token with the person's own 1Password sign-in and writes the ignored,
+  mode-600 `.fnox/env`, after checking that git ignores and does not track it.
+- If neither works, it says what to fix: the cloud secret setting, or the
+  person's sign-in and group membership.
+
+It then checks that every declared secret resolves. Set its three values, the account,
+the project vault, and the token item's title, when copying it into a project.
+The other secret tasks are:
 
 ```toml
 [tasks."secrets:check"]
@@ -222,9 +232,9 @@ run = "fnox list"
 ```
 
 After rotation, update the receiving cloud secret settings and refresh the
-workspace processes using that platform's supported mechanism. A local
-`secrets:rotate-token` task only updates a local exception's file; it does not
-refresh cloud secrets.
+workspace processes using that platform's supported mechanism. On a person's own
+machine, `mise run setup` notices the old token no longer works and replaces it;
+there is no separate refresh task. It cannot update a cloud secret setting.
 
 ## Multi-environment (development / preview / production)
 
@@ -344,13 +354,18 @@ targets and replace project/team placeholders before applying.
 
 ## Onboarding a teammate
 
+[Give and remove access](../handbook/access.md) owns groups, shared-service seats,
+offboarding, and rotation. These steps cover only the workspace.
+
 1. Open the repository in an Amp orb, Cursor cloud environment, or equivalent
    reproducible workspace. Its committed bootstrap installs the tools and dependencies.
-2. Grant the person 1Password access to the saved project token. They retrieve
-   it with their own account and supply it through the project's cloud secret settings.
-3. In the workspace, run `mise run setup` to check presence and
-   `mise run secrets:check` to check access. Resolve application secrets through
-   fnox activation or `fnox exec --`, as in step 1 above, then run `mise run dev`.
+2. Add the person to the project's group. In a cloud workspace the project's
+   secret settings already supply the token; if they do not, the person retrieves
+   it with their own account and enters it there.
+3. Run `mise run setup`. It confirms the token reads the vault, fetching it on
+   the person's own machine if needed, then checks that secrets resolve. Resolve
+   application secrets through fnox activation or `fnox exec --`, as in step 1
+   above, then run `mise run dev`.
 4. Review the app through the workspace portal or deployment preview. A teammate
    should not need your laptop, shell configuration, or local database.
 

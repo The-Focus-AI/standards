@@ -34,24 +34,6 @@ run = "fnox check"
 description = "List all declared secrets and where they resolve from"
 run = "fnox list"
 
-[tasks."secrets:rotate-token"]
-description = "Local exception only: refresh .fnox/env from personal 1Password access"
-run = '''
-set -eu
-git check-ignore -q -- .fnox/env || { echo "Ignore .fnox/env before writing it" >&2; exit 1; }
-if [ -n "$(git ls-files -- .fnox/env)" ]; then
-  echo "STOP: .fnox/env is tracked; do not write credentials" >&2
-  exit 1
-fi
-umask 077
-mkdir -p .fnox
-chmod 700 .fnox
-TOKEN="$(op read 'op://thefocus/standards service account token/credential')"
-printf 'OP_SERVICE_ACCOUNT_TOKEN=%s\n' "$TOKEN" > .fnox/env
-chmod 600 .fnox/env
-echo "✓ .fnox/env refreshed."
-'''
-
 [tasks.install]
 description = "Restore agent skills from the committed lock"
 run = "node scripts/restore-skills.mjs"
