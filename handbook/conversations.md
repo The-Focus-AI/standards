@@ -20,7 +20,7 @@ are a proposed way to record readiness, not an implemented enablement gate.
 | Transition | Guard, owner and recorded effect | Failure or recovery |
 | --- | --- | --- |
 | Unknown or expired card to discovered | Workbench fetches and parses the public AgentCard. Cache uses `max-age` minus `Age`, capped at 300 seconds; no freshness permission means no cache | Expiry evicts the old entry. Fetch/parse errors are discovery failures, not failed token validation or permission revocation. |
-| Configuration disabled to enabled | Operator provides credentials and the selected policy; managed enablement checks configuration blockers | A green discovery dot and an enabled record still do not prove an authenticated operation. Versant's public card succeeded while invocation was blocked. |
+| Configuration disabled to enabled | Operator provides credentials and the selected policy; managed enablement checks configuration blockers | A green discovery dot and an enabled record still do not prove an authenticated operation. Specialist B's public card succeeded while invocation was blocked. |
 | Enabled to invocation-verified, proposed acceptance gate | Approved harness exercises positive and negative calls through the deployed route; record target, code, policy, profile, operation, timestamp and result | Changed target/profile/revision invalidates that evidence. Readiness lifetime and whether the UI toggle blocks on a probe remain design decisions; current enablement has no live-probe gate. |
 | Verified to failed or unverified acceptance | A new acceptance call fails, or the recorded target/profile/revision changes | Keep the card and configuration results separate. Repair the failing path and run new acceptance checks; do not reuse the old success as proof. |
 
@@ -80,14 +80,14 @@ to failed, canceled, or input-required.
 | --- | --- | --- |
 | Attached to observed pause or terminal result | Provider reports an interrupted or terminal state; caller records it even if the stream then closes | An observed input-required or auth-required state is a known pause, not an unknown transport failure. Follow its supported continuation path. |
 | Attached stream to disconnected/unknown | Client loses transport without observing an interrupted or terminal result | Preserve task/context ids. Poll `GetTask` or subscribe only when implemented; an abort does not establish cancellation. Do not resend the question to discover the result. |
-| Known task to recovered observation | Authorized caller reads a persisted task snapshot when both caller and provider support that operation | Roblox supports polling, rejects live resubscription and has no successful cancellation path at the inspected revision. Workbench `askSpecialist` rejects a noncompleted SDK task with “do not repeat the request” and has no polling/resume loop. Its direct transport's `reconnectToStream` returns `null`. |
+| Known task to recovered observation | Authorized caller reads a persisted task snapshot when both caller and provider support that operation | Specialist A supports polling, rejects live resubscription and has no successful cancellation path at the inspected revision. Workbench `askSpecialist` rejects a noncompleted SDK task with “do not repeat the request” and has no polling/resume loop. Its direct transport's `reconnectToStream` returns `null`. |
 | Unknown outcome remains unresolved | No supported read/resume path exists, or its result is unavailable | Caller reports uncertainty with known ids for operator reconciliation. Lack of observation does not authorize replay or prove cancellation. |
 
 ### A new turn is not a task retry
 
 Workbench `c302e20` has distinct input-history paths. Its direct
 `A2AChatTransport` sends only the latest user text for configured `v1` and
-`a2a-0.3` dialects. For `versant`, `composeOutboundText` instead sends a
+`a2a-0.3` dialects. For the legacy specialist-specific dialect, `composeOutboundText` instead sends a
 `<conversation-so-far>` recap followed by the current question. The recap contains
 up to eight prior user/assistant text turns, capped at 1,500 characters each.
 This is an explicit compatibility path for the stateless legacy receiver, not
@@ -114,7 +114,7 @@ dialect the integration configures; do not assume both v1 and v0.3 are supported
 For unsupported operations or dialects, record an explicit unsupported outcome,
 not a successful check or an implicit retry through another path. Test owner
 isolation under the selected authorization profile. See the packet's
-[acceptance checklist](https://standards.upperhandai.com/conformance).
+acceptance checklist.
 
 | Case | Observable acceptance criterion |
 | --- | --- |
@@ -123,7 +123,7 @@ isolation under the selected authorization profile. See the packet's
 | Delegated dispatch | Direct and coordinator-routed Workbench calls carry a target-bound grant for the same human, bound to the actual machine `sub`. Missing or mismatched grants and denied human entitlements stop execution on both paths. Altering task provenance cannot change this result. |
 | Next-turn identity | New turns use distinct message ids, retain the authorized context where supported and never address a completed task id. New Task results have distinct task ids; standalone Messages need not create tasks. Test isolation at the selected profile's owner boundary. |
 | SDK-profile input | Workbench's direct `v1`/`a2a-0.3` transport sends only the latest user text. The server-side specialist client forwards the supplied question without adding a recap. |
-| Legacy Versant direct input | A follow-up contains the current question plus the delimited, capped recap described above. It does not reopen a completed task or establish server-side history. Keep this compatibility assertion separate from the SDK-profile test. |
+| Legacy Specialist B direct input | A follow-up contains the current question plus the delimited, capped recap described above. It does not reopen a completed task or establish server-side history. Keep this compatibility assertion separate from the SDK-profile test. |
 | Known pause | Observe input-required or auth-required before the stream closes. Retain that task state; continue only through supported operations, without reporting unknown failure or bypassing auth. |
 | Interrupted send | Drop the stream after task acceptance. Recover by a supported read or report the missing client capability; no duplicate send or false cancellation success. |
 

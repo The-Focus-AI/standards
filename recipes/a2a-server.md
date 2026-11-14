@@ -15,7 +15,7 @@ before the executor runs. Verify service identity and the target-bound human
 grant, bind `human.azp` to the actual verified `machine.sub`, then check the
 receiver's human entitlement. Exercise direct and coordinator-routed calls with
 the same principal. Task provenance is not authority; a missing or invalid grant
-never falls back to shared-service access. Versant's revised receiver still
+never falls back to shared-service access. Specialist B's revised receiver still
 needs implementation and acceptance evidence for this contract.
 
 ## Server layout
@@ -45,11 +45,11 @@ requests to your own A2A endpoint. Do not add a separate chat route for it:
 `handbook/agent-services.md` permits one if it calls the same entry point, but on the
 Workbench a private route is forbidden.
 
-When adopting the [UpperHand packet](https://standards.upperhandai.com/packet),
+When adopting the client's onboarding packet,
 refusals and citations are typed Parts. Its media types are
-`application/vnd.upperhand.refusal+json` and
-`application/vnd.upperhand.citations+json`, declared under the extension URIs at
-`https://standards.upperhandai.com/ext/…/v1`. Use these shared types for citations
+`application/vnd.<client>.refusal+json` and
+`application/vnd.<client>.citations+json`, declared under the extension URIs at
+`https://<client-standards-host>/ext/…/v1`. Use these shared types for citations
 and refusals rather than replacing them with per-project types. Domain output
 can have its own media type alongside the shared provenance Parts.
 
@@ -152,7 +152,7 @@ versioned with the code:
   task awaiting input can instead receive a message addressed to that task if
   the implementation supports it. Context history is an application persistence
   contract, not guaranteed by the existence of a context id. Workbench's legacy
-  Versant direct transport additionally sends a bounded recap; see
+  Specialist B direct transport additionally sends a bounded recap; see
   [conversation behavior](../handbook/conversations.md#conversations-tasks-and-transport).
 - On disconnection, preserve the known task id and use supported `GetTask` reads.
   Polling is an available recovery operation, not proof that every caller has

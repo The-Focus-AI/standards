@@ -20,12 +20,12 @@ tiles to Apps resources or assume the legacy renderer implements this handshake.
 | Contract | What it defines |
 | --- | --- |
 | Stable MCP Apps | `io.modelcontextprotocol/ui`, tool `_meta.ui.resourceUri`, `ui://` resource discovery with `resources/read`, MIME `text/html;profile=mcp-app`, app visibility and initialization messages |
-| Workbench A2A association | `urn:upperhand:workbench:mcp-apps:1` advertises a same-origin MCP endpoint; `application/vnd.upperhand.mcp-app+json` associates a saved answer with `viewId`, tool, arguments, resource and result |
+| Workbench A2A association | `urn:<client>:workbench:mcp-apps:1` advertises a same-origin MCP endpoint; `application/vnd.<client>.mcp-app+json` associates a saved answer with `viewId`, tool, arguments, resource and result |
 | Workbench permissions | Same owning provider/resource, app-visible tools, `readOnlyHint: true`; no mutating tools, sampling, conversational `ui/message`, arbitrary resources or external-link handler |
 | Workbench persistence | Current arguments, result, revision and selected text context in `mcp_app_views`; original answer remains unchanged |
 
 No official A2A-to-Apps association was found in the inspected upstream specs.
-The two UpperHand identifiers are local contracts, not standards-defined names.
+The two client-namespaced identifiers are local contracts, not standards-defined names.
 Generic MCP hosts discover the UI resource from the provider tool without that
 A2A association. Read-only hints describe tools; they do not enforce data access.
 
@@ -42,7 +42,7 @@ provider tool and protected-resource calls on the user's behalf also carry the
 service identity and target-bound human grant. The receiver can deny that
 human independently. A saved result or task-origin label is not signed authority.
 This is a required policy check, not a claim that the inspected implementation
-or Versant's revised receiver has passed it.
+or Specialist B's revised receiver has passed it.
 
 ## The trusted-renderer exception is local policy
 

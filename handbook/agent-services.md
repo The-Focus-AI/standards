@@ -77,7 +77,7 @@ requirement on every vendor.
 | Persistence | Postgres task/session state with verified-owner scoping | Restart, missing configuration, failed writes, and cross-owner reads are tested. |
 | Model entry point | One `runAgent` used by conversational adapters | An MCP rendering action does not implicitly invoke the model. |
 
-The [UpperHand onboarding packet](https://standards.upperhandai.com/packet)
+The client's onboarding packet
 defines its own refusal/citation Parts and extensions. Use those types when
 adopting that contract; do not claim they are universal A2A fields. A vendor's
 framework, model, database, and cloud remain implementation choices.

@@ -220,7 +220,7 @@ Vary the `background` of consecutive spreads to give the reader spatial awarenes
 | `--tint-sage` | `#eef6ee` | UI / rendering spreads           |
 | `--ink`       | `#161616` | Closing spread (inverted)        |
 
-Don't alternate every spread — group by semantic affinity. The Versant architecture report uses
+Don't alternate every spread — group by semantic affinity. A client architecture report uses
 paper → cool → paper → paper → warm → paper → sage → paper → ink, where each tint marks a thematic
 shift.
 
@@ -262,9 +262,9 @@ This is why magazine mode is the right pick when "we email PDFs sometimes and sh
 
 ### Reference implementation
 
-The Versant architecture report ships the canonical example: nine spreads, paper + four background
+A client architecture report ships the canonical example: nine spreads, paper + four background
 tints + closing on `--ink`, full keyboard wiring, print fallback. Read
-`docs/status/architecture-report.html` in the versant repo only if that project
+`docs/status/architecture-report.html` in the originating client project only if that project
 is available and access is authorized. It is historical source material, not
 a dependency shipped with this skill; the scaffolding above stands on its own.
 
