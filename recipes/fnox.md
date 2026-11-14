@@ -363,8 +363,9 @@ offboarding, and rotation. These steps cover only the workspace.
    secret settings already supply the token; if they do not, the person retrieves
    it with their own account and enters it there.
 3. Run `mise run setup`. It confirms the token reads the vault, fetching it on
-   the person's own machine if needed, then checks that secrets resolve. Resolve application secrets through fnox activation or
-   `fnox exec --`, as in step 1 above, then run `mise run dev`.
+   the person's own machine if needed, then checks that secrets resolve. Resolve
+   application secrets through fnox activation or `fnox exec --`, as in step 1
+   above, then run `mise run dev`.
 4. Review the app through the workspace portal or deployment preview. A teammate
    should not need your laptop, shell configuration, or local database.
 
