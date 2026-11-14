@@ -7,7 +7,8 @@ status: Draft
 Use an Amp orb, Cursor cloud environment, or equivalent reproducible workspace.
 A person's laptop is for review and personal authentication, not a required
 database host or build server. Record genuine hardware or network exceptions
-in the project's agent instructions, with the supported verification path.
+(such as native [macOS menu bar apps](../recipes/macos-menubar-app.md)) in the
+project's agent instructions, with the supported verification path.
 
 ## Keep tooling in mise
 

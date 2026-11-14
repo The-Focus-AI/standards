@@ -94,7 +94,8 @@ rollback pair before release. See [service access](service-access.md).
 | Resume gate | Approved acceptance calls pass for the restored revision before general dispatch resumes. A public card alone cannot pass this gate. |
 
 Platform procedures: [Vercel](../recipes/vercel.md), [GCP](../recipes/gcp.md),
-and the dated [Gaia runtime record](../evidence/gaia-runtime.md).
+[macOS menu bar apps](../recipes/macos-menubar-app.md), and the dated
+[Gaia runtime record](../evidence/gaia-runtime.md).
 
 ## Route failures back to work
 
