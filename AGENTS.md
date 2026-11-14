@@ -15,7 +15,7 @@ Make concrete, verified changes when asked; do not invent policy from memory.
 - Agent contracts: `handbook/agent-services.md`, `conversations.md`, `mcp-apps.md`.
 - Verification, approval, release, and recovery: `handbook/release.md`.
 - Skills and source selection: `handbook/skills.md`.
-- Document structure and status: `handbook/maintaining.md`.
+- Document structure, status, and changelog: `handbook/maintaining.md`, `CHANGELOG.md`.
 
 Paths without a directory above are also under `handbook/`.
 There is no numbered STD/GDE/NOTE registry. Put a decision and its explanation
@@ -45,6 +45,8 @@ Do not rebuild the old hierarchy or maintain a second skill inventory.
 `handbook/navigation.json` is the single topic navigation. Published Markdown
 needs title, summary, and status. Evidence needs its actual checked date and source
 revisions. Approval metadata is required for In force, never inferred by an agent.
+Record substantive handbook, recipe, and skill changes in `CHANGELOG.md`
+(`## YYYY-MM-DD — Title`), which renders `changelog.html` and `feed.xml`.
 
 Build: `mise run handbook:build` → `out/handbook/`.
 Validate: `mise run lint` and `mise run test`.

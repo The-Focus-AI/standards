@@ -32,6 +32,10 @@ become protocol requirements.
 - `skills/` holds installable skills. Keep their CLI-owned frontmatter and record
   attribution in `skills/VENDORED.md`. Generate the catalog from the lock and source.
 - `templates/` and `scripts/` are executable starting points, not a second policy book.
+- [CHANGELOG.md](../CHANGELOG.md) records substantive additions and revisions as
+  newest-first `## YYYY-MM-DD — Title` sections with links to the affected pages.
+  The build renders `changelog.html` and the RSS 2.0 feed `feed.xml` for Focus.AI
+  Labs and other subscribers; omit typo and formatting fixes.
 
 Use meaningful filenames and links. There are no document numbers, clause-number
 registries, duplicate reference lists, or replacement-pointer paperwork. Git

@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
-import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { cpSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { dirname, join } from "node:path";
+import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
 import { test } from "node:test";
@@ -30,6 +30,22 @@ function fixture(t) {
   write("handbook/update-project.md", page(`## Prompt\n\n\`\`\`text\n${prompt}\n\`\`\`\n\n[Next](another.md#section)`));
   write("handbook/another.md", page("## Section\n\n[Recipe](../recipes/fixture.md#details)\n\n[Source](../scripts/build-handbook.mjs)"));
   write("recipes/fixture.md", page("## Details\n\nAn explanatory recipe.", { status: "Reference" }));
+  write("CHANGELOG.md", [
+    "---",
+    'title: "Changelog"',
+    'summary: "Notable handbook and recipe updates."',
+    "---",
+    "",
+    "Subscribe to [the RSS feed](https://standards.thefocus.ai/feed.xml).",
+    "",
+    "## 2026-11-14 — Added fixture recipe",
+    "",
+    "Documented `fixture` & its `<details>` workflow.",
+    "",
+    "- [Fixture recipe](recipes/fixture.md#details)",
+    "- [Another topic](handbook/another.md#section)",
+    "",
+  ].join("\n"));
   write("skills-lock.json", JSON.stringify({ version: 1, skills: {} }));
   return { root, read, write, nav };
 }
@@ -196,3 +212,92 @@ test("invalid skill lock and absent prompt leave the previous build intact", t =
   assert.match(run(root).output, /copyable text prompt/);
   assert.equal(read("index.html"), before);
 });
+
+test("changelog renders HTML, autodiscovery links, and deterministic RSS 2.0 XML with categories and canonical links", t => {
+  const { root, read, write } = fixture(t);
+  write("handbook/another.md", page("## Section\n\nSee [the changelog](../CHANGELOG.md#2026-11-14-added-fixture-recipe)."));
+  write("CHANGELOG.md", [
+    "---",
+    'title: "Changelog"',
+    'summary: "Notable updates for Focus.AI Labs."',
+    "---",
+    "",
+    "Read via [RSS](https://standards.thefocus.ai/feed.xml).",
+    "",
+    "## 2026-11-14 — Second update & CDATA check",
+    "",
+    "Handles `]]>` & `<script>` safely in [the recipe](recipes/fixture.md#details) and [skills lock](skills-lock.json).",
+    "",
+    "```xml",
+    "<![CDATA[nested ]]> example]]>",
+    "```",
+    "",
+    "## 2026-11-14 — Added fixture recipe",
+    "",
+    "Initial [topic](handbook/another.md#section) entry.",
+    "",
+  ].join("\n"));
+  write("evidence/result.md", page("A measured observation.", { status: "Evidence", checked: "2024-02-29" }));
+  const result = run(root);
+  assert.equal(result.status, 0, result.output);
+
+  const outDir = join(root, "out/handbook");
+  const htmlFiles = readdirSync(outDir, { recursive: true }).filter(f => String(f).endsWith(".html"));
+  assert.ok(htmlFiles.length >= 7, "checks root, handbook, recipe, evidence, skills, and changelog HTML files");
+  for (const file of htmlFiles) {
+    const html = read(file);
+    const head = html.match(/<head>([\s\S]*?)<\/head>/)?.[1] ?? "";
+    const tag = head.match(/<link rel="alternate" type="application\/rss\+xml"[^>]*href="([^"]+)"/);
+    assert.ok(tag, `${file} is missing RSS autodiscovery link in <head>`);
+    assert.equal(resolve(dirname(join(outDir, file)), tag[1]), join(outDir, "feed.xml"), `${file} RSS href resolves to feed.xml`);
+  }
+  assert.match(read("handbook/another.html"), /href="\.\.\/changelog\.html#2026-11-14-added-fixture-recipe"/);
+
+  const changelogHtml = read("changelog.html");
+  assert.match(changelogHtml, /id="2026-11-14-second-update-cdata-check"/);
+  assert.match(changelogHtml, /href="recipes\/fixture\.html#details"/);
+  assert.match(changelogHtml, /recipes · skills/);
+
+  const rss = read("feed.xml");
+  assert.equal(run(root).status, 0);
+  assert.equal(read("feed.xml"), rss, "RSS feed is deterministic across builds");
+  assert.match(rss, /<atom:link href="https:\/\/standards\.thefocus\.ai\/feed\.xml" rel="self" type="application\/rss\+xml" \/>/);
+  assert.match(rss, /<guid isPermaLink="true">https:\/\/standards\.thefocus\.ai\/changelog\.html#2026-11-14-second-update-cdata-check<\/guid>/);
+  assert.match(rss, /<pubDate>Sat, 14 Nov 2026 12:00:00 GMT<\/pubDate>/);
+  assert.match(rss, /<pubDate>Sat, 14 Nov 2026 11:59:00 GMT<\/pubDate>/);
+  assert.match(rss, /<category>recipes<\/category>/);
+  assert.match(rss, /<category>skills<\/category>/);
+  assert.match(rss, /<atom:link href="https:\/\/standards\.thefocus\.ai\/recipes\/fixture\.html#details" rel="related" \/>/);
+  assert.match(rss, /<description>Handles ]]&gt; &amp; &lt;script&gt; safely in the recipe and skills lock\.<\/description>/);
+  assert.match(rss, /href="https:\/\/standards\.thefocus\.ai\/recipes\/fixture\.html#details"/);
+  assert.match(rss, /nested ]]&gt; example/);
+
+  const xmlParse = spawnSync("python3", ["-c",
+    "import sys, xml.etree.ElementTree as ET; root = ET.parse(sys.argv[1]).getroot(); assert len(root.findall('./channel/item')) == 2",
+    join(root, "out/handbook/feed.xml")], { encoding: "utf8" });
+  if (!xmlParse.error) assert.equal(xmlParse.status, 0, xmlParse.stderr);
+});
+
+const invalidChangelogs = [
+  ["missing title", '---\nsummary: "Valid"\n---\n\n## 2026-11-14 — Item\n\nBody.\n', /missing title/],
+  ["undated heading", '---\ntitle: "Changelog"\nsummary: "Valid"\n---\n\n## Missing date\n\nBody.\n', /entry heading must match/],
+  ["impossible date", '---\ntitle: "Changelog"\nsummary: "Valid"\n---\n\n## 2026-02-29 — Leap\n\nBody.\n', /invalid entry date/],
+  ["oldest-first order", '---\ntitle: "Changelog"\nsummary: "Valid"\n---\n\n## 2026-11-01 — Old\n\nBody.\n\n## 2026-11-14 — New\n\nBody.\n', /newest-first/],
+  ["empty entry", '---\ntitle: "Changelog"\nsummary: "Valid"\n---\n\n## 2026-11-14 — Empty\n\n## 2026-11-13 — Valid\n\nBody.\n', /empty entry/],
+  ["no entries", '---\ntitle: "Changelog"\nsummary: "Valid"\n---\n\nIntro only.\n', /at least one dated entry/],
+  ["broken link", '---\ntitle: "Changelog"\nsummary: "Valid"\n---\n\n## 2026-11-14 — Broken\n\n[Missing](handbook/missing.md)\n', /broken link/],
+];
+for (const [name, source, expected] of invalidChangelogs) {
+  test(`validator and build reject changelog with ${name} without replacing published output`, t => {
+    const { root, read, write } = fixture(t);
+    assert.equal(run(root).status, 0);
+    const before = read("feed.xml");
+    write("CHANGELOG.md", source);
+    for (const script of ["validate-documents.mjs", "build-handbook.mjs"]) {
+      const result = run(root, script);
+      assert.equal(result.status, 1, result.output);
+      assert.match(result.output, expected);
+    }
+    assert.equal(read("feed.xml"), before);
+  });
+}

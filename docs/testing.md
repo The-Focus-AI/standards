@@ -7,8 +7,8 @@ that the draft standard has been ratified or every external gate is configured.
 
 | Check | Runner / trigger | Class | Coverage |
 | --- | --- | --- | --- |
-| `mise run lint` | `ci.yml`, job `check`; every PR and push to `main` | blocking | Markdown, skill register and immutable lock metadata/parity, design, corpus rendering, document metadata |
-| `mise run test` | `ci.yml`, job `check`; every PR and push to `main` | blocking | Handbook build/link/navigation/catalog behavior, skill restoration, secret sync, bootstrap and task-contract regressions with disposable fixtures |
+| `mise run lint` | `ci.yml`, job `check`; every PR and push to `main` | blocking | Markdown, skill register and immutable lock metadata/parity, design, corpus/changelog/RSS rendering, document metadata |
+| `mise run test` | `ci.yml`, job `check`; every PR and push to `main` | blocking | Handbook build/link/navigation/catalog/changelog/RSS behavior, skill restoration, secret sync, bootstrap and task-contract regressions with disposable fixtures |
 | Pages build validators | `pages.yml`; configured paths on `main` or authorized manual dispatch | blocking for that deployment | Renderer, document, design, and skill validation |
 | `mise run test:docker` | Explicit integration run in a Docker-capable cloud workspace | blocking for image changes; not a required PR job | Image build and container smoke checks |
 | `mise run secrets:check` | Explicit authorized runtime check | operational; outside offline CI | Real project-vault access, not static correctness |

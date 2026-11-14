@@ -35,14 +35,16 @@ mise run handbook:build
 
 `mise run handbook:preview` serves `out/handbook/`; expose it through your cloud
 workspace's managed portal. The generated site has task navigation, full-text
-search, a copyable update prompt, and a skills catalog derived from the lock and
-owned skill directories. `handbook.md` is its downloadable agent reading copy.
+search, a copyable update prompt, a [changelog](CHANGELOG.md) and RSS 2.0 feed
+(`feed.xml`), and a skills catalog derived from the lock and owned skill
+directories. `handbook.md` is its downloadable agent reading copy.
 
 The build uses Node built-ins and the repository's small Markdown renderer.
 No documentation framework, runtime service, or new package dependency is required.
 
 ## Source layout
 
+- `CHANGELOG.md`: curated changelog rendered to `changelog.html` and `feed.xml`.
 - `handbook/`: topic pages and navigation.
 - `recipes/`: platform procedures linked from their owning topics.
 - `evidence/`: dated implementation records, not current policy.

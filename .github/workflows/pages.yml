@@ -12,6 +12,7 @@ on:
     # Path-filtered, per handbook/release.md. The lock supplies the homepage's
     # default skill inventory, so changing it must rebuild the site.
     paths:
+      - "CHANGELOG.md"
       - "handbook/**"
       - "recipes/**"
       - "evidence/**"
