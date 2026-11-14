@@ -57,6 +57,20 @@ fi
 fnox check
 '''
 
+[tasks.install]
+description = "Install project dependencies and restore agent skills"
+run = '''
+set -eu
+if [ -f package.json ]; then
+  if [ -f pnpm-lock.yaml ]; then
+    pnpm install --frozen-lockfile
+  else
+    pnpm install --no-frozen-lockfile
+  fi
+fi
+node scripts/restore-skills.mjs
+'''
+
 [tasks.dev]
 description = "Baseline checks; adapt to the project's real development loop"
 run = '''

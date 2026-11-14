@@ -34,6 +34,18 @@ run = "fnox check"
 description = "List all declared secrets and where they resolve from"
 run = "fnox list"
 
+[tasks.install]
+description = "Restore agent skills from the committed lock"
+run = "node scripts/restore-skills.mjs"
+
+[tasks.dev]
+description = "Run lint + test in development mode"
+run = '''
+set -eu
+mise run lint
+mise run test
+'''
+
 [tasks.lint]
 description = "Offline checks: Markdown, skills, design, handbook links and navigation"
 run = '''
