@@ -75,7 +75,8 @@ Before running setup or creating credential files (`handbook/development.md`, `h
 - Install dependencies with `mise trust`, `mise install`, and `mise run install`.
   The install task runs `node scripts/restore-skills.mjs`, copied from the standards
   repository's canonical helper. Do not substitute a bare upstream restore command.
-  Run `mise run setup` and `mise run secrets:check` separately when runtime secrets are needed.
+  Run `mise run setup` to get secrets working, and again whenever they stop resolving, for example
+  after a token rotation. It replaces a token that no longer works; there is no separate refresh task.
 - Use mise for project tools and runtimes. Do not use global `npm install -g`, `pip install`, or
   `brew install` for project tooling.
 - Use `pnpm` for JavaScript/TypeScript packages unless this project explicitly documents another package manager.

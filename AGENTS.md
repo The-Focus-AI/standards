@@ -10,6 +10,7 @@ Make concrete, verified changes when asked; do not invent policy from memory.
 - Existing-project audit: `handbook/update-project.md`.
 - Issues, claims, and review: `handbook/work.md`.
 - Secrets and credential delivery: `handbook/secrets.md`; platform commands in `recipes/`.
+- People, groups, onboarding, offboarding, and rotation: `handbook/access.md`.
 - Client sign-in: `handbook/sign-in.md`. Machine and delegated access: `service-access.md`.
 - Agent contracts: `handbook/agent-services.md`, `conversations.md`, `mcp-apps.md`.
 - Verification, approval, release, and recovery: `handbook/release.md`.

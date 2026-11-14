@@ -48,30 +48,109 @@ echo "PASS: repeat bootstrap preserves the project's ignore rules"
 MISE="${MISE_BIN:-$(command -v mise)}"
 export MISE_AUTO_INSTALL=0
 export MISE_TRUSTED_CONFIG_PATHS="$TARGET"
+# Keep mise from putting its own op and fnox ahead of the stand-ins used below.
+export MISE_DISABLE_TOOLS="op,fnox"
 env -u OP_SERVICE_ACCOUNT_TOKEN "$MISE" --cd "$TARGET" run --skip-tools setup > "$TARGET/setup.log" 2>&1
 grep -q 'No fnox configuration yet' "$TARGET/setup.log"
 echo "PASS: a project without fnox needs no bootstrap token"
 
 touch "$TARGET/fnox.toml"
-for config in template root; do
-  if [ "$config" = root ]; then
-    cp "$ROOT_DIR/mise.toml" "$TARGET/mise.toml"
-  fi
-  if env -u OP_SERVICE_ACCOUNT_TOKEN "$MISE" --cd "$TARGET" run --skip-tools setup > "$TARGET/setup.log" 2>&1; then
-    echo "FAIL: $config setup accepted a missing bootstrap token"
-    exit 1
-  fi
-  grep -q 'cloud secret settings' "$TARGET/setup.log"
-  for attempt in 1 2; do
-    OP_SERVICE_ACCOUNT_TOKEN=bootstrap-test-token "$MISE" --cd "$TARGET" run --skip-tools setup > "$TARGET/setup.log" 2>&1
-    grep -q 'Bootstrap token is available' "$TARGET/setup.log"
-  done
-  if [ -e "$TARGET/.fnox" ] || grep -RFq bootstrap-test-token "$TARGET"; then
-    echo "FAIL: $config setup wrote the injected token or created a credential directory"
-    exit 1
-  fi
-  echo "PASS: $config setup rejects a missing token and accepts an injected token without printing or persisting it"
+
+# The root repository still only checks that a token was injected.
+cp "$TARGET/mise.toml" "$TARGET/template-mise.toml"
+cp "$ROOT_DIR/mise.toml" "$TARGET/mise.toml"
+if env -u OP_SERVICE_ACCOUNT_TOKEN "$MISE" --cd "$TARGET" run --skip-tools setup > "$TARGET/setup.log" 2>&1; then
+  echo "FAIL: root setup accepted a missing bootstrap token"
+  exit 1
+fi
+grep -q 'cloud secret settings' "$TARGET/setup.log"
+for attempt in 1 2; do
+  OP_SERVICE_ACCOUNT_TOKEN=bootstrap-test-token "$MISE" --cd "$TARGET" run --skip-tools setup > "$TARGET/setup.log" 2>&1
+  grep -q 'Bootstrap token is available' "$TARGET/setup.log"
 done
+if [ -e "$TARGET/.fnox" ] || grep -RFq bootstrap-test-token "$TARGET"; then
+  echo "FAIL: root setup wrote the injected token or created a credential directory"
+  exit 1
+fi
+echo "PASS: root setup rejects a missing token and accepts an injected token without printing or persisting it"
+mv "$TARGET/template-mise.toml" "$TARGET/mise.toml"
+
+# The template's setup checks that the token reads the vault and repairs a
+# person's own machine. Stand in for 1Password and fnox so no vault is needed:
+# the fake vault accepts only tokens named in FAKE_OP_GOOD_TOKENS, and a
+# personal sign-in exists only when FAKE_OP_SAVED_TOKEN is set.
+FAKE_BIN="$(mktemp -d)"
+cat > "$FAKE_BIN/op" <<'FAKE'
+#!/bin/sh
+case "$1 $2" in
+  "vault get")
+    for good in $FAKE_OP_GOOD_TOKENS; do
+      [ "${OP_SERVICE_ACCOUNT_TOKEN:-}" = "$good" ] && exit 0
+    done
+    exit 1 ;;
+  "read "*)
+    [ -n "${FAKE_OP_SAVED_TOKEN:-}" ] || exit 1
+    printf '%s' "$FAKE_OP_SAVED_TOKEN" ;;
+  *) exit 1 ;;
+esac
+FAKE
+printf '#!/bin/sh\nexit 0\n' > "$FAKE_BIN/fnox"
+chmod +x "$FAKE_BIN/op" "$FAKE_BIN/fnox"
+run_setup() {
+  PATH="$FAKE_BIN:$PATH" FAKE_OP_GOOD_TOKENS="good-test-token saved-test-token" \
+    "$MISE" --cd "$TARGET" run --skip-tools setup > "$TARGET/setup.log" 2>&1
+}
+git -C "$TARGET" rev-parse --git-dir >/dev/null 2>&1 || git -C "$TARGET" init -q
+
+if env -u OP_SERVICE_ACCOUNT_TOKEN -u FAKE_OP_SAVED_TOKEN PATH="$FAKE_BIN:$PATH" \
+    "$MISE" --cd "$TARGET" run --skip-tools setup > "$TARGET/setup.log" 2>&1; then
+  echo "FAIL: template setup succeeded with no token and no sign-in"
+  exit 1
+fi
+grep -q 'cloud secret settings' "$TARGET/setup.log"
+[ ! -e "$TARGET/.fnox" ]
+echo "PASS: template setup explains what to fix when no token can be obtained"
+
+for attempt in 1 2; do
+  OP_SERVICE_ACCOUNT_TOKEN=good-test-token run_setup
+  grep -q 'can read the project vault' "$TARGET/setup.log"
+done
+if [ -e "$TARGET/.fnox" ] || grep -RFq good-test-token "$TARGET"; then
+  echo "FAIL: template setup wrote a working injected token or created a credential directory"
+  exit 1
+fi
+echo "PASS: template setup leaves a working injected token alone without printing or persisting it"
+
+if OP_SERVICE_ACCOUNT_TOKEN=stale-test-token run_setup; then
+  echo "FAIL: template setup accepted a token that cannot read the vault"
+  exit 1
+fi
+[ ! -e "$TARGET/.fnox" ]
+echo "PASS: template setup rejects a stale token when no sign-in can replace it"
+
+OP_SERVICE_ACCOUNT_TOKEN=stale-test-token FAKE_OP_SAVED_TOKEN=saved-test-token run_setup
+grep -q 'Token saved to .fnox/env' "$TARGET/setup.log"
+[ "$(cat "$TARGET/.fnox/env")" = "OP_SERVICE_ACCOUNT_TOKEN=saved-test-token" ]
+case "$(ls -l "$TARGET/.fnox/env")" in -rw-------*) ;; *) echo "FAIL: .fnox/env is not mode 600"; exit 1 ;; esac
+if grep -Fq saved-test-token "$TARGET/setup.log" || [ -n "$(git -C "$TARGET" status --porcelain -- .fnox)" ]; then
+  echo "FAIL: template setup printed the fetched token or left it visible to git"
+  exit 1
+fi
+echo "PASS: template setup replaces a stale token from a personal sign-in into an ignored mode-600 file"
+
+rm -rf "$TARGET/.fnox"
+printf '\n!.fnox/\n!.fnox/env\n' >> "$TARGET/.gitignore"
+if env -u OP_SERVICE_ACCOUNT_TOKEN FAKE_OP_SAVED_TOKEN=saved-test-token PATH="$FAKE_BIN:$PATH" \
+    FAKE_OP_GOOD_TOKENS="saved-test-token" "$MISE" --cd "$TARGET" run --skip-tools setup > "$TARGET/setup.log" 2>&1; then
+  echo "FAIL: template setup wrote a token to a path git does not ignore"
+  exit 1
+fi
+grep -q 'not ignored by git' "$TARGET/setup.log"
+[ ! -e "$TARGET/.fnox/env" ]
+cp "$TARGET/expected-ignore" "$TARGET/.gitignore"
+rm -rf "$TARGET/.fnox" "$FAKE_BIN"
+unset MISE_DISABLE_TOOLS
+echo "PASS: template setup refuses to write a token git would not ignore"
 
 # A brief is data, not shell code. Prompt emission must not scaffold or install.
 cat > "$TARGET/brief with spaces.md" <<'EOF'

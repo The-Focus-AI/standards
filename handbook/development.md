@@ -35,8 +35,10 @@ and [locked skills](skills.md), not credentials or a person's login session.
 | `test` | Exercise observable behavior and fail on regression. An empty suite is not success. |
 | `deploy` | Use the documented release path and explicit target, or fail with the non-deploying reason. A build is not a deployment. |
 
-For projects that use secrets, keep `setup` for bootstrap-token presence,
-`secrets:check` for authorized resolution, and `secrets:list` for declarations.
+`mise run setup` is the one command that gets a checkout's secrets working, new
+or existing: it makes sure a token that reads the project vault is in place and
+checks that secrets resolve. Keep `secrets:check` for authorized resolution on its
+own and `secrets:list` for declarations. Do not add a separate token-refresh task.
 Keep credential/network checks out of offline lint and tests where feasible.
 
 Inline mise shell tasks use POSIX `set -eu`. A task needing `pipefail` declares

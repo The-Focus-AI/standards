@@ -14,32 +14,47 @@ op = "2.41.1"
 _.file = ".fnox/env"
 
 [tasks.setup]
-description = "Check the bootstrap token injected into this cloud environment"
+description = "Get this checkout ready: a working 1Password token, then a secrets check"
 run = '''
 set -eu
 if [ ! -f fnox.toml ]; then
-  echo "No fnox configuration yet; no bootstrap token is needed."
+  echo "No fnox configuration yet; no token is needed."
   exit 0
 fi
-if [ -z "${OP_SERVICE_ACCOUNT_TOKEN:-}" ]; then
-  echo "Set OP_SERVICE_ACCOUNT_TOKEN in this project's cloud secret settings using your 1Password account." >&2
-  exit 1
-fi
-echo "Bootstrap token is available; run mise run secrets:check to verify access."
-'''
+OP_ACCOUNT_HOST="<org>.1password.com"
+OP_VAULT="<Client> - <Project>"
+OP_TOKEN_ITEM="<repo> service account token"
 
-[tasks.install]
-description = "Install project dependencies and restore agent skills"
-run = '''
-set -eu
-if [ -f package.json ]; then
-  if [ -f pnpm-lock.yaml ]; then
-    pnpm install --frozen-lockfile
-  else
-    pnpm install --no-frozen-lockfile
+token_reads_vault() {
+  [ -n "${OP_SERVICE_ACCOUNT_TOKEN:-}" ] && op vault get "$OP_VAULT" >/dev/null 2>&1
+}
+
+if token_reads_vault; then
+  echo "✓ The service account token can read the project vault."
+else
+  echo "No working token here; fetching it with your own 1Password sign-in..."
+  TOKEN="$(env -u OP_SERVICE_ACCOUNT_TOKEN op read "op://$OP_VAULT/$OP_TOKEN_ITEM/credential" --account "$OP_ACCOUNT_HOST" --no-newline 2>/dev/null || true)"
+  if [ -z "$TOKEN" ]; then
+    echo "Could not get the project token." >&2
+    echo "  Cloud workspace: set OP_SERVICE_ACCOUNT_TOKEN in the project's cloud secret settings to the value of '$OP_TOKEN_ITEM', then restart the workspace." >&2
+    echo "  Your own machine: sign in to $OP_ACCOUNT_HOST in the 1Password app, turn on its command-line integration, and ask an owner to add you to this project's group." >&2
+    exit 1
   fi
+  git check-ignore -q -- .fnox/env || { echo "STOP: .fnox/env is not ignored by git; not writing a token." >&2; exit 1; }
+  if [ -n "$(git ls-files -- .fnox/env)" ]; then
+    echo "STOP: .fnox/env is tracked by git; not writing a token." >&2
+    exit 1
+  fi
+  umask 077
+  mkdir -p .fnox
+  chmod 700 .fnox
+  printf 'OP_SERVICE_ACCOUNT_TOKEN=%s\n' "$TOKEN" > .fnox/env
+  chmod 600 .fnox/env
+  export OP_SERVICE_ACCOUNT_TOKEN="$TOKEN"
+  token_reads_vault || { echo "The fetched token cannot read the project vault; tell the project owner." >&2; exit 1; }
+  echo "✓ Token saved to .fnox/env (ignored by git)."
 fi
-node scripts/restore-skills.mjs
+fnox check
 '''
 
 [tasks.dev]
