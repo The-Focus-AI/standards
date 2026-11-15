@@ -29,9 +29,12 @@ Do not rebuild the old hierarchy or maintain a second skill inventory.
 - Preserve per-client Clerk/OAuth isolation, production-like preview behavior,
   protected production data, and the distinction between machine and human authority.
 - Develop and verify in a reproducible cloud workspace. Record genuine local exceptions.
-- A person retrieves the project-scoped bootstrap token using their own 1Password
-  account and supplies it through project cloud secret settings. Do not copy their
-  session or persist an injected token into a reusable image/snapshot.
+- Store project vaults, service accounts, and saved bootstrap tokens in TheFocus.AI's
+  company 1Password account (`thefocusai.1password.com`), never in a personal
+  `my.1password.com` account or a `Private`/`Personal`/`Employee`/`Shared`/`default`
+  vault. A person retrieves the project-scoped bootstrap token through their seat in
+  `thefocusai.1password.com` and supplies it through project cloud secret settings. Do
+  not copy their session or persist an injected token into a reusable image/snapshot.
 - Before a secret-file write, verify every intended path separately with
   `git check-ignore -q -- <path>` and `git ls-files -- <path>`. Stop on tracked
   secret files without printing contents. Ignore `.fnox/`, `.env`, `.env.*`, and

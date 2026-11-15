@@ -20,7 +20,7 @@ description = "Check the bootstrap token injected into this cloud environment"
 run = '''
 set -eu
 if [ -z "${OP_SERVICE_ACCOUNT_TOKEN:-}" ]; then
-  echo "Set OP_SERVICE_ACCOUNT_TOKEN in this project's cloud secret settings using your 1Password account." >&2
+  echo "Set OP_SERVICE_ACCOUNT_TOKEN in this project's cloud secret settings from thefocusai.1password.com (never a personal my.1password.com account)." >&2
   exit 1
 fi
 echo "Bootstrap token is available; run mise run secrets:check to verify access."

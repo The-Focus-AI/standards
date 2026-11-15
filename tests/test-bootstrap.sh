@@ -84,11 +84,16 @@ cat > "$FAKE_BIN/op" <<'FAKE'
 #!/bin/sh
 case "$1 $2" in
   "vault get")
+    [ -z "${OP_ACCOUNT:-}" ] || exit 1
     for good in $FAKE_OP_GOOD_TOKENS; do
       [ "${OP_SERVICE_ACCOUNT_TOKEN:-}" = "$good" ] && exit 0
     done
     exit 1 ;;
   "read "*)
+    case " $* " in
+      *" --account thefocusai.1password.com "*) ;;
+      *) exit 1 ;;
+    esac
     [ -n "${FAKE_OP_SAVED_TOKEN:-}" ] || exit 1
     printf '%s' "$FAKE_OP_SAVED_TOKEN" ;;
   *) exit 1 ;;
@@ -101,6 +106,17 @@ run_setup() {
     "$MISE" --cd "$TARGET" run --skip-tools setup > "$TARGET/setup.log" 2>&1
 }
 git -C "$TARGET" rev-parse --git-dir >/dev/null 2>&1 || git -C "$TARGET" init -q
+
+for bad_toml in 'vault = "Private"' 'vault = "Personal"' 'vault = "default"' 'account = "my.1password.com"'; do
+  printf '[providers.op]\ntype = "1password"\n%s\n' "$bad_toml" > "$TARGET/fnox.toml"
+  if OP_SERVICE_ACCOUNT_TOKEN=good-test-token run_setup; then
+    echo "FAIL: template setup accepted personal/built-in fnox config ($bad_toml)"
+    exit 1
+  fi
+  grep -q 'personal account or built-in vault' "$TARGET/setup.log"
+done
+: > "$TARGET/fnox.toml"
+echo "PASS: template setup rejects personal accounts and built-in vaults in fnox.toml"
 
 if env -u OP_SERVICE_ACCOUNT_TOKEN -u FAKE_OP_SAVED_TOKEN PATH="$FAKE_BIN:$PATH" \
     "$MISE" --cd "$TARGET" run --skip-tools setup > "$TARGET/setup.log" 2>&1; then

@@ -190,6 +190,13 @@ export function readHandbook(root) {
   }
   const prompt = byPath.get("handbook/update-project.md")?.tokens.find(b => b.type === "code" && b.lang === "text")?.text;
   if (!prompt?.trim()) throw new Error("Update a project needs a copyable text prompt");
+  const readmeFile = join(root, "README.md");
+  if (existsSync(readmeFile)) {
+    const readmePrompt = blocks(readFileSync(readmeFile, "utf8")).find(b => b.type === "code" && b.lang === "text")?.text;
+    if (readmePrompt !== undefined && readmePrompt !== prompt) {
+      throw new Error("README.md: copyable text prompt must match handbook/update-project.md");
+    }
+  }
   return { pages, byPath, navigation, prompt, changelog };
 }
 

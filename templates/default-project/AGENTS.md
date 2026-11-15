@@ -54,10 +54,12 @@ such as an Amp orb or Cursor cloud environment (`handbook/development.md`). The 
 review and personal authentication, not a required build server or database host.
 Record supported platforms and any genuine local hardware/network exceptions here.
 
-A person retrieves the project's scoped service-account token through their own 1Password
-account and supplies `OP_SERVICE_ACCOUNT_TOKEN` through this project's cloud secret settings.
-Do not request their account password or session, or save an injected token into a reusable
-image or snapshot. Keep bootstrap and service configuration in the repository.
+A person retrieves the project's scoped service-account token through their seat in
+TheFocus.AI's company 1Password account (`thefocusai.1password.com`, never a personal
+`my.1password.com` account or `Private`/`Personal` vault) and supplies
+`OP_SERVICE_ACCOUNT_TOKEN` through this project's cloud secret settings. Do not request
+their account password or session, or save an injected token into a reusable image or
+snapshot. Keep bootstrap and service configuration in the repository.
 
 ## Secret-file preflight
 

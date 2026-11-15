@@ -296,6 +296,34 @@ for (const button of document.querySelectorAll("[data-copy]")) {
   });
 }
 
+for (const pre of document.querySelectorAll(".prose pre")) {
+  if (pre.closest(".prompt-box")) continue;
+  const wrap = document.createElement("div");
+  wrap.className = "code-wrap";
+  pre.parentNode.insertBefore(wrap, pre);
+  wrap.append(pre);
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.className = "code-copy-btn";
+  btn.textContent = "Copy";
+  btn.setAttribute("aria-label", "Copy code block");
+  btn.addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(pre.textContent);
+      btn.textContent = "Copied ✓";
+      setTimeout(() => { btn.textContent = "Copy"; }, 1600);
+    } catch {
+      const range = document.createRange();
+      range.selectNodeContents(pre);
+      window.getSelection().removeAllRanges();
+      window.getSelection().addRange(range);
+      btn.textContent = "Selected";
+      setTimeout(() => { btn.textContent = "Copy"; }, 1600);
+    }
+  });
+  wrap.append(btn);
+}
+
 function filterSkills() {
   const terms = document.querySelector("#skill-search").value.toLowerCase().trim().split(/\s+/).filter(Boolean);
   const selection = document.querySelector("#skill-selection").value;

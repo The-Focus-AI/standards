@@ -8,6 +8,20 @@ Subscribe via [the RSS feed](https://standards.thefocus.ai/feed.xml) to consume 
 entries in Focus.AI Labs or any feed reader. Formatting, typo, and lint-only commits
 are omitted.
 
+## 2026-11-15 — Unified update prompt, raw Markdown endpoints, and company 1Password vault enforcement
+
+Unified the copyable update-project prompt card and JavaScript copy buttons across
+`index.html`, `handbook/update-project.html`, and `README.md`, published raw `.md`
+endpoints (`handbook/*.md`, `recipes/*.md`, `evidence/*.md`, `CHANGELOG.md`, `DESIGN.md`)
+on `standards.thefocus.ai`, and pinned secret guidance and `mise run setup` to
+TheFocus.AI's company 1Password Business account (`thefocusai.1password.com`) while
+rejecting personal `my.1password.*` accounts and built-in `Private`/`Personal`/`default` vaults.
+
+- [Update a project](handbook/update-project.md)
+- [Handle secrets](handbook/secrets.md)
+- [Give and remove access](handbook/access.md)
+- [Configure fnox and secret delivery](recipes/fnox.md)
+
 ## 2026-11-15 — Inkling monograph typography, reading-ruler navigation, and status ledger
 
 Migrated the engineering handbook renderer and `DESIGN.md` tokens to the Inkling

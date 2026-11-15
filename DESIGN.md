@@ -49,8 +49,9 @@ their owning topic.
   page's `H2` sub-ticks on the rail, frame that active document span with the
   petrol bracket, and move the vermilion bead 1:1 across the current page's own
   sections as the reader scrolls.
-- Put the copyable update prompt near the top of the homepage; keep its text
-  in the update-project source page, not a second string in the renderer.
+- Render the copyable update prompt with the same card and copy button on both the
+  homepage and the update-project page; keep its text in the update-project source
+  page, not a second string in the renderer.
 - Make inline repository document references (`handbook/*.md`, `recipes/*.md`,
   `evidence/*.md`, and `CHANGELOG.md`) directly clickable alongside Markdown links.
 - Group skills by source, with selection and source filters. Show canonical

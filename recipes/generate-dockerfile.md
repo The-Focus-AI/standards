@@ -110,11 +110,13 @@ The generated Dockerfile must include comments at the top documenting:
    pi -p "$(cat skills/setup-project/SKILL.md)"   # supply a project brief; target /app
    ```
 
-5. A person retrieves the project-scoped bootstrap token using their own
-   1Password account and injects it through cloud secret settings. Do not mount
-   personal authentication directories (`~/.pi`, `~/.config`, `~/.ssh`, or a
-   1Password session), persist tokens, or bake credentials into the image.
-   Installation and offline checks do not need those runtime credentials.
+5. A person retrieves the project-scoped bootstrap token through their seat in
+   TheFocus.AI's company 1Password account (`thefocusai.1password.com`, never a
+   personal `my.1password.com` account) and injects it through cloud secret
+   settings. Do not mount personal authentication directories (`~/.pi`,
+   `~/.config`, `~/.ssh`, or a 1Password session), persist tokens, or bake
+   credentials into the image. Installation and offline checks do not need those
+   runtime credentials.
 6. Sessions are ephemeral (lost when the container exits). Store durable project
    work in an approved workspace, not a personal auth-directory mount.
 

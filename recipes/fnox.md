@@ -9,8 +9,12 @@ Follow the [secret-handling guidance](../handbook/secrets.md) before setup.
 A reference for setting up isolated, auditable secret management on any project.
 Goals:
 
-1. **Project isolation** — each project's secrets live in its own 1Password vault,
-   accessed by a service account scoped to that vault.
+1. **Project isolation in the company account** — each project's secrets live in
+   its own dedicated vault (`<Client> - <Project>` or `<Client>`) inside
+   TheFocus.AI's company 1Password Business account (`thefocusai.1password.com`),
+   accessed by a service account scoped to that vault. Never use a personal
+   1Password account (`my.1password.com`) or built-in `Private`, `Personal`,
+   `Employee`, `Shared`, or `default` vaults.
 2. **1Password is the source of truth for development and preview values** — production
    values are set in the deployment platform by an owner. The scoped bootstrap token enters through
    cloud secret settings; application credentials resolve through fnox. Platform
@@ -78,22 +82,31 @@ fnox --profile runtime exec -- sh -c 'test -n "$ANTHROPIC_API_KEY"'
 The second command resolves real secrets: run it only in an authorized workspace.
 Presence alone is not proof of vault access or correct scope.
 
-### Create the dedicated vault
+### Create the dedicated vault in the company account
+
+Always pass `--account thefocusai.1password.com` (and unset any ambient
+`OP_SERVICE_ACCOUNT_TOKEN`) on interactive `op` commands. A laptop signed in to
+both `thefocusai.1password.com` and a personal `my.1password.com` account
+otherwise creates resources in whichever account signed in last:
 
 ```bash
-op vault create "<Project Name>" --icon vault-door \
+env -u OP_SERVICE_ACCOUNT_TOKEN op vault create "<Client> - <Project>" \
+  --account thefocusai.1password.com --icon vault-door \
   --description "Secrets for <project>; managed by fnox"
 ```
 
 ### Retrieve and inject the scoped bootstrap token
 
-A person uses their own 1Password account to retrieve the project's saved
-service-account token. If it does not exist, an authorized person creates it
-and saves the result in 1Password; the CLI supports:
+A person uses their individual seat in the company 1Password account
+(`thefocusai.1password.com`, never a personal `my.1password.com` account) to
+retrieve the project's saved service-account token. If it does not exist, an
+authorized owner or administrator creates it in `thefocusai.1password.com` and
+saves the result in the project vault:
 
 ```bash
-op service-account create "<project>-sa" \
-  --vault "<Project Name>:read_items"
+env -u OP_SERVICE_ACCOUNT_TOKEN op service-account create "<project>-sa" \
+  --account thefocusai.1password.com \
+  --vault "<Client> - <Project>:read_items"
 ```
 
 Use `write_items` only for an authorized secret-management workflow, not merely
@@ -135,15 +148,23 @@ writing; patterns do not protect already tracked files.
 
 ```bash
 fnox provider add op 1password
-# Edit fnox.toml: set vault = "<Project Name>".
+# Edit fnox.toml: replace vault = "default" with vault = "<Client> - <Project>".
 ```
+
+`fnox provider add` writes `vault = "default"` as a placeholder: always replace
+it with the dedicated company project vault (`<Client> - <Project>` or
+`<Client>`), never `"default"`, `"Private"`, `"Personal"`, `"Employee"`, or
+`"Shared"`. Do **not** set `account = "thefocusai.1password.com"` inside
+`[providers.op]`: fnox forwards `--account` to `op read`, which conflicts with
+`OP_SERVICE_ACCOUNT_TOKEN`, whereas the scoped service-account token already
+binds resolution exclusively to `thefocusai.1password.com` and its granted vault.
 
 Example declarations (references, not secret values):
 
 ```toml
 [providers.op]
 type = "1password"
-vault = "<Project Name>"
+vault = "<Client> - <Project>"
 
 [secrets.ANTHROPIC_API_KEY]
 provider = "op"
@@ -212,13 +233,16 @@ the one command that gets a checkout ready, and it is safe to run again at any t
 
 - If the token in the environment can read the project vault, it changes nothing.
 - If there is no token, or the token no longer reads the vault, it fetches the
-  saved token with the person's own 1Password sign-in and writes the ignored,
-  mode-600 `.fnox/env`, after checking that git ignores and does not track it.
+  saved token from `thefocusai.1password.com` (`--account thefocusai.1password.com`)
+  and writes the ignored, mode-600 `.fnox/env`, after checking that git ignores
+  and does not track it. It refuses personal `my.1password.*` accounts and
+  built-in `Private`, `Personal`, `Employee`, `Shared`, or `default` vaults.
 - If neither works, it says what to fix: the cloud secret setting, or the
-  person's sign-in and group membership.
+  person's sign-in and group membership in `thefocusai.1password.com`.
 
-It then checks that every declared secret resolves. Set its three values, the account,
-the project vault, and the token item's title, when copying it into a project.
+It then checks that every declared secret resolves. `OP_ACCOUNT_HOST` defaults
+to `thefocusai.1password.com`; set the project vault (`OP_VAULT`) and the token
+item's title (`OP_TOKEN_ITEM`) when adapting it to a project.
 The other secret tasks are:
 
 ```toml
@@ -359,9 +383,11 @@ offboarding, and rotation. These steps cover only the workspace.
 
 1. Open the repository in an Amp orb, Cursor cloud environment, or equivalent
    reproducible workspace. Its committed bootstrap installs the tools and dependencies.
-2. Add the person to the project's group. In a cloud workspace the project's
-   secret settings already supply the token; if they do not, the person retrieves
-   it with their own account and enters it there.
+2. Add the person to the project's group in `thefocusai.1password.com`. In a
+   cloud workspace the project's secret settings already supply the token; if
+   they do not, the person retrieves it from their seat in
+   `thefocusai.1password.com` (never a personal `my.1password.com` account) and
+   enters it there.
 3. Run `mise run setup`. It confirms the token reads the vault, fetching it on
    the person's own machine if needed, then checks that secrets resolve. Resolve
    application secrets through fnox activation or `fnox exec --`, as in step 1
@@ -389,6 +415,8 @@ secret storage and delivery.
 
 ## Security checklist
 
+- [ ] Vault, service account, and saved token live in `thefocusai.1password.com`,
+  never `my.1password.com` or `Private`/`Personal`/`Employee`/`Shared`/`default` vaults.
 - [ ] Service account scoped to one project vault; review `op vault list` using
   the already injected token, not a token literal in the command.
 - [ ] Secret-file preflight confirms intended paths are ignored and untracked.
@@ -397,7 +425,7 @@ secret storage and delivery.
 - [ ] Preview cannot write to the production database.
 - [ ] Rotation owner, expiry, token location, and receiving environments recorded.
 - [ ] Provider target/inventory reviewed after sync; runtime smoke check after deployment.
-- [ ] A person can recover the saved token with their own 1Password identity.
+- [ ] An authorized member can recover the saved token through their seat in `thefocusai.1password.com`.
 - [ ] No bootstrap token or personal session persisted into a shared image/snapshot.
 
 ## Verification and references

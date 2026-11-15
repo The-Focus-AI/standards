@@ -5,6 +5,7 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
 import { test } from "node:test";
+import { readHandbook } from "../scripts/lib/handbook.mjs";
 
 const ROOT = fileURLToPath(new URL("../", import.meta.url));
 const prompt = "Audit <this repo> & preserve behavior.\nDo not merge.";
@@ -64,6 +65,11 @@ test("build emits linked pages, source-derived prompt, search content and readab
   const result = run(root);
   assert.equal(result.status, 0, result.output);
   assert.match(read("index.html"), /Audit &lt;this repo&gt; &amp; preserve behavior/);
+  assert.match(read("index.html"), /class="prompt-box"[\s\S]*?data-copy="update-prompt"/);
+  assert.match(read("handbook/update-project.html"), /class="prompt-box"[\s\S]*?data-copy="update-prompt"/);
+  assert.match(read("handbook/update-project.html"), /Audit &lt;this repo&gt; &amp; preserve behavior/);
+  assert.match(read("handbook/update-project.html"), /standards\.thefocus\.ai\/handbook\.md/);
+  assert.match(read("handbook/update-project.md"), /Audit <this repo> & preserve behavior/);
   assert.match(read("handbook/update-project.html"), /href="another.html#section"/);
   assert.match(read("handbook/another.html"), /href="..\/recipes\/fixture.html#details"/);
   assert.match(read("handbook/another.html"), /href="https:\/\/github.com\/The-Focus-AI\/standards\/blob\/main\/scripts\/build-handbook.mjs"/);
@@ -211,6 +217,14 @@ test("invalid skill lock and absent prompt leave the previous build intact", t =
   write("handbook/update-project.md", page("No copyable prompt"));
   assert.match(run(root).output, /copyable text prompt/);
   assert.equal(read("index.html"), before);
+  write("handbook/update-project.md", page(`\`\`\`text\n${prompt}\n\`\`\``));
+  write("README.md", "# Readme\n\n```text\nDrifted prompt\n```\n");
+  for (const script of ["validate-documents.mjs", "build-handbook.mjs"]) {
+    const drift = run(root, script);
+    assert.equal(drift.status, 1, drift.output);
+    assert.match(drift.output, /README\.md: copyable text prompt/);
+  }
+  assert.equal(read("index.html"), before);
 });
 
 test("changelog renders HTML, autodiscovery links, and deterministic RSS 2.0 XML with categories and canonical links", t => {
@@ -301,3 +315,11 @@ for (const [name, source, expected] of invalidChangelogs) {
     assert.equal(read("feed.xml"), before);
   });
 }
+
+test("repository prompt enforces standards.thefocus.ai Markdown endpoints and company 1Password vault", () => {
+  const corpus = readHandbook(ROOT);
+  assert.match(corpus.prompt, /https:\/\/standards\.thefocus\.ai\/handbook\/update-project\.md/);
+  assert.match(corpus.prompt, /https:\/\/standards\.thefocus\.ai\/handbook\.md/);
+  assert.match(corpus.prompt, /thefocusai\.1password\.com/);
+  assert.match(corpus.prompt, /never a personal 1Password account \(my\.1password\.com\)/);
+});

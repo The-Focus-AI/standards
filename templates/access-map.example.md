@@ -4,7 +4,7 @@ Copy this into a **private** repository and replace every placeholder. It record
 names and locations only. Never put a secret value, token, or connection string here.
 `handbook/access.md` explains how it is used.
 
-Organization 1Password account: `<org>.1password.com`
+Organization 1Password account: `thefocusai.1password.com` (never a personal `my.1password.com` account)
 
 ## Groups
 

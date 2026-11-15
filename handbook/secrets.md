@@ -4,30 +4,40 @@ summary: Keep credentials project-scoped, out of transcripts, and separate from 
 status: Draft
 ---
 
-Use one project vault in 1Password and a service account scoped to that vault.
+Use one dedicated project vault (`<Client> - <Project>` or `<Client>`) in
+TheFocus.AI's company 1Password Business account (`thefocusai.1password.com`)
+and a service account scoped to that vault. Never store project secrets,
+service accounts, or bootstrap tokens in a personal 1Password account
+(`my.1password.com`) or in built-in `Private`, `Personal`, `Employee`,
+`Shared`, or `default` vaults.
+
 The vault supplies development environments and previews; production values are
 set where the deployment runs. `fnox.toml` declares references, not values. A
 fnox profile selects values; it is not an access boundary or a deployment destination.
 
-The vault, its service account, and the saved token belong to the organization
-account. [Give and remove access](access.md) owns who can reach them and what
-to rotate when that changes.
+The vault, its service account, and the saved token belong to the company
+account (`thefocusai.1password.com`). [Give and remove access](access.md) owns
+who can reach them and what to rotate when that changes.
 
 ## Bootstrap without taking a person's identity
 
-A person retrieves the project token through their own 1Password account and
-supplies `OP_SERVICE_ACCOUNT_TOKEN` through the project's cloud secret settings.
-Do not request their password, Secret Key, or login cache. Never save an injected
-token into a reusable image or snapshot.
+A person retrieves the project token through their individual seat in the
+company 1Password account (`thefocusai.1password.com`, never a personal
+`my.1password.com` account) and supplies `OP_SERVICE_ACCOUNT_TOKEN` through the
+project's cloud secret settings. Do not request their password, Secret Key, or
+login cache. Never save an injected token into a reusable image or snapshot.
 
 Record the token item's location, recovery owner, scope, and receiving environments.
-Recovery uses the person's own 1Password access. Save the token in the project
-vault it unlocks, so one grant gives a developer both.
+Recovery uses an authorized member's seat in `thefocusai.1password.com`. Save
+the token in the project vault it unlocks, so one grant gives a developer both.
 
-On a person's own machine, `mise run setup` fetches the token with their
-1Password sign-in and writes it to `.fnox/env`, a mode-600 ignored file. It is
-not a prerequisite for cloud injection. Setup checks that the token actually
-reads the vault, not merely that one is present, and replaces one that does not.
+On a person's own machine, `mise run setup` fetches the token from
+`thefocusai.1password.com` (`--account thefocusai.1password.com`) and writes it
+to `.fnox/env`, a mode-600 ignored file. It refuses personal `my.1password.*`
+accounts and built-in `Private`, `Personal`, `Employee`, `Shared`, or `default`
+vaults, and is not a prerequisite for cloud injection. Setup checks that the
+token actually reads the vault, not merely that one is present, and replaces
+one that does not.
 
 ## Check before writing a credential file
 

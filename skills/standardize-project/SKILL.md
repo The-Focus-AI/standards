@@ -60,13 +60,17 @@ for **each** intended `.fnox/`, `.env`, `.env.*`, and credential path:
 file is tracked; report its path without reading or printing its contents.
 Keep `.env.example` trackable and placeholder-only.
 
-The target state is a project-scoped vault/service account, `fnox.toml`
-declarations, and a person supplying the bootstrap token to the authorized
-cloud environment's secret settings. Do not request their account password,
-copy their session, or persist the injected token in an image/snapshot.
-`.fnox/env` is only a documented local exception, not a required cloud file.
-Do not add a required dotenv load for a file that cloud bootstrap never creates.
-Do not move, quarantine, delete, or provision secrets without explicit approval.
+The target state is a dedicated project vault (`<Client> - <Project>` or
+`<Client>`) and scoped service account in TheFocus.AI's company 1Password
+Business account (`thefocusai.1password.com`, never a personal `my.1password.com`
+account or a `Private`/`Personal`/`Employee`/`Shared`/`default` vault),
+`fnox.toml` declarations, and a person supplying the bootstrap token from their
+seat in `thefocusai.1password.com` to the authorized cloud environment's secret
+settings. Do not request their account password, copy their session, or persist
+the injected token in an image/snapshot. `.fnox/env` is only a documented local
+exception, not a required cloud file. Do not add a required dotenv load for a
+file that cloud bootstrap never creates. Do not move, quarantine, delete, or
+provision secrets without explicit approval.
 
 ### Skills, pi, and agent instructions
 

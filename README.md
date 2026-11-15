@@ -8,10 +8,25 @@ GitHub Pages publishes `main` at <https://standards.thefocus.ai>.
 - **Live handbook:** <https://standards.thefocus.ai>
 - **Skills catalog:** <https://standards.thefocus.ai/skills.html>
 - **Changelog & RSS 2.0 feed:** [CHANGELOG.md](CHANGELOG.md) · <https://standards.thefocus.ai/feed.xml>
-- **Single-file agent bundle:** `https://standards.thefocus.ai/handbook.md`
+- **Agent Markdown endpoints:** <https://standards.thefocus.ai/handbook.md> (full bundle)
+  and `https://standards.thefocus.ai/handbook/<topic>.md` (per-topic Markdown)
 
-Start with [starting a project](handbook/project-setup.md), [updating an existing repo](handbook/update-project.md)
-(which owns the copyable homepage prompt), or [building an agent service](handbook/agent-services.md).
+Start with [starting a project](handbook/project-setup.md), [updating an existing repo](handbook/update-project.md),
+or [building an agent service](handbook/agent-services.md).
+
+## Copy this prompt
+
+Owned by [handbook/update-project.md](handbook/update-project.md) (validated to stay identical here and rendered
+with a one-click Copy button on <https://standards.thefocus.ai> and
+<https://standards.thefocus.ai/handbook/update-project.html>):
+
+```text
+Update this repository using TheFocus.AI engineering handbook at https://standards.thefocus.ai (Markdown guide: https://standards.thefocus.ai/handbook/update-project.md; full Markdown bundle: https://standards.thefocus.ai/handbook.md; source repository: https://github.com/The-Focus-AI/standards).
+
+Read https://standards.thefocus.ai/handbook/update-project.md and https://standards.thefocus.ai/handbook.md, and fetch https://github.com/The-Focus-AI/standards main safely to record the revision and compare templates/default-project/ and skills-lock.json. Inspect this repo's instructions, tooling, skills, secrets, auth, CI, and deployment against the relevant handbook Markdown pages (https://standards.thefocus.ai/handbook/<topic>.md). Ensure 1Password secrets use TheFocus.AI's company account (thefocusai.1password.com) and a dedicated project vault (<Client> - <Project> or <Client>), never a personal 1Password account (my.1password.com) or a Private/Personal/default vault. Treat Draft pages as recommendations unless this project adopted them. Preserve product behavior and documented exceptions.
+
+Report concrete gaps, then implement the smallest safe fixes authorized by this request. Work in a reproducible cloud workspace. Run lint, tests, and relevant preview checks; report evidence and remaining decisions. Ask before changing credentials, production infrastructure, public contracts, or release policy. Do not ratify policy, merge, or deploy. Push or open PRs only when authorized.
+```
 
 ## Document authority statuses
 

@@ -21,23 +21,39 @@ if [ ! -f fnox.toml ]; then
   echo "No fnox configuration yet; no token is needed."
   exit 0
 fi
-OP_ACCOUNT_HOST="<org>.1password.com"
+OP_ACCOUNT_HOST="thefocusai.1password.com"
 OP_VAULT="<Client> - <Project>"
 OP_TOKEN_ITEM="<repo> service account token"
 
+case "$OP_ACCOUNT_HOST" in
+  my.1password.*|"")
+    echo "STOP: OP_ACCOUNT_HOST must be the company 1Password account (thefocusai.1password.com), never a personal my.1password.* account." >&2
+    exit 1 ;;
+esac
+case "$OP_VAULT" in
+  Private|Personal|Employee|Shared|default|"")
+    echo "STOP: OP_VAULT ('$OP_VAULT') must be a dedicated company project vault, never a personal or built-in vault." >&2
+    exit 1 ;;
+esac
+if grep -Eq '^[[:space:]]*vault[[:space:]]*=[[:space:]]*"(Private|Personal|Employee|Shared|default)"' fnox.toml || \
+   grep -Eq '^[[:space:]]*account[[:space:]]*=[[:space:]]*"my\.1password\.' fnox.toml; then
+  echo "STOP: fnox.toml points at a personal account or built-in vault; use a dedicated project vault in $OP_ACCOUNT_HOST." >&2
+  exit 1
+fi
+
 token_reads_vault() {
-  [ -n "${OP_SERVICE_ACCOUNT_TOKEN:-}" ] && op vault get "$OP_VAULT" >/dev/null 2>&1
+  [ -n "${OP_SERVICE_ACCOUNT_TOKEN:-}" ] && env -u OP_ACCOUNT op vault get "$OP_VAULT" >/dev/null 2>&1
 }
 
 if token_reads_vault; then
   echo "✓ The service account token can read the project vault."
 else
-  echo "No working token here; fetching it with your own 1Password sign-in..."
+  echo "No working token here; fetching it from the company 1Password account ($OP_ACCOUNT_HOST)..."
   TOKEN="$(env -u OP_SERVICE_ACCOUNT_TOKEN op read "op://$OP_VAULT/$OP_TOKEN_ITEM/credential" --account "$OP_ACCOUNT_HOST" --no-newline 2>/dev/null || true)"
   if [ -z "$TOKEN" ]; then
     echo "Could not get the project token." >&2
-    echo "  Cloud workspace: set OP_SERVICE_ACCOUNT_TOKEN in the project's cloud secret settings to the value of '$OP_TOKEN_ITEM', then restart the workspace." >&2
-    echo "  Your own machine: sign in to $OP_ACCOUNT_HOST in the 1Password app, turn on its command-line integration, and ask an owner to add you to this project's group." >&2
+    echo "  Cloud workspace: set OP_SERVICE_ACCOUNT_TOKEN in the project's cloud secret settings to the value of '$OP_TOKEN_ITEM' from $OP_ACCOUNT_HOST, then restart the workspace." >&2
+    echo "  Your own machine: sign in to the company account ($OP_ACCOUNT_HOST, not my.1password.com) in the 1Password app, turn on its command-line integration, and ask an owner to add you to this project's group." >&2
     exit 1
   fi
   git check-ignore -q -- .fnox/env || { echo "STOP: .fnox/env is not ignored by git; not writing a token." >&2; exit 1; }

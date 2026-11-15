@@ -5,10 +5,11 @@ status: Draft
 ---
 
 1Password exists to supply development environments: cloud workspaces, laptops,
-and previews. Those credentials live in the organization's 1Password Business
-account, never in a person's individual account. A person is granted access by
-joining a group; a group is granted a vault. Nobody is added to a project vault
-by name. Production values live where the deployment runs, not in a project vault.
+and previews. Those credentials live in TheFocus.AI's company 1Password Business
+account (`thefocusai.1password.com`), never in a person's personal account
+(`my.1password.com`) or a personal vault. A person is granted access by joining
+a group; a group is granted a vault. Nobody is added to a project vault by name.
+Production values live where the deployment runs, not in a project vault.
 
 [Handle secrets](secrets.md) owns how a credential is stored and delivered. This
 page owns who may reach it, and what happens when that changes.
@@ -16,18 +17,21 @@ page owns who may reach it, and what happens when that changes.
 ## Keep everything in the organization account
 
 - Project vaults, their service accounts, and the saved bootstrap-token items all
-  belong to the organization account. An individual account cannot have other
-  members, so nothing stored there can be shared or recovered by a teammate.
-- Name the account in every command: `op read --account <org>.1password.com ...`
-  or `OP_ACCOUNT`. With several accounts signed in, an unqualified `op` command
-  uses whichever signed in last.
+  belong to the company account (`thefocusai.1password.com`). A personal account
+  (`my.1password.com`) cannot have organization groups or shared recovery, so
+  nothing stored there can be governed or recovered by a teammate.
+- Name the company account in every interactive `op` command:
+  `env -u OP_SERVICE_ACCOUNT_TOKEN op read --account thefocusai.1password.com ...`
+  (do not combine `--account` or `OP_ACCOUNT` with `OP_SERVICE_ACCOUNT_TOKEN`).
+  With both `thefocusai.1password.com` and `my.1password.com` signed in on a
+  laptop, an unqualified `op` command silently uses whichever signed in last.
 - An owner or administrator creates each service account. Members who are merely
   granted the create permission manage only their own service accounts [1], which
   leaves the organization dependent on that person.
 - Save the bootstrap token as an item in its own project vault. One vault grant
   then gives a developer both the runtime values and the token, and removes both.
-  A service account cannot be granted the built-in Private, Employee, or default
-  Shared vault [2]; do not keep project secrets there.
+  A service account cannot be granted the built-in `Private`, `Personal`,
+  `Employee`, or default `Shared` vault [2]; never keep project secrets there.
 
 ## Grant by client group
 
@@ -110,8 +114,8 @@ On Vercel, Neon, Supabase, Clerk, GitHub, and cloud providers:
 2. For each project row in those groups, invite them to the listed shared
    services and repositories.
 3. They run `mise run setup` in each project. A cloud workspace already has the
-   token from its secret settings; on their own machine, setup fetches it with
-   their own account.
+   token from its secret settings; on their own machine, setup fetches it from
+   their seat in `thefocusai.1password.com`.
 4. Record the person, their groups, and their seats in the map.
 
 ## Remove a person

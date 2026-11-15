@@ -112,13 +112,17 @@ project just to satisfy the baseline; adapt tasks to its real tooling instead.
 
 ### 8. Configure secrets (fnox + 1Password)
 
-When secrets are needed, write `fnox.toml` declaring the provider and secrets, against a 1Password vault named
-for the project. Declare the API keys the project will need. **Never write actual secret
+When secrets are needed, write `fnox.toml` declaring the provider and secrets against a
+dedicated project vault (`<Client> - <Project>` or `<Client>`) in TheFocus.AI's company
+1Password Business account (`thefocusai.1password.com`). Never use a personal 1Password
+account (`my.1password.com`) or built-in `Private`, `Personal`, `Employee`, `Shared`, or
+`default` vaults. Declare the API keys the project will need. **Never write actual secret
 values** — only the mappings to 1Password items.
 
-A person retrieves the scoped bootstrap token with their own 1Password account
-and supplies it through the project's cloud secret settings. Run `mise run setup`
-for presence, then `mise run secrets:check` for access. Do not print the token
+A person retrieves the scoped bootstrap token through their seat in `thefocusai.1password.com`
+(always passing `--account thefocusai.1password.com` on interactive `op` commands) and
+supplies it through the project's cloud secret settings. Run `mise run setup` for
+bootstrap verification, then `mise run secrets:check` for access. Do not print the token
 or persist it into a reusable image. Before any secret-file write, perform the
 ignore/tracked-file preflight in the template's `AGENTS.md`.
 

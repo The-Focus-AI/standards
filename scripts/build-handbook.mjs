@@ -82,8 +82,27 @@ for (const g of rulerGroups) {
   }
 }
 
+function renderPromptBox(promptText, { id = "update-prompt", toRootHref = x => x } = {}) {
+  return `<div class="prompt-box">
+    <div class="prompt-head">
+      <div>
+        <p class="prompt-title">Bring a repo up to date</p>
+        <p class="prompt-sub">References <a class="code-link" href="${attr(toRootHref("handbook.md"))}"><code>standards.thefocus.ai/handbook.md</code></a> and <a class="code-link" href="${attr(toRootHref("handbook/update-project.md"))}"><code>standards.thefocus.ai/handbook/update-project.md</code></a>.</p>
+      </div>
+      <button type="button" data-copy="${attr(id)}" data-enhancement hidden>Copy prompt</button>
+    </div>
+    <details open><summary>Prompt text</summary><pre id="${attr(id)}">${esc(promptText)}</pre></details>
+    <span class="copy-status" role="status" aria-live="polite"></span>
+  </div>`;
+}
+
 function renderTokens(tokens, sourcePath, toHref, linkCodePaths = false) {
+  let renderedUpdatePrompt = false;
   return tokens.map(block => {
+    if (sourcePath === "handbook/update-project.md" && !renderedUpdatePrompt && block.type === "code" && block.lang === "text") {
+      renderedUpdatePrompt = true;
+      return renderPromptBox(block.text, { id: "update-prompt", toRootHref: toHref });
+    }
     let html = block.type === "heading"
       ? `<h${block.level} id="${attr(block.id)}">${inline(block.text)}</h${block.level}>`
       : renderBlock(block);
@@ -282,7 +301,7 @@ function renderPage(page) {
         <p class="eyebrow">${meta ? `§ ${esc(meta.groupNum)} · ${esc(meta.groupTitle)}` : esc(page.path.split("/")[0])} / <span class="status-pill" data-status="${attr(page.status)}">${esc(page.status)}</span> <code class="path-tag">${esc(page.path)}</code></p>
         <h1>${esc(page.title)}</h1>
         <p class="lede">${esc(page.summary)}</p>
-        <p class="notice"><span>${esc(notices[page.status])}</span><a class="notice-source" href="${sourceUrl(page.path)}">Source .md ↗</a></p>
+        <p class="notice"><span>${esc(notices[page.status])}</span><span class="notice-links"><a class="notice-source" href="${attr(toRel(page.path))}">Markdown .md</a> · <a class="notice-source" href="${sourceUrl(page.path)}">GitHub ↗</a></span></p>
       </div>
       <article class="prose">${content}${pager}<p class="source-link"><a href="${sourceUrl(page.path)}">Read or edit the source ↗</a></p></article>
     </div>
@@ -317,17 +336,7 @@ const home = `<div class="reading">
       <p class="eyebrow">TheFocus.AI · How we build</p>
       <h1>Start with the <em>work</em>.</h1>
       <p class="lede">Set up a project. Connect an agent. Ship a verified change. One place for the <span class="ink-mark">decisions, the procedures, and their limits</span> — guidance stays Draft unless a person ratifies it.</p>
-      <div class="prompt-box">
-        <div class="prompt-head">
-          <div>
-            <h2>Bring a repo up to date</h2>
-            <p>Give your coding agent the handbook and a safe starting point from <a class="code-link" href="handbook/update-project.html"><code>handbook/update-project.md</code></a>.</p>
-          </div>
-          <button type="button" data-copy="update-prompt" data-enhancement hidden>Copy prompt</button>
-        </div>
-        <details><summary>Read the prompt</summary><pre id="update-prompt">${esc(corpus.prompt)}</pre></details>
-        <span class="copy-status" role="status"></span>
-      </div>
+      ${renderPromptBox(corpus.prompt, { id: "update-prompt", toRootHref: x => x })}
       <div class="governance-grid" aria-label="Document authority and project maturity">
         <div class="gov-card">
           <div class="gov-head">
@@ -491,8 +500,13 @@ const outputs = new Map([
   ["handbook.css", css],
   ["handbook-client.js", script],
   ["handbook.md", bundle],
+  ["CHANGELOG.md", readFileSync(join(ROOT, "CHANGELOG.md"), "utf8")],
+  ["DESIGN.md", readFileSync(join(ROOT, "DESIGN.md"), "utf8")],
 ]);
-for (const page of corpus.pages) outputs.set(pageUrl(page.path), renderPage(page));
+for (const page of corpus.pages) {
+  outputs.set(pageUrl(page.path), renderPage(page));
+  outputs.set(page.path, readFileSync(join(ROOT, page.path), "utf8"));
+}
 for (const file of FONTS) {
   outputs.set(`fonts/${file}`, readFileSync(join(ROOT, "scripts/assets/fonts", file)));
 }
