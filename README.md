@@ -1,28 +1,88 @@
-# The Focus AI engineering handbook
+# TheFocus.AI engineering handbook
 
-Practical guidance for building, connecting, and shipping projects. Read by task,
-not by document class. The Markdown is the source; GitHub Pages publishes it from
-`main` at <https://standards.thefocus.ai>.
+Practical guidance, platform procedures, dated implementation evidence, and locked agent
+skills for building, connecting, and shipping TheFocus.AI projects. Read by task rather
+than by numbered clause codes. Markdown in this repository is the source of truth;
+GitHub Pages publishes `main` at <https://standards.thefocus.ai>.
 
-Start with [a new project](handbook/project-setup.md), [an existing repo](handbook/update-project.md),
-or [agent integration](handbook/agent-services.md). The update page includes the
-copyable prompt shown on the homepage.
+- **Live handbook:** <https://standards.thefocus.ai>
+- **Skills catalog:** <https://standards.thefocus.ai/skills.html>
+- **Changelog & RSS 2.0 feed:** [CHANGELOG.md](CHANGELOG.md) · <https://standards.thefocus.ai/feed.xml>
+- **Single-file agent bundle:** `https://standards.thefocus.ai/handbook.md`
 
-## Read by task
+Start with [starting a project](handbook/project-setup.md), [updating an existing repo](handbook/update-project.md)
+(which owns the copyable homepage prompt), or [building an agent service](handbook/agent-services.md).
 
-| Work | Start here |
-| --- | --- |
-| Projects and development | [Setup](handbook/project-setup.md), [updates](handbook/update-project.md), [cloud development](handbook/development.md) |
-| Work and review | [Issues, claims, and PRs](handbook/work.md) |
-| Identity and credentials | [Secrets](handbook/secrets.md), [client sign-in](handbook/sign-in.md), [service access](handbook/service-access.md) |
-| Agent integration | [Services](handbook/agent-services.md), [conversations](handbook/conversations.md), [interactive views](handbook/mcp-apps.md) |
-| Verification and release | [Checks, approval, deployment, and recovery](handbook/release.md) |
-| Skills and handbook | [Skills](handbook/skills.md), [maintaining this handbook](handbook/maintaining.md) |
+## Document authority statuses
 
-Guidance marked **Draft** remains proposed. Restructuring it does not ratify it.
-Recipes provide procedures; evidence records dated observations and their limits.
+Every published page declares its authority `status` in frontmatter, enforced by
+`scripts/validate-documents.mjs` and documented in [Maintain the handbook](handbook/maintaining.md#authority-stays-explicit).
+Restructuring or rendering a page never ratifies it; only a person can grant `In force`.
 
-## Run it
+| Status | Current count | Meaning and ratification rule |
+| --- | --- | --- |
+| `Draft` | 14 topics | Proposed guidance. Not an organization-wide obligation unless a project explicitly adopts a named page revision locally. |
+| `In force` | 0 topics | Organization policy ratified by a named person (`approved-by` and ISO `approved-on` required in frontmatter; never inferred by an agent). |
+| `Reference` | 8 recipes | Concrete platform or CLI procedure behind an owning topic, not independent policy. |
+| `Evidence` | 3 records | Dated implementation observation (`checked` ISO date required) with sources and limits, not a claim about current live deployments. |
+
+## Project maturity model
+
+Each target project records its own product maturity, owner approval date, and rationale
+in its root `AGENTS.md` (see [Verify and release](handbook/release.md#name-who-can-release)
+and [templates/default-project/AGENTS.md](templates/default-project/AGENTS.md)).
+
+| Maturity | Verification required | Release approval |
+| --- | --- | --- |
+| Unassessed *(default when omitted)* | Missing maturity is unassessed, **never** an implicit `alpha`. | No delegated release or merge authority is inferred. |
+| `alpha` | Lint, tests, changed-workflow smoke test, and documented known gaps in `docs/testing.md`. | Project owner may explicitly delegate bounded, reversible releases. |
+| `client-testing` | `alpha` checks plus client scenarios and representative non-production data. | Named owner accepts client-visible changes; record agreed client acceptance. |
+| `production` | Regression, auth/isolation/migration checks, candidate smoke test, and tested recovery path. | Recorded release approval and named operational recovery owner. |
+
+Maturity never waives security, secret preflight rules, or independent code review
+([Take work through review](handbook/work.md#keep-approval-independent)). An agent can
+gather verification evidence, but cannot supply a person's required approval. This
+standards repository's own verification coverage and open sign-off/alerting gaps are
+recorded in [docs/testing.md](docs/testing.md) (maturity currently unassessed).
+
+## Corpus index by task and status
+
+### Handbook topics (`handbook/`)
+
+| Section | Topic | Status |
+| --- | --- | --- |
+| 01 · Projects and development | [Start a project](handbook/project-setup.md) | `Draft` |
+| 01 · Projects and development | [Update a project](handbook/update-project.md) | `Draft` |
+| 01 · Projects and development | [Develop in the cloud](handbook/development.md) | `Draft` |
+| 02 · Work and review | [Take work through review](handbook/work.md) | `Draft` |
+| 03 · People, secrets, and access | [Give and remove access](handbook/access.md) | `Draft` |
+| 03 · People, secrets, and access | [Handle secrets](handbook/secrets.md) | `Draft` |
+| 03 · People, secrets, and access | [Isolate client sign-in](handbook/sign-in.md) | `Draft` |
+| 03 · People, secrets, and access | [Authorize service calls](handbook/service-access.md) | `Draft` |
+| 04 · Agent integration | [Build an agent service](handbook/agent-services.md) | `Draft` |
+| 04 · Agent integration | [Run an agent conversation](handbook/conversations.md) | `Draft` |
+| 04 · Agent integration | [Host interactive agent views](handbook/mcp-apps.md) | `Draft` |
+| 05 · Verification and release | [Verify and release](handbook/release.md) | `Draft` |
+| 06 · Skills and this handbook | [Install and maintain skills](handbook/skills.md) | `Draft` |
+| 06 · Skills and this handbook | [Maintain the handbook](handbook/maintaining.md) | `Draft` |
+
+### Platform recipes (`recipes/`) and dated evidence (`evidence/`)
+
+| Kind | Document | Status / Checked |
+| --- | --- | --- |
+| Recipe | [Build an A2A server](recipes/a2a-server.md) | `Reference` |
+| Recipe | [Configure CI and failure routing](recipes/ci.md) | `Reference` |
+| Recipe | [Configure Clerk and social sign-in](recipes/clerk.md) | `Reference` |
+| Recipe | [Configure fnox and secret delivery](recipes/fnox.md) | `Reference` |
+| Recipe | [Deploy on GCP](recipes/gcp.md) | `Reference` |
+| Recipe | [Generate the agent Dockerfile](recipes/generate-dockerfile.md) | `Reference` |
+| Recipe | [Build and release single-file macOS menu bar apps](recipes/macos-menubar-app.md) | `Reference` |
+| Recipe | [Deploy on Vercel](recipes/vercel.md) | `Reference` |
+| Evidence | [Gaia runtime deployment record](evidence/gaia-runtime.md) | `Evidence` (`2026-07-25`) |
+| Evidence | [Component lifecycle reference](evidence/component-lifecycle.md) | `Evidence` (`2026-08-27`) |
+| Evidence | [Workbench, Specialist A, and Specialist B integration](evidence/workbench-integration.md) | `Evidence` (`2026-11-07`) |
+
+## Run and verify
 
 ```sh
 mise trust
@@ -33,26 +93,25 @@ mise run test
 mise run handbook:build
 ```
 
-`mise run handbook:preview` serves `out/handbook/`; expose it through your cloud
-workspace's managed portal. The generated site has task navigation, full-text
-search, a copyable update prompt, a [changelog](CHANGELOG.md) and RSS 2.0 feed
-(`feed.xml`), and a skills catalog derived from the lock and owned skill
-directories. `handbook.md` is its downloadable agent reading copy.
+Useful individual tasks:
 
-The build uses Node built-ins and the repository's small Markdown renderer.
-No documentation framework, runtime service, or new package dependency is required.
+- `mise run handbook:preview` — build `out/handbook/` and serve at `http://localhost:8900/`.
+- `mise run design:validate` — verify [DESIGN.md](DESIGN.md) token references and WCAG AA contrast ratios.
+- `mise run docs:validate` — verify frontmatter metadata, dates, local links, and `handbook/navigation.json` coverage.
+- `mise run skills:check` — validate owned `skills/` frontmatter and `skills/VENDORED.md` parity.
+- `mise run deploy:status` — inspect the GitHub Pages workflow target and recent runs.
+
+The static build uses Node built-ins, self-hosted `Source Serif 4` and `Courier Prime`
+WOFF2 fonts (`scripts/assets/fonts/`), and [DESIGN.md](DESIGN.md) as the single token source.
+Deployments run exclusively from `main` via `.github/workflows/pages.yml`.
 
 ## Source layout
 
-- `CHANGELOG.md`: curated changelog rendered to `changelog.html` and `feed.xml`.
-- `handbook/`: topic pages and navigation.
-- `recipes/`: platform procedures linked from their owning topics.
-- `evidence/`: dated implementation records, not current policy.
-- `skills/`: installable capabilities, with provenance in `VENDORED.md`.
-- `templates/`: project baseline and secret-sync target example.
-- `scripts/`, `tests/`: build, validation, bootstrap, and executable checks.
-
-Deploy through the authorized GitHub Actions Pages workflow, not a workspace
-upload. `mise run deploy:status` shows the configured target and recent runs.
-This repository's actual verification and open operational gaps are recorded in
-[docs/testing.md](docs/testing.md).
+- `DESIGN.md` — palette, typography tokens, visual rules, and verified contrast table.
+- `CHANGELOG.md` — curated updates rendered to `changelog.html` and `feed.xml` (RSS 2.0).
+- `handbook/` — task-oriented guidance and `handbook/navigation.json`.
+- `recipes/` — platform and CLI procedures linked behind their owning topics.
+- `evidence/` — dated implementation records with explicit verification limits.
+- `skills/`, `skills-lock.json` — owned skills, attribution (`skills/VENDORED.md`), and immutable upstream pins.
+- `templates/` — `default-project` scaffold (`AGENTS.md`, `mise.toml`, `docs/testing.md`) and access-map example.
+- `scripts/`, `tests/` — static renderer, offline validators, secret sync, bootstrap, and test suites.

@@ -36,6 +36,7 @@ export function tokensToCss(file) {
   out.push(`  --lh-display: ${t.display?.lineHeight ?? 0.95};`);
   out.push(`  --font-body: ${t.body?.fontFamily ?? "system-ui, sans-serif"};`);
   out.push(`  --lh-body: ${t.body?.lineHeight ?? 1.55};`);
+  out.push(`  --font-sans: ${t.sans?.fontFamily ?? "system-ui, sans-serif"};`);
   out.push(`  --font-mono: ${t.mono?.fontFamily ?? "ui-monospace, monospace"};`);
   out.push(`  --ls-mono: ${t.mono?.letterSpacing ?? "0.1em"};`);
   for (const [k, v] of Object.entries(t.sizes || {})) out.push(`  --size-${k}: ${v};`);

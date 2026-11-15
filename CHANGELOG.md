@@ -8,6 +8,20 @@ Subscribe via [the RSS feed](https://standards.thefocus.ai/feed.xml) to consume 
 entries in Focus.AI Labs or any feed reader. Formatting, typo, and lint-only commits
 are omitted.
 
+## 2026-11-15 — Inkling monograph typography, reading-ruler navigation, and status ledger
+
+Migrated the engineering handbook renderer and `DESIGN.md` tokens to the Inkling
+monograph palette (`sheet`, `page`, petrol `action`, and vermilion `attention`),
+self-hosted `Source Serif 4` and `Courier Prime` WOFF2 fonts, clickable inline document
+path badges, a `⌘K` spotlight palette, per-page authority status badges (`Draft`,
+`In force`, `Reference`, `Evidence`), an overview document-authority and project-maturity
+ledger, and a spatially grounded reading-ruler sidebar whose active bracket and
+scroll-spy bead track the current page's own sections 1:1.
+
+- [Handbook design](DESIGN.md)
+- [Maintain the handbook](handbook/maintaining.md)
+- [Verify and release](handbook/release.md)
+
 ## 2026-11-14 — Curated changelog and RSS 2.0 feed
 
 Added a root `CHANGELOG.md` rendered to `changelog.html` and a deterministic RSS 2.0
