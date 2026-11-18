@@ -52,12 +52,20 @@ an item is titled with the variable it supplies.
 
 | Role | Vault permission | Who |
 | --- | --- | --- |
-| Developer | View and copy | Members of the client group |
-| Project owner | Edit and manage | One named person, plus the Owners group |
+| Developer | View, copy, create, and edit | Members of the client group |
+| Project owner | Archive, delete, and manage | One named person, plus the Owners group |
 | Development environments | `read_items` | The project's service account |
 
 Vault access is fixed when a service account is created and cannot be edited
 later [1]. Changing what a project reads means issuing a new service account.
+
+Developers add and change items with their own sign-in, so the item history
+names who made each change:
+`env -u OP_SERVICE_ACCOUNT_TOKEN op item create --account thefocusai.1password.com ...`.
+The service account stays read-only. Its token is copied into every workspace,
+so a token that could write would let any of them alter or add a value without
+a name attached. Only an owner archives or deletes an item, because other
+checkouts may still depend on it.
 
 ## Keep production out of the project vault
 

@@ -8,6 +8,15 @@ Subscribe via [the RSS feed](https://standards.thefocus.ai/feed.xml) to consume 
 entries in Focus.AI Labs or any feed reader. Formatting, typo, and lint-only commits
 are omitted.
 
+## 2026-11-17 — Client groups may create and edit vault items
+
+Changed the developer role in a project vault from view and copy to view, copy,
+create, and edit, so the people working on a project can add and rotate its
+development values with their own sign-in. Archive and delete stay with the
+project owner, and the project's service account stays read-only.
+
+- [Give and remove access](handbook/access.md)
+
 ## 2026-11-15 — Unified update prompt, raw Markdown endpoints, and company 1Password vault enforcement
 
 Unified the copyable update-project prompt card and JavaScript copy buttons across
